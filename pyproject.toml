@@ -1,7 +1,7 @@
 [project]
 name = "jhutils"
-version = "0.1.0"
-description = "Python AWS Lambda template"
+version = "0.0.0"
+description = "Python utilities by Jireh, for Jireh"
 authors = [
     {name="Jireh Huang", email="ijirehhuang@gmail.com"},
 ]
