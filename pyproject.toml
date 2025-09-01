@@ -10,11 +10,6 @@ packages = [{ include = "jhutils" }]
 
 requires-python = ">=3.12,<4.0"
 dependencies = [
-    "requests>=2.32.4",
-    "types-requests>=2.32.4.20250809",
-    "ask-sdk-core>=1.19.0",
-    "uuid6>=2025.0.1",
-    "numpy>=2.3.2"
 ]
 
 [tool.poetry.group.dev.dependencies]
@@ -28,7 +23,6 @@ pytest-cov = "^6.2.1"
 pytest-randomly = "^3.16.0"
 commitizen = "^4.8.3"
 pre-commit = "^4.3.0"
-python-dotenv = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core"]
