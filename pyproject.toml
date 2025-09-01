@@ -53,7 +53,6 @@ convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D205"] # missing-blank-line-after-summary
-"lambda_function/alexa.py" = ["D102"]  # undocumented-public-method
 "__init__.py" = ["F401"]  # unused-import
 
 [tool.flake8]
@@ -76,7 +75,7 @@ tag_format = "v$version"
 update_changelog_on_bump = true
 
 [tool.pytest.ini_options]
-addopts = "-v --cov=lambda_function --cov-report=term-missing --cov-report=xml:coverage.xml"
+addopts = "-v --cov=jhutils --cov-report=term-missing --cov-report=xml:coverage.xml"
 testpaths = ["tests"]
 markers = [
     "e2e: mark a test as end-to-end (skipped unless --url is provided)"
