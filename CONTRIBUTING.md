@@ -2,19 +2,6 @@
 
 ## Usage
 
-### New AWS user
-
-1. [Create an AWS account](https://signin.aws.amazon.com/signup?request_type=register)
-1. [Add the GitHub OIDC identity provider to AWS IAM](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws#adding-the-identity-provider-to-aws)
-1. [Create GitHub OIDC deploy role](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws#configuring-the-role-and-trust-policy)
-	1. IAM > Roles > Create role
-	1. Trusted entity type: Web identity
-	1. Identity provider: http://tokens.actions.githubusercontent.com/ (created in previous step)
-	1. Specify GitHub organization (`org`), repository, and branch
-	1. Add permissions: `AWSLambda_FullAccess`, `IAMReadOnlyAccess`, and `AmazonAPIGatewayAdministrator`
-	1. Role name: `github-{org}-oidc-lambda-deployer`
-	1. Update `GH_OIDC_ROLE_NAME` in [ci-cd.yml](.github/workflows/ci-cd.yml)
-
 ### New system
 
 1. Install [pyenv](https://github.com/pyenv/pyenv) and run `pyenv install X.Y` to install Python X.Y
@@ -29,11 +16,6 @@ I want to set up remote development using the Visual Studio Code Remote - SSH ex
 ```
 
 If on Mac OS, make sure to [give Local Network access to VS Code](https://github.com/microsoft/vscode/issues/228862#issuecomment-2358636415).
-
-### New Lambda project
-
-1. Use this template > Create a new repository
-1. Issues > New issue > Convert template
 
 ### New clone of repository
 
