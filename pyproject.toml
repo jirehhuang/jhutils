@@ -1,18 +1,16 @@
-[tool.poetry]
-name = "python-lambda-template"
-version = "0.1.0"
-description = "Python AWS Lambda template"
-authors = ["Jireh Huang <ijirehhuang@gmail.com>"]
+[project]
+name = "jhutils"
+version = "0.0.0"
+description = "Python utilities by Jireh, for Jireh"
+authors = [
+    {name="Jireh Huang", email="ijirehhuang@gmail.com"},
+]
 readme = "README.md"
-packages = [{ include = "lambda_function" }]
+requires-python = ">=3.12, <4.0"
+dependencies = []
 
-[tool.poetry.dependencies]
-python = "^3.12"
-requests = "^2.32.4"
-types-requests = "^2.32.4.20250809"
-ask-sdk-core = "^1.19.0"
-uuid6 = "^2025.0.1"
-numpy = "^2.3.2"
+[tool.poetry]
+packages = [{ include = "jhutils" }]
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
@@ -25,7 +23,6 @@ pytest-cov = "^6.2.1"
 pytest-randomly = "^3.16.0"
 commitizen = "^4.8.3"
 pre-commit = "^4.3.0"
-python-dotenv = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -53,7 +50,6 @@ convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["D205"] # missing-blank-line-after-summary
-"lambda_function/alexa.py" = ["D102"]  # undocumented-public-method
 "__init__.py" = ["F401"]  # unused-import
 
 [tool.flake8]
@@ -76,7 +72,7 @@ tag_format = "v$version"
 update_changelog_on_bump = true
 
 [tool.pytest.ini_options]
-addopts = "-v --cov=lambda_function --cov-report=term-missing --cov-report=xml:coverage.xml"
+addopts = "-v --cov=jhutils --cov-report=term-missing --cov-report=xml:coverage.xml"
 testpaths = ["tests"]
 markers = [
     "e2e: mark a test as end-to-end (skipped unless --url is provided)"
