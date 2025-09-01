@@ -1,6 +1,6 @@
-# `python-lambda-template`
+# `jhutils`
 
-This repository contains utilities developed by Jireh Huang for his own interests and personal projects.
+This repository contains Python utilities developed by Jireh for his own interests and personal projects.
 
 ## Contributing
 
