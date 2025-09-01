@@ -1,18 +1,21 @@
-[tool.poetry]
-name = "python-lambda-template"
+[project]
+name = "jhutils"
 version = "0.1.0"
 description = "Python AWS Lambda template"
-authors = ["Jireh Huang <ijirehhuang@gmail.com>"]
+authors = [
+    {name="Jireh Huang", email="ijirehhuang@gmail.com"},
+]
 readme = "README.md"
-packages = [{ include = "lambda_function" }]
+packages = [{ include = "jhutils" }]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-requests = "^2.32.4"
-types-requests = "^2.32.4.20250809"
-ask-sdk-core = "^1.19.0"
-uuid6 = "^2025.0.1"
-numpy = "^2.3.2"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "requests>=2.32.4",
+    "types-requests>=2.32.4.20250809",
+    "ask-sdk-core>=1.19.0",
+    "uuid6>=2025.0.1",
+    "numpy>=2.3.2"
+]
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
