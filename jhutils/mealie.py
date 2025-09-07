@@ -61,7 +61,7 @@ class Mealie:
                 response = self._request(
                     "GET",
                     "api/foods",
-                    params=params.update({"perPage": total}),
+                    params=params | {"perPage": total},
                 )
             self._foods = response["items"]
 
