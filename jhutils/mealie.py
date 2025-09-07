@@ -14,7 +14,10 @@ class Mealie:
     def __init__(self, api_url: str, api_key: str) -> None:
         self._shopping_list_id: str | None = None
 
-        self._api_url = api_url.rstrip("/")
+        self._foods: Optional[List[Dict[str, Any]]] = None
+        self._shopping_items: Optional[List[Dict[str, Any]]] = None
+
+        self._api_url: str = api_url.rstrip("/")
 
         self.session = requests.Session()
         self.session.headers.update(
@@ -40,62 +43,85 @@ class Mealie:
 
         return response.json()
 
-    def get_foods(self, initial_perPage: int=N_FOODS) -> Dict[str, Any]:
+    def load_foods(
+        self, initial_per_page: int = N_FOODS, force: bool = False
+    ) -> List[Dict[str, Any]]:
         """Retrieve foods data."""
-        params = {
-            "page": 1,
-            "perPage": initial_perPage,
-            "orderBy": "name",
-            "orderDirection": "asc",
-        }
-        response = self._request("GET", "api/foods", params=params)
+        if self._foods is None or force:
+            params = {
+                "page": 1,
+                "perPage": initial_per_page,
+                "orderBy": "name",
+                "orderDirection": "asc",
+            }
+            response = self._request("GET", "api/foods", params=params)
 
-        total = response["total"]
-        if total > initial_perPage:
-            response = self._request(
-                "GET", "api/foods", params=params.update({"perPage": total})
-            )
+            total = response["total"]
+            if total > initial_per_page:
+                response = self._request(
+                    "GET",
+                    "api/foods",
+                    params=params.update({"perPage": total}),
+                )
+            self._foods = response["items"]
 
-        return response["items"]
+        return self._foods
+
+    @property
+    def foods(self) -> List[Dict[str, Any]]:
+        """Getter for foods data."""
+        return self.load_foods()
 
     @property
     def shopping_list_id(self) -> str | None:
-        """Setter and getter for the shopping list ID."""
+        """Getter and setter for the shopping list ID."""
         return self._shopping_list_id
 
     @shopping_list_id.setter
     def shopping_list_id(self, shopping_list_id: str) -> None:
         self._shopping_list_id = shopping_list_id
 
-    def get_shopping_items(self, perPage: int=N_ITEMS) -> List[Dict[str, Any]]:
+    def load_shopping_items(
+        self, per_page: int = N_ITEMS, force: bool = False
+    ) -> List[Dict[str, Any]]:
         """Retrieve unchecked items from Mealie shopping lists."""
-        params = {
-            "page": 1,
-            "perPage": perPage,
-            "orderBy": "checked",
-            "orderDirection": "asc",
-        }
-        items = []
-        while True:
-            response = self._request(
-                "GET", "api/households/shopping/items", params=params
-            )
-            new_items = [
-                item for item in response["items"] if not item["checked"]
-            ]
-            items.extend(new_items)
-            if len(new_items) < perPage or not response["next"]:
-                break
+        if self._shopping_items is None or force:
+            page = 1
+            params = {
+                "page": page,
+                "perPage": per_page,
+                "orderBy": "checked",
+                "orderDirection": "asc",
+            }
+            items = []
+            while True:
+                response = self._request(
+                    "GET", "api/households/shopping/items", params=params
+                )
+                new_items = [
+                    item for item in response["items"] if not item["checked"]
+                ]
+                items.extend(new_items)
+                if len(new_items) < per_page or not response["next"]:
+                    break
 
-            params["page"] += 1
+                page += 1
+                params["page"] = page
 
-        if self._shopping_list_id:
-            items = [
-                item
-                for item in items
-                if item["shoppingListId"] == self._shopping_list_id
-            ]
-        return items
+            if self._shopping_list_id:
+                items = [
+                    item
+                    for item in items
+                    if item["shoppingListId"] == self._shopping_list_id
+                ]
+            self._shopping_items = items
+
+        return self._shopping_items
+
+    @property
+    def shopping_items(self) -> List[Dict[str, Any]]:
+        """Get shopping items."""
+        return self.load_shopping_items()
 
     def add_shopping_items(self, items: List[Dict[str, Any]]):
         """Add items to the shopping list."""
