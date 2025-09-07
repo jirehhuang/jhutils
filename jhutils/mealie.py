@@ -79,6 +79,9 @@ class Mealie:
 
     @shopping_list_id.setter
     def shopping_list_id(self, shopping_list_id: str) -> None:
+        # If the shopping list ID changes, reset the cached shopping items
+        if shopping_list_id != self._shopping_list_id:
+            self._shopping_items = None
         self._shopping_list_id = shopping_list_id
 
     def load_shopping_items(
