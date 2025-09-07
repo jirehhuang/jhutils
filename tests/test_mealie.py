@@ -3,9 +3,9 @@
 import pytest
 
 
-def test_get_foods(mealie):
-    """Test that method .get_foods() executes successfully."""
-    foods = mealie.get_foods(initial_perPage=1)
+def test_load_foods(mealie):
+    """Test that method .load_foods() executes successfully."""
+    foods = mealie.load_foods(initial_per_page=1)
     assert isinstance(foods, list)
 
 
@@ -17,16 +17,18 @@ def test_set_shopping_list(mealie, mealie_shopping_list_id):
     assert not mealie.shopping_list_id
 
 
-def test_get_shopping_items(mealie):
-    """Test that method .get_shopping_items() executes successfully."""
-    items = mealie.get_shopping_items(perPage=1)
+def test_load_shopping_items(mealie):
+    """Test that method .load_shopping_items() executes successfully."""
+    items = mealie.load_shopping_items(per_page=1)
     assert isinstance(items, list)
 
 
-def test_get_shopping_items_invalid_list(mealie):
-    """Test that method .get_shopping_items() executes successfully."""
+def test_load_shopping_items_invalid_list(mealie):
+    """Test that an empty shopping list is returned when an invalid list ID is
+    provided.
+    """
     mealie.shopping_list_id = "invalid_id"
-    items = mealie.get_shopping_items()
+    items = mealie.load_shopping_items()
     assert not items
 
 
@@ -44,7 +46,7 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     """Test that items can be successfully added to and deleted from a shopping
     list.
     """
-    items_before = mealie.get_shopping_items()
+    items_before = mealie.load_shopping_items()
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [
         {"isFood": False, "note": "non-food example"},
@@ -61,5 +63,5 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
             for item in response["createdItems"] + response["updatedItems"]
         ]
     )
-    items_after = mealie.get_shopping_items()
+    items_after = mealie.load_shopping_items()
     assert items_before == items_after
