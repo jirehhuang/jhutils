@@ -46,6 +46,7 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     """Test that items can be successfully added to and deleted from a shopping
     list.
     """
+    mealie.shopping_list_id = None
     items_before = mealie.load_shopping_items()
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [
