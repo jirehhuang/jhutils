@@ -58,6 +58,10 @@ jobs:
           fi
 
       - name: Run tests
+        env:
+          MEALIE_API_URL: ${{ secrets.MEALIE_API_URL }}
+          MEALIE_API_KEY: ${{ secrets.MEALIE_API_KEY }}
+          MEALIE_SHOPPING_LIST_ID: ${{ secrets.MEALIE_SHOPPING_LIST_ID }}
         run: poetry run pytest
 
       - name: Check coverage
