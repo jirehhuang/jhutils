@@ -54,7 +54,7 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
         {
             "isFood": True,
             "note": "food example",
-            "foodId": "6062b2b6-1476-4b37-933b-b1866c9a4857",
+            "foodId": mealie.foods[0]["id"],
         },
     ]
     response = mealie.add_shopping_items(items)
