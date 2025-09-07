@@ -141,7 +141,7 @@ class Mealie:
             data=items,
         )
 
-    def delete_shopping_items(self, ids: Dict[str, Any]):
+    def delete_shopping_items(self, ids: List[str]):
         """Delete items from the shopping list by ID."""
         return self._request(
             "DELETE",
