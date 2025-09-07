@@ -29,7 +29,7 @@ def fixture_mealie_shopping_list_id():
     return os.getenv("MEALIE_SHOPPING_LIST_ID", "")
 
 
-@pytest.fixture(name="mealie", scope="session")
+@pytest.fixture(name="mealie", scope="function")
 def fixture_mealie(mealie_api_url, mealie_api_key):
     """Return Mealie client object."""
     return Mealie(

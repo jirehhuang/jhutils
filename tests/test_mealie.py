@@ -1,5 +1,6 @@
 """Test Mealie module."""
 
+import numpy as np
 import pytest
 
 
@@ -18,9 +19,9 @@ def test_set_shopping_list(mealie, mealie_shopping_list_id):
 
 
 def test_load_shopping_items(mealie):
-    """Test that method .load_shopping_items() executes successfully."""
-    items = mealie.load_shopping_items(per_page=1)
-    assert isinstance(items, list)
+    """Test that shopping_items property can be successfully retrieved."""
+    items = mealie.load_shopping_items(per_page=1, force=True)
+    assert np.array_equal(items, mealie.shopping_items)
 
 
 def test_load_shopping_items_invalid_list(mealie):
@@ -28,7 +29,7 @@ def test_load_shopping_items_invalid_list(mealie):
     provided.
     """
     mealie.shopping_list_id = "invalid_id"
-    items = mealie.load_shopping_items()
+    items = mealie.shopping_items
     assert not items
 
 
@@ -36,7 +37,6 @@ def test_add_shopping_items_no_list(mealie):
     """Test that a ValueError is raised when attempting to add items without a
     shopping list.
     """
-    mealie.shopping_list_id = None
     msg = "Item is missing required key shoppingListId"
     with pytest.raises(ValueError, match=msg):
         mealie.add_shopping_items([{"note": "potatoes"}])
@@ -46,8 +46,7 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     """Test that items can be successfully added to and deleted from a shopping
     list.
     """
-    mealie.shopping_list_id = None
-    items_before = mealie.shopping_items
+    items_before = mealie.load_shopping_items(force=True)
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [
         {"isFood": False, "note": "non-food example"},
