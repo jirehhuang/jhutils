@@ -5,7 +5,7 @@ import pytest
 
 def test_load_foods(mealie):
     """Test that method .load_foods() executes successfully."""
-    foods = mealie.load_foods(initial_per_page=1)
+    foods = mealie.load_foods(initial_per_page=1, force=True)
     assert isinstance(foods, list)
 
 
@@ -47,7 +47,7 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     list.
     """
     mealie.shopping_list_id = None
-    items_before = mealie.load_shopping_items()
+    items_before = mealie.shopping_items
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [
         {"isFood": False, "note": "non-food example"},
@@ -64,5 +64,5 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
             for item in response["createdItems"] + response["updatedItems"]
         ]
     )
-    items_after = mealie.load_shopping_items()
+    items_after = mealie.load_shopping_items(force=True)
     assert items_before == items_after

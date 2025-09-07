@@ -105,11 +105,12 @@ class Mealie:
                     item for item in response["items"] if not item["checked"]
                 ]
                 items.extend(new_items)
-                if len(new_items) < per_page or not response["next"]:
-                    break
 
                 page += 1
                 params["page"] = page
+
+                if len(new_items) < per_page or not response["next"]:
+                    break
 
             if self._shopping_list_id:
                 items = [
