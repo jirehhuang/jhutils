@@ -36,6 +36,11 @@ class Obsidian:
 
         return response.json()
 
+    @property
+    def files(self) -> Dict[str, Any]:
+        """Getter for the files."""
+        return self._files
+
     def list_files(self, path: str = "") -> list:
         """List files from a folder in the repository."""
         response = self._request("GET", f"{path}?ref={self._branch}")
