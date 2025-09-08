@@ -7,6 +7,7 @@ import pytest
 from dotenv import load_dotenv
 
 from jhutils.mealie import Mealie
+from jhutils.obsidian import Obsidian
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
@@ -23,4 +24,15 @@ def fixture_mealie():
     return Mealie(
         api_url=os.getenv("MEALIE_API_URL", ""),
         api_key=os.getenv("MEALIE_API_KEY", ""),
+    )
+
+
+@pytest.fixture(name="obsidian", scope="function")
+def fixture_obsidian():
+    """Return Obsidian client object."""
+    return Obsidian(
+        owner=os.getenv("OBSIDIAN_VAULT_OWNER", ""),
+        repository=os.getenv("OBSIDIAN_VAULT_REPOSITORY", ""),
+        branch=os.getenv("OBSIDIAN_VAULT_BRANCH", ""),
+        github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
     )
