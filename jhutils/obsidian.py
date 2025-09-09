@@ -27,32 +27,72 @@ class Obsidian:
         endpoint: str,
         params: Optional[Dict[str, Any]] = None,
         data: Optional[Dict[str, Any] | List[Dict[str, Any]]] = None,
-    ) -> Dict[str, Any] | List[Dict[str, Any]]:
+    ) -> Dict[str, Any]:
         """Make API request to endpoint with error handling."""
         url = f"{self._api_url}/{endpoint.lstrip('/')}"
 
         response = self.session.request(method, url, params=params, json=data)
         response.raise_for_status()
 
-        return response.json()
+        response_json = response.json()
+        if isinstance(response_json, list):
+            response_json = {"content": response_json}
+
+        return response_json
 
     @property
     def files(self) -> Dict[str, Any]:
         """Getter for the files."""
         return self._files
 
-    def list_files(self, path: str = "") -> list:
+    def list_files(self, path: str = "") -> List[Dict[str, Any]]:
         """List files from a folder in the repository."""
         response = self._request("GET", f"{path}?ref={self._branch}")
-        self._files.update({path: response})
+        self._files.update({path: response["content"]})
         return self._files[path]
 
-    def read_file(self, file_path: str) -> None:
+    def read_file(self, file_path: str) -> Dict[str, Any]:
         """Read a file from the repository."""
         response = self._request("GET", f"{file_path}?ref={self._branch}")
         if isinstance(response, dict):
             response.update(
-                {"body": base64.b64decode(response["content"]).decode("utf-8")}
+                {
+                    "content": base64.b64decode(response["content"]).decode(
+                        "utf-8"
+                    )
+                }
             )
         self._files.update({file_path: response})
         return self._files[file_path]
+
+    def add_file(self, file_path: str, content: str) -> Dict[str, Any]:
+        """Add a new file to the repository."""
+        data = {
+            "message": f"add {file_path}",
+            "content": base64.b64encode(content.encode("utf-8")).decode(
+                "utf-8"
+            ),
+            "branch": self._branch,
+        }
+        return self._request("PUT", file_path, data=data)
+
+    def delete_file(self, file_path: str) -> Dict[str, Any]:
+        """Delete a file from the repository."""
+        data = {
+            "message": f"delete {file_path}",
+            "sha": self.read_file(file_path)["sha"],
+            "branch": self._branch,
+        }
+        return self._request("DELETE", file_path, data=data)
+
+    def update_file(self, file_path: str, content: str) -> Dict[str, Any]:
+        """Update an existing file in the repository."""
+        data = {
+            "message": f"update {file_path}",
+            "content": base64.b64encode(content.encode("utf-8")).decode(
+                "utf-8"
+            ),
+            "sha": self.read_file(file_path)["sha"],
+            "branch": self._branch,
+        }
+        return self._request("PUT", file_path, data=data)
