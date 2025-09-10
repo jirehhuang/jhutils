@@ -55,14 +55,9 @@ class Obsidian:
     def read_file(self, file_path: str) -> Dict[str, Any]:
         """Read a file from the repository."""
         response = self._request("GET", f"{file_path}?ref={self._branch}")
-        if isinstance(response, dict):
-            response.update(
-                {
-                    "content": base64.b64decode(response["content"]).decode(
-                        "utf-8"
-                    )
-                }
-            )
+        response.update(
+            {"content": base64.b64decode(response["content"]).decode("utf-8")}
+        )
         self._files.update({file_path: response})
         return self._files[file_path]
 
