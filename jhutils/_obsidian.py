@@ -21,6 +21,7 @@ class Obsidian:
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"token {github_token}"})
 
+    # pylint: disable=duplicate-code
     def _request(
         self,
         method: str,

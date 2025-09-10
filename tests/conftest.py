@@ -6,8 +6,7 @@ from pathlib import Path
 import pytest
 from dotenv import load_dotenv
 
-from jhutils.mealie import Mealie
-from jhutils.obsidian import Obsidian
+from jhutils import Mealie, Obsidian
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
