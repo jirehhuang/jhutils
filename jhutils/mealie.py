@@ -41,7 +41,11 @@ class Mealie:
         response = self.session.request(method, url, params=params, json=data)
         response.raise_for_status()
 
-        return response.json()
+        response_json = response.json()
+        if isinstance(response_json, list):
+            response_json = {"content": response_json}
+
+        return response_json
 
     def load_foods(
         self, initial_per_page: int = N_FOODS, force: bool = False
