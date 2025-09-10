@@ -72,23 +72,35 @@ class Obsidian:
         }
         return self._request("PUT", file_path, data=data)
 
-    def delete_file(self, file_path: str) -> Dict[str, Any]:
+    def delete_file(
+        self, file_path: str, sha: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Delete a file from the repository."""
+        if sha is None:
+            sha = self._files.get(file_path, {}).get("sha")
+            if sha is None:
+                sha = self.read_file(file_path)["sha"]
         data = {
             "message": f"delete {file_path}",
-            "sha": self.read_file(file_path)["sha"],
+            "sha": sha,
             "branch": self._branch,
         }
         return self._request("DELETE", file_path, data=data)
 
-    def update_file(self, file_path: str, content: str) -> Dict[str, Any]:
+    def update_file(
+        self, file_path: str, content: str, sha: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Update an existing file in the repository."""
+        if sha is None:
+            sha = self._files.get(file_path, {}).get("sha")
+            if sha is None:
+                sha = self.read_file(file_path)["sha"]
         data = {
             "message": f"update {file_path}",
             "content": base64.b64encode(content.encode("utf-8")).decode(
                 "utf-8"
             ),
-            "sha": self.read_file(file_path)["sha"],
+            "sha": sha,
             "branch": self._branch,
         }
         return self._request("PUT", file_path, data=data)
