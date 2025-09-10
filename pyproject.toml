@@ -54,7 +54,10 @@ ignore = []
 convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D205"] # missing-blank-line-after-summary
+"tests/*" = [
+    "D205",  # missing-blank-line-after-summary
+    "D209"  # new-line-after-last-paragraph
+]
 "__init__.py" = ["F401"]  # unused-import
 
 [tool.flake8]

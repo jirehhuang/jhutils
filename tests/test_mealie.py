@@ -26,8 +26,7 @@ def test_load_shopping_items(mealie):
 
 def test_load_shopping_items_invalid_list(mealie):
     """Test that an empty shopping list is returned when an invalid list ID is
-    provided.
-    """
+    provided."""
     mealie.shopping_list_id = "invalid_id"
     items = mealie.shopping_items
     assert not items
@@ -35,8 +34,7 @@ def test_load_shopping_items_invalid_list(mealie):
 
 def test_add_shopping_items_no_list(mealie):
     """Test that a ValueError is raised when attempting to add items without a
-    shopping list.
-    """
+    shopping list."""
     msg = "Item is missing required key shoppingListId"
     with pytest.raises(ValueError, match=msg):
         mealie.add_shopping_items([{"note": "potatoes"}])
@@ -44,8 +42,7 @@ def test_add_shopping_items_no_list(mealie):
 
 def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     """Test that items can be successfully added to and deleted from a shopping
-    list.
-    """
+    list."""
     items_before = mealie.load_shopping_items(force=True)
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [

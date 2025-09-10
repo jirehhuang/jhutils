@@ -14,7 +14,7 @@ class Mealie:
     def __init__(self, api_url: str, api_key: str) -> None:
         self._shopping_list_id: str | None = None
 
-        self._foods: Optional[List[Dict[str, Any]]] = None
+        self._foods: List[Dict[str, Any]] = []
         self._shopping_items: Optional[List[Dict[str, Any]]] = None
 
         self._api_url: str = api_url.rstrip("/")
@@ -41,13 +41,17 @@ class Mealie:
         response = self.session.request(method, url, params=params, json=data)
         response.raise_for_status()
 
-        return response.json()
+        response_json = response.json()
+        if isinstance(response_json, list):
+            response_json = {"content": response_json}
+
+        return response_json
 
     def load_foods(
         self, initial_per_page: int = N_FOODS, force: bool = False
     ) -> List[Dict[str, Any]]:
         """Retrieve foods data."""
-        if self._foods is None or force:
+        if not self._foods or force:
             params = {
                 "page": 1,
                 "perPage": initial_per_page,

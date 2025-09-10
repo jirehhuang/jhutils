@@ -1,1 +1,4 @@
-"""Utilities by Jireh Huang for Jireh Huang."""
+"""Utilities by Jireh for Jireh."""
+
+from ._mealie import Mealie
+from ._obsidian import Obsidian

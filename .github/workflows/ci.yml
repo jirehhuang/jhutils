@@ -62,6 +62,10 @@ jobs:
           MEALIE_API_URL: ${{ secrets.MEALIE_API_URL }}
           MEALIE_API_KEY: ${{ secrets.MEALIE_API_KEY }}
           MEALIE_SHOPPING_LIST_ID: ${{ secrets.MEALIE_SHOPPING_LIST_ID }}
+          OBSIDIAN_VAULT_OWNER: ${{ secrets.OBSIDIAN_VAULT_OWNER }}
+          OBSIDIAN_VAULT_REPOSITORY: ${{ secrets.OBSIDIAN_VAULT_REPOSITORY }}
+          OBSIDIAN_VAULT_BRANCH: ${{ secrets.OBSIDIAN_VAULT_BRANCH }}
+          OBSIDIAN_VAULT_TOKEN: ${{ secrets.OBSIDIAN_VAULT_TOKEN }}
         run: poetry run pytest
 
       - name: Check coverage
