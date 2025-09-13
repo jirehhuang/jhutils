@@ -12,14 +12,17 @@ def func_numpy(a: int = 1, b: int = 2) -> int:
     Parameters
     ----------
     a : int
-        First number.
+        First
+        number.
     b : int
-        Second number.
+        Second
+        number.
 
     Returns
     -------
     int
-        Sum of the numbers.
+        Sum of the
+        numbers.
     """
     return a + b
 
@@ -28,11 +31,13 @@ def func_google(name: str = "") -> None:
     """Say hello.
 
     Args:
-        name (str): Person's name.
+        name (str): Person's
+            name.
 
     Returns
     -------
-        None: Nothing is returned.
+        None: Nothing is
+            returned.
     """
     print(f"Hello, {name}!")
 
@@ -45,12 +50,14 @@ def func_mixed(x: float = 1.0) -> float:
     Parameters
     ----------
     x : float
-        Value to square.
+        Value to
+        square.
 
     Returns
     -------
     float
-        Squared value.
+        Squared
+        value.
 
     Notes
     -----
