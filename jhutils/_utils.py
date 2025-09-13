@@ -1,3 +1,5 @@
+"""General utility functions."""
+
 import textwrap
 from typing import Optional
 
