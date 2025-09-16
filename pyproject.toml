@@ -11,6 +11,7 @@ dependencies = [
     "requests (>=2.32.5,<3.0.0)",
     "types-requests (>=2.32.4.20250809,<3.0.0.0)",
     "docstring-parser (>=0.17.0,<0.18.0)",
+    "atomic-agents (>=2.1.0,<3.0.0)",
 ]
 
 [tool.poetry]
