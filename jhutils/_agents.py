@@ -88,6 +88,11 @@ class ToolSchedulingAgent(ToolCallingAgent):
         self._mock_registry = mock_registry or {}
         super().__init__(*args, tools=self._prepared_tools, **kwargs)
 
+    @property
+    def actions(self) -> list[dict[str, Any]]:
+        """Getter for the actions."""
+        return self._actions
+
     def _prepare_tool(self, tool: Callable):
         """Prepare a tool for use by the agent.
 
