@@ -5,3 +5,8 @@ from ._add_shopping_items import (
     AddShoppingItemsInputSchema,
     AddShoppingItemsTool,
 )
+from ._add_tasks import (
+    AddTasksConfig,
+    AddTasksInputSchema,
+    AddTasksTool,
+)
