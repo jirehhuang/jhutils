@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 from dotenv import load_dotenv
-from smolagents import LiteLLMModel
 
 from jhutils import Mealie, Obsidian
 
@@ -35,14 +34,4 @@ def fixture_obsidian():
         repository=os.getenv("OBSIDIAN_VAULT_REPOSITORY", ""),
         branch=os.getenv("OBSIDIAN_VAULT_BRANCH", ""),
         github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
-    )
-
-
-@pytest.fixture(name="llm", scope="module")
-def fixture_llm():
-    """Return fixture for the LLM instance."""
-    return LiteLLMModel(
-        model_id="openrouter/openai/gpt-4o-mini",
-        token=os.getenv("OPENROUTER_API_KEY"),
-        temperature=0.0,
     )
