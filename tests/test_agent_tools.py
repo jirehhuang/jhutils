@@ -1,6 +1,6 @@
 """Tests for the agent tools module."""
 
-from jhutils.agent_tools import (
+from jhutils.agents.tools import (
     AddShoppingItemsInputSchema,
     AddShoppingItemsTool,
     AddTasksInputSchema,
