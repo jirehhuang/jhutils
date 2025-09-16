@@ -47,11 +47,15 @@ def func_mixed(x: float = 1.0) -> float:
 
     Square a number and return the result.
 
+    This is a new paragraph in the long description.
+
     Parameters
     ----------
     x : float
         Value to
         square.
+        - Bullet point in a list
+        - Another bullet point
 
     Returns
     -------
