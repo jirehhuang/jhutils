@@ -32,8 +32,10 @@ class AddTasksConfig(BaseToolConfig):
 class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
     """Add multiple tasks to the task list.
 
-    Args:
-        config (AddTasksConfig): Configuration for the tool.
+    Parameters
+    ----------
+    config : AddTasksConfig
+        Configuration for the tool.
 
     Attributes
     ----------
@@ -52,8 +54,10 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
     def run(self, params: AddTasksInputSchema) -> AddTasksOutputSchema:
         """Execute the AddTasksTool with the given parameters.
 
-        Args:
-            params (AddTasksInputSchema): The input parameters for the tool.
+        Parameters
+        ----------
+        params : AddTasksInputSchema
+            The input parameters for the tool.
 
         Returns
         -------

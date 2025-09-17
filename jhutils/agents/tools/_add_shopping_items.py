@@ -8,7 +8,10 @@ class AddShoppingItemsInputSchema(BaseIOSchema):
     """Input schema for items to add to the shopping list."""
 
     items: List[str] = Field(
-        ..., description="Individual shopping items to add."
+        ...,
+        description=(
+            "Individual shopping items to add. Do not capitalize items."
+        ),
     )
 
 
@@ -29,8 +32,10 @@ class AddShoppingItemsTool(
 ):
     """Add multiple items to the shopping list.
 
-    Args:
-        config (AddShoppingItemsConfig): Configuration for the tool.
+    Parameters
+    ----------
+    config : AddShoppingItemsConfig
+        Configuration for the tool.
 
     Attributes
     ----------
@@ -53,9 +58,10 @@ class AddShoppingItemsTool(
     ) -> AddShoppingItemsOutputSchema:
         """Execute the AddShoppingItemsTool with the given parameters.
 
-        Args:
-            params (AddShoppingItemsInputSchema): The input parameters for the
-                tool.
+        Parameters
+        ----------
+        params : AddShoppingItemsInputSchema
+            The input parameters for the tool.
 
         Returns
         -------
