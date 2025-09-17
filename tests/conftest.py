@@ -3,6 +3,8 @@
 import os
 from pathlib import Path
 
+import instructor
+import openai
 import pytest
 from dotenv import load_dotenv
 
@@ -34,4 +36,15 @@ def fixture_obsidian():
         repository=os.getenv("OBSIDIAN_VAULT_REPOSITORY", ""),
         branch=os.getenv("OBSIDIAN_VAULT_BRANCH", ""),
         github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
+    )
+
+
+@pytest.fixture(name="openrouter_client", scope="function")
+def fixture_openrouter_client():
+    """Return OpenRouter client object."""
+    return instructor.from_openai(
+        openai.OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+        )
     )
