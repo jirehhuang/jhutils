@@ -1,4 +1,4 @@
-"""Tests for the agent tools module."""
+"""Test the agent tools module."""
 
 from jhutils.agents.tools import (
     AddShoppingItemsInputSchema,
