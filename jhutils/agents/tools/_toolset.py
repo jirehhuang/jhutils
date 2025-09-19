@@ -21,10 +21,11 @@ ToolList: TypeAlias = list[BaseTool]
 AVAILABLE_MODES = list(get_args(AvailableModes))
 
 
-class Toolset:
+class _Toolset:
     """Class for managing tools."""
 
     _all_tools: ToolList = TOOLS
+    _tools: ToolList = TOOLS
 
     def __init__(self, mode: AvailableModes = "default"):
         """Initialize the Toolset with a list of tools."""
@@ -56,7 +57,7 @@ class Toolset:
         if mode == "shopping":
             self._tools = [
                 tool
-                for tool in self._tools
+                for tool in self._all_tools
                 if tool.__qualname__ in SHOPPING_TOOL_NAMES
             ]
         else:  # mode == "default"
@@ -67,24 +68,26 @@ class Toolset:
         """Get the names of all tools in the toolset."""
         return [tool.__qualname__ for tool in self._tools]
 
-    def get_tool(self, name: AvailableTools) -> BaseTool:
+    def get_tool(self, tool_name: AvailableTools) -> BaseTool:
         """Get a tool by its name."""
         for tool in self._tools:
-            if tool.__qualname__ == name:
+            if tool.__qualname__ == tool_name:
                 return tool
-        raise ValueError(f"Tool with name {name} not found in the toolset.")
+        raise ValueError(
+            f"Tool with name '{tool_name}' not found in the toolset."
+        )
 
-    def get_input_schema(self, name: AvailableTools) -> BaseIOSchema:
+    def get_input_schema(self, tool_name: AvailableTools) -> BaseIOSchema:
         """Get the input schema constructor for a tool by its name."""
-        return self.get_tool(name).input_schema
+        return self.get_tool(tool_name).input_schema
 
-    def get_output_schema(self, name: AvailableTools) -> BaseIOSchema:
+    def get_output_schema(self, tool_name: AvailableTools) -> BaseIOSchema:
         """Get the output schema constructor for a tool by its name."""
-        return self.get_tool(name).output_schema
+        return self.get_tool(tool_name).output_schema
 
-    def get_config(self, name: AvailableTools) -> BaseToolConfig:
+    def get_config(self, tool_name: AvailableTools) -> BaseToolConfig:
         """Get the config constructor for a tool by its name."""
-        return self.get_tool(name).config_cls
+        return self.get_tool(tool_name).config_cls
 
 
-toolset = Toolset()
+toolset = _Toolset()
