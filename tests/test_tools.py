@@ -1,5 +1,6 @@
 """Test the agent tools module."""
 
+import numpy as np
 import pytest
 from pydantic import ValidationError
 
@@ -8,6 +9,12 @@ from jhutils.agents.tools import (
     AddTasksTool,
     MakeChainToolOutputSchema,
     RespondTool,
+)
+from jhutils.agents.tools._toolset import (
+    DEFAULT_TOOL_NAMES,
+    SHOPPING_TOOL_NAMES,
+    TOOLS,
+    _Toolset,
 )
 
 REMAINDER = "Unaddressed part of the user query."
@@ -84,3 +91,70 @@ def test_schema_none_valid_tool(add_tasks_input):
         next_tool=None,
     )
     assert schema.next_tool is None
+
+
+@pytest.fixture(name="toolset_", scope="function")
+def fixture_toolset_():
+    """Return the default instance of _Toolset."""
+    return _Toolset()
+
+
+@pytest.mark.parametrize(
+    "mode, tool_names",
+    [
+        ("default", DEFAULT_TOOL_NAMES),
+        ("shopping", SHOPPING_TOOL_NAMES),
+    ],
+)
+def test_toolset_constructs_with_mode(mode, tool_names):
+    """Test that _Toolset constructs correctly with different modes, as well
+    as tool_names property."""
+    toolset_ = _Toolset(mode=mode)
+    assert toolset_.mode == mode
+    assert np.all(toolset_.tool_names == tool_names)
+
+
+def test_toolset_all_tools(toolset_):
+    """Test that _Toolset.all_tools property getter correctly returns the
+    expected list of tools."""
+    assert np.all(toolset_.all_tools == TOOLS)
+
+
+def test_toolset_tools_getter_setter(toolset_):
+    """Test that the _Toolset.tools property getter and setter work as
+    expected."""
+    assert np.all(toolset_.tools == TOOLS)
+    toolset_.tools = [AddTasksTool]
+    assert toolset_.tools == [AddTasksTool]
+
+
+def test_toolset_mode_getter_setter(toolset_):
+    """Test that the _Toolset.mode property getter and setter work as
+    expected, as well as the tool_names property."""
+    assert toolset_.mode == "default"
+    toolset_.mode = "shopping"
+    assert toolset_.mode == "shopping"
+    assert np.all(toolset_.tool_names == SHOPPING_TOOL_NAMES)
+
+
+def test_toolset_get_tool_methods(toolset_):
+    """Test that the _Toolset.get_tool and other get_* methods correctly
+    retrieve the corresponding tools and their attributes."""
+    for tool in TOOLS:
+        tool_name = tool.__qualname__
+        assert toolset_.get_tool(tool_name) == tool
+        assert toolset_.get_input_schema(tool_name) == tool.input_schema
+        assert toolset_.get_output_schema(tool_name) == tool.output_schema
+        assert toolset_.get_config(tool_name) == tool.config_cls
+
+
+def test_toolset_error_if_invalid_tool_name(toolset_):
+    """Test that a ValueError is raised if an invalid tool name is provided."""
+    with pytest.raises(ValueError):
+        toolset_.get_tool("InvalidTool")
+    with pytest.raises(ValueError):
+        toolset_.get_input_schema("InvalidTool")
+    with pytest.raises(ValueError):
+        toolset_.get_output_schema("InvalidTool")
+    with pytest.raises(ValueError):
+        toolset_.get_config("InvalidTool")
