@@ -12,6 +12,12 @@ from ._add_tasks import (
     AddTasksOutputSchema,
     AddTasksTool,
 )
+from ._chain import (
+    ALL_TOOLS,
+    QUICK_TOOLS,
+    MakeChainToolOutputSchema,
+    QueryInputSchema,
+)
 from ._respond import (
     RespondConfig,
     RespondInputSchema,
