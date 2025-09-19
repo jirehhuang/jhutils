@@ -1,3 +1,5 @@
+"""Tool to add tasks to a task list."""
+
 from typing import List, Optional
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
@@ -45,6 +47,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
 
     input_schema = AddTasksInputSchema
     output_schema = AddTasksOutputSchema
+    config_cls = AddTasksConfig
 
     def __init__(self, config: Optional[AddTasksConfig] = None):
         if config is None:

@@ -1,3 +1,5 @@
+"""Tool to add shopping items to a shopping list."""
+
 from typing import List, Optional
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
@@ -47,6 +49,7 @@ class AddShoppingItemsTool(
 
     input_schema = AddShoppingItemsInputSchema
     output_schema = AddShoppingItemsOutputSchema
+    config_cls = AddShoppingItemsConfig
 
     def __init__(self, config: Optional[AddShoppingItemsConfig] = None):
         if config is None:
