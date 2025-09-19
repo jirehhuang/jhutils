@@ -5,12 +5,7 @@ from typing import Literal, Type, Union, cast
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field
 
-from ._add_shopping_items import AddShoppingItemsTool
-from ._add_tasks import AddTasksTool
-from ._respond import RespondTool
-
-ALL_TOOLS = [AddShoppingItemsTool, AddTasksTool, RespondTool]
-QUICK_TOOLS = ALL_TOOLS
+from ._toolset import toolset
 
 
 class QueryInputSchema(BaseIOSchema):
@@ -40,7 +35,7 @@ def MakeChainToolOutputSchema(  # noqa: N802
         is a Union of the tools' input schemas.
     """
     if not tools:
-        tools = ALL_TOOLS
+        tools = toolset.all_tools
 
     tool_input_schemas = tuple(
         cast(type[BaseTool], tool).input_schema for tool in tools
