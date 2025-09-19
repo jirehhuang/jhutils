@@ -1,6 +1,6 @@
 """Schemas for chaining multiple tool calls together."""
 
-from typing import Literal, Union
+from typing import Literal, Type, Union, cast
 
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field
@@ -23,7 +23,9 @@ class QueryInputSchema(BaseIOSchema):
 
 
 # pylint: disable=invalid-name
-def MakeChainToolOutputSchema(tools: list[BaseTool]):  # noqa: N802
+def MakeChainToolOutputSchema(  # noqa: N802
+    tools: list[BaseTool] | None = None,
+) -> Type[BaseIOSchema]:
     """Construct a ChainToolOutputSchema for a given set of tools.
 
     Parameters
@@ -37,7 +39,12 @@ def MakeChainToolOutputSchema(tools: list[BaseTool]):  # noqa: N802
         A dynamically created Pydantic schema class where `tool_input`
         is a Union of the tools' input schemas.
     """
-    tool_input_schemas = tuple(tool.input_schema for tool in tools)
+    if not tools:
+        tools = ALL_TOOLS
+
+    tool_input_schemas = tuple(
+        cast(type[BaseTool], tool).input_schema for tool in tools
+    )
     tool_input_type = (
         tool_input_schemas[0]
         if len(tool_input_schemas) == 1

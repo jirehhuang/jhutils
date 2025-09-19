@@ -75,7 +75,7 @@ def test_error_if_invalid_tool(tools, add_tasks_input):
 
 def test_none_valid_tool(add_tasks_input):
     """Test that None is a valid value for the next_tool field."""
-    schema = MakeChainToolOutputSchema(ALL_TOOLS)(
+    schema = MakeChainToolOutputSchema()(
         tool_input=add_tasks_input,
         remainder=REMAINDER,
         next_tool=None,
