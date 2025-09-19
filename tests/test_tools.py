@@ -4,8 +4,6 @@ import pytest
 from pydantic import ValidationError
 
 from jhutils.agents.tools import (
-    ALL_TOOLS,
-    QUICK_TOOLS,
     AddShoppingItemsTool,
     AddTasksTool,
     MakeChainToolOutputSchema,
@@ -52,9 +50,15 @@ def test_add_tasks_tool():
     assert result.model_dump() == expected_result
 
 
-def test_respond_tool():
+@pytest.mark.parametrize(
+    "response",
+    [
+        "All tasks have been added successfully.",
+        "Added milk, eggs, and bread to the shopping list.",
+    ],
+)
+def test_respond_tool(response):
     """Test that running the RespondTool returns the expected result."""
-    response = "All tasks have been added successfully."
     expected_result = {"response": response}
     tool = RespondTool()
     input_data = tool.input_schema(response=response)
@@ -62,18 +66,17 @@ def test_respond_tool():
     assert result.model_dump() == expected_result
 
 
-@pytest.mark.parametrize("tools", [ALL_TOOLS, QUICK_TOOLS])
-def test_error_if_invalid_tool(tools, add_tasks_input):
+def test_schema_error_if_invalid_tool(add_tasks_input):
     """Test that a ValidationError is raised if an invalid tool is provided."""
     with pytest.raises(ValidationError):
-        MakeChainToolOutputSchema(tools)(
+        MakeChainToolOutputSchema()(
             tool_input=add_tasks_input,
             remainder=REMAINDER,
             next_tool="InvalidTool",
         )
 
 
-def test_none_valid_tool(add_tasks_input):
+def test_schema_none_valid_tool(add_tasks_input):
     """Test that None is a valid value for the next_tool field."""
     schema = MakeChainToolOutputSchema()(
         tool_input=add_tasks_input,
