@@ -41,20 +41,18 @@ def MakeChainToolOutputSchema(  # noqa: N802
         cast(type[BaseTool], tool).input_schema for tool in tools
     )
     tool_input_type = (
-        tool_input_schemas[0]
+        (Union[tool_input_schemas[0], None] if tool_input_schemas else None)
         if len(tool_input_schemas) == 1
-        else Union[*tool_input_schemas]
+        else Union[(*tool_input_schemas, None)]
     )
 
     tool_name_literals = tuple(
         Literal[str(tool.__qualname__)] for tool in tools
     )
     next_tool_type = (
-        Union[(*tool_name_literals, None)]
-        if len(tool_name_literals) > 1
-        else (
-            Union[tool_name_literals[0], None] if tool_name_literals else None
-        )
+        (Union[tool_name_literals[0], None] if tool_name_literals else None)
+        if len(tool_name_literals) == 1
+        else Union[(*tool_name_literals, None)]
     )
 
     annotations = {
