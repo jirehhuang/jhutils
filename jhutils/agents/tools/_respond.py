@@ -7,28 +7,33 @@ from pydantic import Field
 
 
 class RespondInputSchema(BaseIOSchema):
-    """Input schema for responding to the user."""
+    """Input schema for RespondTool."""
 
-    response: str = Field(
+    response: str | None = Field(
         ...,
         description=(
-            "The concise response to be sent addressing the user's request."
+            "The concise response to be sent addressing the user query. "
+            "If None or no text is provided, the action will be skipped."
         ),
     )
 
 
 class RespondOutputSchema(BaseIOSchema):
-    """Output schema of responding to the user."""
+    """Output schema for RespondTool."""
 
-    response: str = Field(..., description="The response to the user.")
+    response: str | None = Field(..., description="The response to the user.")
 
 
 class RespondConfig(BaseToolConfig):
-    """Configuration for the Respond tool."""
+    """Configuration for RespondTool."""
 
 
 class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
-    """Add multiple tasks to the task list.
+    """Respond to the user query.
+
+    Use RespondTool to send a final response to the user if the user asked a
+    question or if none of the Available Tool(s) are applicable to address the
+    remaining user query. If called, this should always be the last tool.
 
     Parameters
     ----------

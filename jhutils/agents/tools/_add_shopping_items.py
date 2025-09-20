@@ -7,7 +7,7 @@ from pydantic import Field
 
 
 class AddShoppingItemsInputSchema(BaseIOSchema):
-    """Input schema for items to add to the shopping list."""
+    """Input schema for AddShoppingItemsTool."""
 
     items: List[str] = Field(
         ...,
@@ -18,7 +18,7 @@ class AddShoppingItemsInputSchema(BaseIOSchema):
 
 
 class AddShoppingItemsOutputSchema(BaseIOSchema):
-    """Output schema of the AddShoppingItems tool."""
+    """Output schema for AddShoppingItemsTool."""
 
     result: str = Field(
         ..., description="Confirmation message after adding the items."
@@ -26,13 +26,16 @@ class AddShoppingItemsOutputSchema(BaseIOSchema):
 
 
 class AddShoppingItemsConfig(BaseToolConfig):
-    """Configuration for the AddShoppingItems tool."""
+    """Configuration for AddShoppingItemsTool."""
 
 
 class AddShoppingItemsTool(
     BaseTool[AddShoppingItemsInputSchema, AddShoppingItemsOutputSchema]
 ):
-    """Add multiple items to the shopping list.
+    """Add one or more individual shopping items to the shopping list.
+
+    Use this tool for adding items that need to be purchased, especially
+    groceries and regular purchases.
 
     Parameters
     ----------

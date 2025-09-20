@@ -7,7 +7,7 @@ from pydantic import Field
 
 
 class AddTasksInputSchema(BaseIOSchema):
-    """Input schema for tasks to add to the task list."""
+    """Input schema for AddTasksTool."""
 
     tasks: List[str] = Field(
         ...,
@@ -20,7 +20,7 @@ class AddTasksInputSchema(BaseIOSchema):
 
 
 class AddTasksOutputSchema(BaseIOSchema):
-    """Output schema of the AddTasks tool."""
+    """Output schema for AddTasksTool."""
 
     result: str = Field(
         ..., description="Confirmation message after adding the tasks."
@@ -28,11 +28,16 @@ class AddTasksOutputSchema(BaseIOSchema):
 
 
 class AddTasksConfig(BaseToolConfig):
-    """Configuration for the AddTasks tool."""
+    """Configuration for AddTasksTool."""
 
 
 class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
-    """Add multiple tasks to the task list.
+    """Add one or more independent tasks to the task list.
+
+    Use this tool for adding one or more tasks, action items, or to-dos. Use
+    AddShoppingItemsTool instead for shopping items that need to be purchased.
+    However, prefer using AddTasksTool over AddShoppingItemsTool if uncertain
+    about which to use.
 
     Parameters
     ----------
