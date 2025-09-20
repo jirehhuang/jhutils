@@ -104,6 +104,18 @@ class Toolset:
             f"Tool with name '{tool_name}' not found in the toolset."
         )
 
+    def get_tool_by_schema(self, tool_schema) -> BaseTool:
+        """Get a tool by its input schema."""
+        for tool in self._all_tools:
+            if (
+                isinstance(tool_schema, tool.input_schema)
+                or tool.input_schema == tool_schema
+            ):
+                return tool
+        raise ValueError(
+            f"Tool with schema '{tool_schema}' not found in the toolset."
+        )
+
     def get_input_schema(self, tool_name: AvailableTools) -> BaseIOSchema:
         """Get the input schema constructor for a tool by its name."""
         return self.get_tool(tool_name).input_schema
@@ -117,5 +129,5 @@ class Toolset:
         return self.get_tool(tool_name).config_cls
 
 
-# Static instance of Toolset
+# Static instance of Toolset for internal use
 _toolset = Toolset()

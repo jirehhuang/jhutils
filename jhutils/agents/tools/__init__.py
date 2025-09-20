@@ -22,4 +22,4 @@ from ._respond import (
     RespondOutputSchema,
     RespondTool,
 )
-from ._toolset import toolset
+from ._toolset import Toolset
