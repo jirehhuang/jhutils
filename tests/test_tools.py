@@ -11,8 +11,8 @@ from jhutils.agents.tools import (
     RespondTool,
 )
 from jhutils.agents.tools._toolset import (
-    DEFAULT_TOOL_NAMES,
-    SHOPPING_TOOL_NAMES,
+    AVAILABLE_MODES,
+    TOOL_NAMES,
     TOOLS,
     Toolset,
 )
@@ -112,8 +112,8 @@ def fixture_toolset():
 @pytest.mark.parametrize(
     "mode, tool_names",
     [
-        ("default", DEFAULT_TOOL_NAMES),
-        ("shopping", SHOPPING_TOOL_NAMES),
+        ("default", AVAILABLE_MODES["default"]),
+        ("shopping", AVAILABLE_MODES["shopping"]),
     ],
 )
 def test_toolset_constructs_with_mode(mode, tool_names):
@@ -124,10 +124,36 @@ def test_toolset_constructs_with_mode(mode, tool_names):
     assert np.all(toolset.available_tool_names == tool_names)
 
 
+def test_toolset_mode_getter_setter(toolset):
+    """Test that the Toolset.mode property getter and setter work as
+    expected, as well as the tool_names property."""
+    assert toolset.mode == "default"
+    toolset.mode = "shopping"
+    assert toolset.mode == "shopping"
+    assert np.all(toolset.available_tool_names == AVAILABLE_MODES["shopping"])
+    toolset.mode = "default"
+    assert toolset.mode == "default"
+    assert np.all(toolset.available_tool_names == AVAILABLE_MODES["default"])
+
+
+def test_toolset_error_if_invalid_mode(toolset):
+    """Test that a ValueError is raised if an invalid mode is provided to
+    the mode setter."""
+    with pytest.raises(ValueError):
+        toolset.mode = "invalid_mode"
+
+
 def test_toolset_all_tools(toolset):
     """Test that Toolset.all_tools property getter correctly returns the
     expected list of tools."""
     assert np.all(toolset.all_tools == TOOLS)
+    assert np.all(toolset.all_tool_names == TOOL_NAMES)
+
+
+def test_toolset_available_tools_getter(toolset):
+    """Test that the Toolset.available_tools property getter works as
+    expected."""
+    assert np.all(toolset.available_tools == TOOLS)
 
 
 def test_toolset_selected_tools_getter_setter(toolset):
@@ -136,15 +162,16 @@ def test_toolset_selected_tools_getter_setter(toolset):
     assert np.all(toolset.selected_tools == TOOLS)
     toolset.selected_tools = [AddTasksTool]
     assert toolset.selected_tools == [AddTasksTool]
+    assert toolset.selected_tool_names == ["AddTasksTool"]
 
 
-def test_toolset_mode_getter_setter(toolset):
-    """Test that the Toolset.mode property getter and setter work as
-    expected, as well as the tool_names property."""
-    assert toolset.mode == "default"
-    toolset.mode = "shopping"
-    assert toolset.mode == "shopping"
-    assert np.all(toolset.available_tool_names == SHOPPING_TOOL_NAMES)
+def test_toolset_error_if_invalid_selected_tools(toolset):
+    """Test that a ValueError is raised if an invalid tool is provided to
+    the selected_tools setter."""
+    with pytest.raises(ValueError):
+        toolset.selected_tools = [AddTasksTool, "InvalidTool"]  # type: ignore
+    with pytest.raises(ValueError):
+        toolset.selected_tools = ["InvalidTool"]  # type: ignore
 
 
 def test_toolset_get_tool_methods(toolset):
@@ -169,3 +196,15 @@ def test_toolset_error_if_invalid_tool_name(toolset):
         toolset.get_output_schema("InvalidTool")
     with pytest.raises(ValueError):
         toolset.get_config("InvalidTool")
+
+
+def test_toolset_error_if_invalid_tool_schema(toolset):
+    """Test that a ValueError is raised if an invalid tool schema is
+    provided."""
+
+    class InvalidSchema:
+        # pylint: disable=too-few-public-methods
+        pass
+
+    with pytest.raises(ValueError):
+        toolset.get_tool_by_schema(InvalidSchema)  # type: ignore
