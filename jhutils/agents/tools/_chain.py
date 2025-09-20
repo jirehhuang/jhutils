@@ -5,7 +5,7 @@ from typing import Literal, Type, Union, cast
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field
 
-from ._toolset import toolset
+from ._toolset import _toolset
 
 
 class QueryInputSchema(BaseIOSchema):
@@ -35,7 +35,7 @@ def MakeChainToolOutputSchema(  # noqa: N802
         is a Union of the tools' input schemas.
     """
     if not tools:
-        tools = toolset.all_tools
+        tools = _toolset.all_tools
 
     tool_input_schemas = tuple(
         cast(type[BaseTool], tool).input_schema for tool in tools
