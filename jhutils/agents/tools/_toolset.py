@@ -1,6 +1,6 @@
 """Toolset class for managing tools."""
 
-from typing import Literal, TypeAlias, get_args
+from typing import Literal, TypeAlias
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 
@@ -9,16 +9,15 @@ from ._add_tasks import AddTasksTool
 from ._respond import RespondTool
 
 TOOLS = [AddShoppingItemsTool, AddTasksTool, RespondTool]
-
 TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
-DEFAULT_TOOL_NAMES = ["AddShoppingItemsTool", "AddTasksTool", "RespondTool"]
-SHOPPING_TOOL_NAMES = ["AddShoppingItemsTool"]
 
 AvailableTools = Literal["AddShoppingItemsTool", "AddTasksTool", "RespondTool"]
-AvailableModes = Literal["default", "shopping", None]
 ToolList: TypeAlias = list[BaseTool]
 
-AVAILABLE_MODES = list(get_args(AvailableModes))
+AVAILABLE_MODES = {
+    "default": ["AddShoppingItemsTool", "AddTasksTool", "RespondTool"],
+    "shopping": ["AddShoppingItemsTool", "RespondTool"],
+}
 
 
 class Toolset:
@@ -26,7 +25,7 @@ class Toolset:
 
     _all_tools: ToolList = TOOLS
 
-    def __init__(self, mode: AvailableModes = "default"):
+    def __init__(self, mode: str = "default"):
         """Initialize the Toolset with a list of tools."""
         self.mode = mode  # This sets _available_tools
         self._selected_tools: ToolList = self._all_tools
@@ -52,8 +51,7 @@ class Toolset:
         for tool in tools:
             if tool not in self._available_tools:
                 raise ValueError(
-                    f"{tool.__qualname__} is not available "
-                    f"in mode {self.mode}."
+                    f"{tool!s} is not available " f"in mode {self.mode}."
                 )
         self._selected_tools = tools
 
@@ -63,16 +61,14 @@ class Toolset:
         return self._mode
 
     @mode.setter
-    def mode(self, mode: AvailableModes):
+    def mode(self, mode: str):
         """Update the mode and the corresponding active tools."""
-        if mode not in AVAILABLE_MODES:
+        available_tool_names = AVAILABLE_MODES.get(mode, None)
+        if not available_tool_names:
             raise ValueError(
                 f"Mode '{mode}' is not supported. "
-                f"Available modes: {AVAILABLE_MODES}"
+                f"Available modes: {AVAILABLE_MODES.keys()}"
             )
-        available_tool_names = (
-            SHOPPING_TOOL_NAMES if mode == "shopping" else DEFAULT_TOOL_NAMES
-        )
         self._available_tools = [
             tool
             for tool in self._all_tools
@@ -104,7 +100,7 @@ class Toolset:
             f"Tool with name '{tool_name}' not found in the toolset."
         )
 
-    def get_tool_by_schema(self, tool_schema) -> BaseTool:
+    def get_tool_by_schema(self, tool_schema: BaseIOSchema) -> BaseTool:
         """Get a tool by its input schema."""
         for tool in self._all_tools:
             if (
