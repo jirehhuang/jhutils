@@ -77,7 +77,7 @@ def test_schema_error_if_invalid_tool(add_tasks_input):
     """Test that a ValidationError is raised if an invalid tool is provided."""
     with pytest.raises(ValidationError):
         MakeChainToolOutputSchema()(
-            tool_input=add_tasks_input,
+            called_tool_input=add_tasks_input,
             remainder=REMAINDER,
             next_tool="InvalidTool",
         )
@@ -86,27 +86,32 @@ def test_schema_error_if_invalid_tool(add_tasks_input):
 def test_schema_none_valid_tool_input():
     """Test that None is a valid value for the tool_input field."""
     schema = MakeChainToolOutputSchema()(
-        tool_input=None,
+        called_tool_input=None,
         remainder=REMAINDER,
         next_tool="AddTasksTool",
     )
-    assert schema.tool_input is None
+    assert schema.called_tool_input is None
 
 
 def test_schema_none_valid_next_tool(add_tasks_input):
     """Test that None is a valid value for the next_tool field."""
     schema = MakeChainToolOutputSchema()(
-        tool_input=add_tasks_input,
+        called_tool_input=add_tasks_input,
         remainder=REMAINDER,
         next_tool=None,
     )
     assert schema.next_tool is None
 
 
-@pytest.fixture(name="toolset", scope="function")
-def fixture_toolset():
-    """Return the default instance of Toolset."""
-    return Toolset()
+def test_schema_error_if_no_remainder_and_next_tool(add_tasks_input):
+    """Test that a ValueError is raised if there is no remainder and next_tool
+    is not None."""
+    with pytest.raises(ValueError):
+        MakeChainToolOutputSchema()(
+            called_tool_input=add_tasks_input,
+            remainder="",
+            next_tool="RespondTool",
+        )
 
 
 @pytest.mark.parametrize(

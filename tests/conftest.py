@@ -9,6 +9,7 @@ import pytest
 from dotenv import load_dotenv
 
 from jhutils import Mealie, Obsidian
+from jhutils.agents.tools import Toolset
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
@@ -48,3 +49,9 @@ def fixture_openrouter_client():
             api_key=os.getenv("OPENROUTER_API_KEY"),
         )
     )
+
+
+@pytest.fixture(name="toolset", scope="function")
+def fixture_toolset():
+    """Return the default instance of Toolset."""
+    return Toolset()
