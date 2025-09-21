@@ -8,14 +8,14 @@ from ._add_shopping_items import AddShoppingItemsTool
 from ._add_tasks import AddTasksTool
 from ._respond import RespondTool
 
-TOOLS = [AddShoppingItemsTool, AddTasksTool, RespondTool]
+TOOLS = [AddTasksTool, AddShoppingItemsTool, RespondTool]
 TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
 
-AvailableTools = Literal["AddShoppingItemsTool", "AddTasksTool", "RespondTool"]
+AvailableTools = Literal["AddTasksTool", "AddShoppingItemsTool", "RespondTool"]
 ToolList: TypeAlias = list[BaseTool]
 
 AVAILABLE_MODES = {
-    "default": ["AddShoppingItemsTool", "AddTasksTool", "RespondTool"],
+    "default": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
 }
 
