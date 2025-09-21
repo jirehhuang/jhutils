@@ -3,17 +3,17 @@
 from typing import Literal, Type, Union, cast
 
 from atomic_agents import BaseIOSchema, BaseTool
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from ._toolset import _toolset
 
 
 class QueryInputSchema(BaseIOSchema):
-    """Input schema providing the user's query."""
+    """Input schema providing the user query."""
 
     query: str = Field(
         ...,
-        description=("The user's input query to be analyzed and addressed."),
+        description=("The user input query to be analyzed and addressed."),
     )
 
 
@@ -31,7 +31,7 @@ def MakeChainToolOutputSchema(  # noqa: N802
     Returns
     -------
     type[BaseIOSchema]
-        A dynamically created Pydantic schema class where `tool_input`
+        A dynamically created Pydantic schema class where `called_tool_input`
         is a Union of the tools' input schemas.
     """
     if not tools:
@@ -55,33 +55,63 @@ def MakeChainToolOutputSchema(  # noqa: N802
         else Union[(*tool_name_literals, None)]
     )
 
+    @model_validator(mode="after")
+    def _validate(self):
+        called_tool_input = getattr(self, "called_tool_input", None)
+        remainder = getattr(self, "remainder", None)
+        next_tool = getattr(self, "next_tool", None)
+
+        if remainder == "" and next_tool is not None:
+            raise ValueError(
+                "If `remainder` is empty, `next_tool` must be `None`."
+            )
+
+        # Assuming RespondInputSchema is one of the input schemas
+        if called_tool_input == "RespondInputSchema" and next_tool is not None:
+            raise ValueError(
+                "If `called_tool_input` is `RespondInputSchema`, `next_tool` "
+                "must be `None`."
+            )
+        return self
+
     annotations = {
-        "tool_input": tool_input_type,
+        "called_tool_input": tool_input_type,
         "remainder": str,
         "next_tool": next_tool_type,
     }
     class_dict = {
         "__annotations__": annotations,
-        "tool_input": Field(
-            ..., description="The input parameters for the selected tool."
+        "called_tool_input": Field(
+            ...,
+            description=(
+                "The input parameters to call one of the Selected Tool(s). "
+                "ONLY skip to the next iteration to select `next_tool` with "
+                "`called_tool_input=None` if (a) none of the Selected Tool(s) "
+                "are applicable, AND (b) one of the Available Tool(s) is."
+            ),
         ),
         "remainder": Field(
             ...,
             description=(
-                "The remaining text from the user's request that has not been "
-                "addressed by the tool. Maintain the format as instructions "
-                "from the user."
+                "The remaining text from the user query that has not been "
+                "addressed by the called tool. "
+                "The format should be maintained as a text query with "
+                "instructions as if provided by the user."
             ),
         ),
         "next_tool": Field(
             ...,
             description=(
-                "The next tool to call to address the remainder of the user's "
-                "request. If there are no remaining tasks, this should be "
-                "None."
+                "The next tool to select and call to address some or all of "
+                "the remainder of the user query. "
+                "Can be one of any of the Available Tool(s). "
+                "If there is no `remainder`, this MUST be `None`."
             ),
         ),
-        "__doc__": "Output schema for the tool chaining agent.",
+        "__doc__": (
+            "Output schema for calling a tool and chaining to the next tool."
+        ),
+        "_validate": _validate,
     }
     ChainToolOutputSchema = type(  # noqa: N806
         "ChainToolOutputSchema", (BaseIOSchema,), class_dict
