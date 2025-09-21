@@ -1,15 +1,17 @@
 """Tool to add shopping items to a shopping list."""
 
-from typing import List, Optional
+from typing import Optional
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
-from pydantic import Field
+from pydantic import Field, conlist
+
+ItemsList = conlist(str, min_length=1)
 
 
 class AddShoppingItemsInputSchema(BaseIOSchema):
     """Input schema for AddShoppingItemsTool."""
 
-    items: List[str] = Field(
+    items: ItemsList = Field(  # type: ignore[valid-type]
         ...,
         description=(
             "Individual shopping items to add. Do not capitalize items."

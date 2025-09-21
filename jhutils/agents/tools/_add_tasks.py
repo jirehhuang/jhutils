@@ -1,15 +1,17 @@
 """Tool to add tasks to a task list."""
 
-from typing import List, Optional
+from typing import Optional
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
-from pydantic import Field
+from pydantic import Field, conlist
+
+TasksList = conlist(str, min_length=1)
 
 
 class AddTasksInputSchema(BaseIOSchema):
     """Input schema for AddTasksTool."""
 
-    tasks: List[str] = Field(
+    tasks: TasksList = Field(  # type: ignore[valid-type]
         ...,
         description=(
             "Individual tasks to add. Each task should be written in the "
