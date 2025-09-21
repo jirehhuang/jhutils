@@ -12,8 +12,8 @@ class RespondInputSchema(BaseIOSchema):
     response: str | None = Field(
         ...,
         description=(
-            "The concise response to be sent addressing the user query. "
-            "If None or no text is provided, the action will be skipped."
+            "The concise response to be sent addressing the user query. This "
+            "input value will be directly reflected to the user."
         ),
     )
 
@@ -29,11 +29,13 @@ class RespondConfig(BaseToolConfig):
 
 
 class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
-    """Respond to the user query.
+    """Respond to the user, such as by answering a question or by explaining.
 
-    Use RespondTool to send a final response to the user if the user asked a
-    question or if none of the Available Tool(s) are applicable to address the
-    remaining user query. If called, this should always be the last tool.
+    Use RespondTool to send a response to the user if none of the other
+    Available Tool(s) are applicable to address the user query. For example,
+    use this to answer questions, or to explain to the user that you do not
+    know how to address their query. If called, this should always be the last
+    tool because it responds to the user.
 
     Parameters
     ----------
