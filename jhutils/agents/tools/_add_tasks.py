@@ -14,9 +14,12 @@ class AddTasksInputSchema(BaseIOSchema):
     tasks: TasksList = Field(  # type: ignore[valid-type]
         ...,
         description=(
-            "Individual tasks to add. Each task should be written in the "
-            "imperative mood from the perspective of the user. The first word "
-            "should be capitalized."
+            "Individual tasks to add, with all applicable context. "
+            "The first word of each task should be capitalized. "
+            "Each task should be written in the imperative mood, as if written"
+            "by the user for the user to perform. "
+            "If requested by the user to add or remind of a task, extract the "
+            "task and do not use 'add' or 'remind' as the task."
         ),
     )
 
