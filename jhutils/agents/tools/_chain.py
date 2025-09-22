@@ -66,11 +66,15 @@ def MakeChainToolOutputSchema(  # noqa: N802
                 "If `remainder` is empty, `next_tool` must be `None`."
             )
 
-        # Assuming RespondInputSchema is one of the input schemas
-        if called_tool_input == "RespondInputSchema" and next_tool is not None:
+        if (
+            isinstance(
+                called_tool_input, _toolset.get_input_schema("RespondTool")
+            )
+            and next_tool is not None
+        ):
             raise ValueError(
-                "If `called_tool_input` is `RespondInputSchema`, `next_tool` "
-                "must be `None`."
+                "If `called_tool_input` calls `RespondTool`, `next_tool` must "
+                "be `None`."
             )
         return self
 
