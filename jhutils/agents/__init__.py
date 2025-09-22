@@ -1,3 +1,3 @@
 """Agents module."""
 
-from .assistant import AssistantAgent, AssistantInputSchema
+from .assistant import AssistantAgent
