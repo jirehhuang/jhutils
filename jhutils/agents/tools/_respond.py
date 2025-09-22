@@ -12,8 +12,10 @@ class RespondInputSchema(BaseIOSchema):
     response: str | None = Field(
         ...,
         description=(
-            "The concise response to be sent addressing the user query. This "
-            "input value will be directly reflected to the user."
+            "The concise response to be sent addressing the user query. "
+            "This input value will be directly reflected to the user. "
+            "Do not make up answers for the sake of responding. "
+            "If you do not know the answer, say so honestly."
         ),
     )
 
