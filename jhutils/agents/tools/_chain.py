@@ -84,10 +84,8 @@ def MakeChainToolOutputSchema(  # noqa: N802
         "called_tool_input": Field(
             ...,
             description=(
-                "The input parameters to call one of the Selected Tool(s). "
-                "ONLY skip to the next iteration to select `next_tool` with "
-                "`called_tool_input=None` if (a) none of the Selected Tool(s) "
-                "are applicable, AND (b) one of the Available Tool(s) is."
+                "The input parameters used to call one of the Selected "
+                "Tool(s)."
             ),
         ),
         "remainder": Field(
@@ -104,12 +102,26 @@ def MakeChainToolOutputSchema(  # noqa: N802
             description=(
                 "The next tool to select and call to address some or all of "
                 "the remainder of the user query. "
-                "Can be one of any of the Available Tool(s). "
-                "If there is no `remainder`, this MUST be `None`."
+                "Can be one of any of the Available Tool(s)."
             ),
         ),
         "__doc__": (
             "Output schema for calling a tool and chaining to the next tool."
+            "\n\n"
+            "Some specific scenarios include:\n"
+            "- *Skip tool call and select next tool:* "
+            "If (a) no tool from the Selected Tool(s) is applicable to "
+            "address the user query, AND "
+            "if (b) a tool from the Available Tool(s) may be applicable, then "
+            "*skip* with `called_tool_input=None` and select the next tool "
+            "with `next_tool`.\n"
+            "- *Trigger exit with explanation*: "
+            "If no tool from the Available Tool(s) is applicable to "
+            "specifically address the user query, use `RespondTool` to "
+            "respond to the remainder.\n"
+            "- *Exit with successful completion:* "
+            "If `remainder=''` (is blank), then `next_tool` MUST be `None` to "
+            "signal successful completion and exit.\n"
         ),
         "_validate": _validate,
     }
