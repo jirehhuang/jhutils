@@ -61,21 +61,24 @@ def MakeChainToolOutputSchema(  # noqa: N802
         remainder = getattr(self, "remainder", None)
         next_tool = getattr(self, "next_tool", None)
 
+        if remainder != "" and next_tool is None:
+            raise ValueError(
+                "If `remainder` is not empty, `next_tool` must not be `None`."
+            )
+
         if remainder == "" and next_tool is not None:
             raise ValueError(
                 "If `remainder` is empty, `next_tool` must be `None`."
             )
 
-        if (
-            isinstance(
-                called_tool_input, _toolset.get_input_schema("RespondTool")
-            )
-            and next_tool is not None
-        ):
+        if isinstance(
+            called_tool_input, _toolset.get_input_schema("RespondTool")
+        ) and (remainder != "" or next_tool is not None):
             raise ValueError(
                 "If `called_tool_input` calls `RespondTool`, `next_tool` must "
                 "be `None`."
             )
+
         return self
 
     annotations = {
