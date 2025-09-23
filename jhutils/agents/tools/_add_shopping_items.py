@@ -9,7 +9,11 @@ ItemsList = conlist(str, min_length=1)
 
 
 class AddShoppingItemsInputSchema(BaseIOSchema):
-    """Input schema for AddShoppingItemsTool."""
+    """Input schema for AddShoppingItemsTool.
+
+    Use this tool for adding any and all items that need to be purchased.
+    For example, all groceries and regular purchases.
+    """
 
     items: ItemsList = Field(  # type: ignore[valid-type]
         ...,
@@ -34,23 +38,7 @@ class AddShoppingItemsConfig(BaseToolConfig):
 class AddShoppingItemsTool(
     BaseTool[AddShoppingItemsInputSchema, AddShoppingItemsOutputSchema]
 ):
-    """Add one or more individual shopping items to the shopping list.
-
-    Use this tool for adding items that need to be purchased, especially
-    groceries and regular purchases.
-
-    Parameters
-    ----------
-    config : AddShoppingItemsConfig
-        Configuration for the tool.
-
-    Attributes
-    ----------
-        input_schema (AddShoppingItemsInputSchema): The schema for the input
-            data.
-        output_schema (AddShoppingItemsOutputSchema): The schema for the output
-            data.
-    """
+    """Add one or more individual shopping items to the shopping list."""
 
     input_schema = AddShoppingItemsInputSchema
     output_schema = AddShoppingItemsOutputSchema

@@ -9,7 +9,11 @@ TasksList = conlist(str, min_length=1)
 
 
 class AddTasksInputSchema(BaseIOSchema):
-    """Input schema for AddTasksTool."""
+    """Input schema for AddTasksTool.
+
+    Use this tool for adding one or more tasks, action items, or to-dos.
+    Do NOT use this tool for adding tasks to purchase shopping items.
+    """
 
     tasks: TasksList = Field(  # type: ignore[valid-type]
         ...,
@@ -37,23 +41,7 @@ class AddTasksConfig(BaseToolConfig):
 
 
 class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
-    """Add one or more independent tasks to the task list.
-
-    Use this tool for adding one or more tasks, action items, or to-dos. Use
-    AddShoppingItemsTool instead for shopping items that need to be purchased.
-    However, prefer using AddTasksTool over AddShoppingItemsTool if uncertain
-    about which to use.
-
-    Parameters
-    ----------
-    config : AddTasksConfig
-        Configuration for the tool.
-
-    Attributes
-    ----------
-        input_schema (AddTasksInputSchema): The schema for the input data.
-        output_schema (AddTasksOutputSchema): The schema for the output data.
-    """
+    """Add one or more independent tasks to the task list."""
 
     input_schema = AddTasksInputSchema
     output_schema = AddTasksOutputSchema
