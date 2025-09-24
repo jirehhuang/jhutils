@@ -97,7 +97,7 @@ def test_chain_schema_none_valid_next_tool(add_tasks_input):
     """Test that None is a valid value for the next_tool field."""
     schema = MakeChainToolOutputSchema()(
         called_tool_input=add_tasks_input,
-        remainder=REMAINDER,
+        remainder="",
         next_tool=None,
     )
     assert schema.next_tool is None
