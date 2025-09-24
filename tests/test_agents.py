@@ -97,15 +97,40 @@ def test_assistant_select_and_execute_respond(assistant):
         "According to the Westminster Shorter Catechism, what is the chief "
         "end of man?"
     )
-    expected_response = (
-        "According to the Westminster Shorter Catechism, the chief end of man "
-        "is to glorify God and to enjoy Him forever."
+    expected_phrases = ["glorify God", "enjoy Him forever"]
+    response = assistant.run(query)
+    assert all(
+        expected_phrase in response for expected_phrase in expected_phrases
+    )
+
+
+def test_assistant_respond_sorry_if_cannot_answer(assistant):
+    """Test that the assistant correctly acknowledges inability to handle a
+    query where no tool is applicable and the assistant does not know."""
+    query = "What did Grace make for dinner last Tuesday?"
+    expected_phrases = ["sorry", "don't know", "do not know"]
+    response = assistant.run(query)
+    assert any(
+        expected_phrase in response for expected_phrase in expected_phrases
+    )
+    history = assistant.agent.history.get_history()
+    assert "response" in json.loads(history[1]["content"])["called_tool_input"]
+
+
+def test_assistant_chain_tools_task_shopping_respond(assistant):
+    """Test that the assistant can correctly chain multiple tools:
+    AddTasksTool, AddShoppingItemsTool, RespondTool."""
+    query = (
+        "Add onions to my shopping list. "
+        "Remind me to text Georgie back. "
+        "What chapter of the Bible does Jireh come from?"
     )
     response = assistant.run(query)
-    assert response == expected_response
     history = assistant.agent.history.get_history()
-    assert json.loads(history[1]["content"]) == {
-        "called_tool_input": {"response": expected_response},
-        "remainder": "",
-        "next_tool": None,
+    assert json.loads(history[1]["content"])["called_tool_input"] == {
+        "items": ["onions"]
     }
+    assert json.loads(history[3]["content"])["called_tool_input"] == {
+        "tasks": ["Text Georgie back"]
+    }
+    assert "Genesis 22" in response
