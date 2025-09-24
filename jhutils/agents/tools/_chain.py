@@ -25,8 +25,8 @@ def MakeChainToolOutputSchema(  # noqa: N802
 
     Parameters
     ----------
-    tools
-        List of tools whose input schemas will be unioned.
+    toolset
+        Toolset whose tools' input schemas will be unioned.
 
     Returns
     -------
