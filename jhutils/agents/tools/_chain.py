@@ -5,7 +5,7 @@ from typing import Literal, Type, Union, cast
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field, model_validator
 
-from ._toolset import _toolset
+from ._toolset import Toolset, _toolset
 
 
 class QueryInputSchema(BaseIOSchema):
@@ -19,7 +19,7 @@ class QueryInputSchema(BaseIOSchema):
 
 # pylint: disable=invalid-name
 def MakeChainToolOutputSchema(  # noqa: N802
-    tools: list[BaseTool] | None = None,
+    toolset: Toolset | None = None,
 ) -> Type[BaseIOSchema]:
     """Construct a ChainToolOutputSchema for a given set of tools.
 
@@ -34,11 +34,12 @@ def MakeChainToolOutputSchema(  # noqa: N802
         A dynamically created Pydantic schema class where `called_tool_input`
         is a Union of the tools' input schemas.
     """
-    if not tools:
-        tools = _toolset.all_tools
+    if toolset is None:
+        toolset = _toolset
 
     tool_input_schemas = tuple(
-        cast(type[BaseTool], tool).input_schema for tool in tools
+        cast(type[BaseTool], tool).input_schema
+        for tool in toolset.selected_tools
     )
     tool_input_type = (
         (Union[tool_input_schemas[0], None] if tool_input_schemas else None)
@@ -47,7 +48,7 @@ def MakeChainToolOutputSchema(  # noqa: N802
     )
 
     tool_name_literals = tuple(
-        Literal[str(tool.__qualname__)] for tool in tools
+        Literal[tool_name] for tool_name in toolset.available_tool_names
     )
     next_tool_type = (
         (Union[tool_name_literals[0], None] if tool_name_literals else None)
@@ -72,7 +73,7 @@ def MakeChainToolOutputSchema(  # noqa: N802
             )
 
         if isinstance(
-            called_tool_input, _toolset.get_input_schema("RespondTool")
+            called_tool_input, toolset.get_input_schema("RespondTool")
         ) and (remainder != "" or next_tool is not None):
             raise ValueError(
                 "If `called_tool_input` calls `RespondTool`, `next_tool` must "
@@ -98,8 +99,8 @@ def MakeChainToolOutputSchema(  # noqa: N802
         "remainder": Field(
             ...,
             description=(
-                "The remaining text from the user query that has not been "
-                "addressed by the called tool. "
+                "ALL remaining text from the user query that has NOT been "
+                "addressed by the called tool in `called_tool_input`. "
                 "The format should be maintained as a text query with "
                 "instructions as if provided by the user."
             ),
@@ -107,8 +108,9 @@ def MakeChainToolOutputSchema(  # noqa: N802
         "next_tool": Field(
             ...,
             description=(
-                "The next tool to select and call to address some or all of "
-                "the remainder of the user query. "
+                "The next tool to select and call in the next iteration to "
+                "address some or all of the remainder of the user query in "
+                "`remainder`. "
                 "Can be one of any of the Available Tool(s)."
             ),
         ),
