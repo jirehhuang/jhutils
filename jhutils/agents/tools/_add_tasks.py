@@ -20,8 +20,8 @@ class AddTasksInputSchema(BaseIOSchema):
         description=(
             "Individual tasks to add, with all applicable context. "
             "The first word of each task should be capitalized. "
-            "Each task should be written in the imperative mood, as if written "
-            "by the user for the user to perform. "
+            "Each task should be written in the imperative mood, as if "
+            "written by the user for the user to perform. "
             "If requested by the user to add or remind of a task, extract the "
             "task and do not use 'add' or 'remind' as the task."
         ),
