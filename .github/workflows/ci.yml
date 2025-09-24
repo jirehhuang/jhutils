@@ -66,6 +66,7 @@ jobs:
           OBSIDIAN_VAULT_REPOSITORY: ${{ secrets.OBSIDIAN_VAULT_REPOSITORY }}
           OBSIDIAN_VAULT_BRANCH: ${{ secrets.OBSIDIAN_VAULT_BRANCH }}
           OBSIDIAN_VAULT_TOKEN: ${{ secrets.OBSIDIAN_VAULT_TOKEN }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: poetry run pytest
 
       - name: Check coverage
