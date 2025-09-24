@@ -39,18 +39,7 @@ class RespondConfig(BaseToolConfig):
 
 
 class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
-    """Respond to the user, such as by answering a question or by explaining.
-
-    Parameters
-    ----------
-    config : RespondConfig
-        Configuration for the tool.
-
-    Attributes
-    ----------
-        input_schema (RespondInputSchema): The schema for the input data.
-        output_schema (RespondOutputSchema): The schema for the output data.
-    """
+    """Respond to the user, such as by answering a question or explaining."""
 
     input_schema = RespondInputSchema
     output_schema = RespondOutputSchema
