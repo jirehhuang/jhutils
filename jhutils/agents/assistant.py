@@ -3,7 +3,7 @@
 from typing import Optional, TypeVar
 
 import instructor
-from atomic_agents import AgentConfig, AtomicAgent, BaseIOSchema, BaseTool
+from atomic_agents import AgentConfig, AtomicAgent, BaseIOSchema
 from atomic_agents.context import (
     BaseDynamicContextProvider,
     SystemPromptGenerator,
@@ -20,31 +20,22 @@ InputSchema = TypeVar("InputSchema", bound=BaseIOSchema)
 OutputSchema = TypeVar("OutputSchema", bound=BaseIOSchema)
 
 
-DEFAULT_MODEL = "gpt-4o-mini"
+DEFAULT_MODEL = "gpt-4.1-mini"
 MODEL_API_PARAMETERS = {"temperature": 0.0}
 
 ASSISTANT_BACKGROUND = [
     (
         "You are an assistant who helps address user input queries by "
-        "calling tools to perform actions across sequential iterations."
-    ),
-    (
-        "You have immediate access to a set of Selected Tool(s), including "
-        "their detailed descriptions and input schema, so you know exactly "
-        "how to call them."
-    ),
-    (
-        "You have access to select a tool from a set of Available Tool(s) at "
-        "each iteration."
+        "sequentially calling tools to perform actions."
     ),
 ]
-# Tool descriptions are included in their docstrings and injected dynamically.
+# Tool summaries are included in their docstrings and injected dynamically.
 # Output details are included in ChainToolOutputSchema.
 # Tool input details are included in their respective input schemas, which are
 # injected via ChainToolOutputSchema.
 OUTPUT_INSTRUCTIONS = [
     "Analyze the user input query to fill out ChainToolOutputSchema.",
-    "Make sure to follow the instructions in the schema exactly.",
+    "Make sure to follow the instructions in the schema EXACTLY.",
 ]
 
 
@@ -62,7 +53,7 @@ class AvailableToolsProvider(BaseDynamicContextProvider):
             [
                 (
                     f"- {tool.__qualname__}: "
-                    f"{parse_docstring(tool.__doc__).short_description!s}"
+                    f"{parse_docstring(tool.__doc__).short_description}"
                 )
                 for tool in self._toolset.available_tools
             ]
@@ -78,21 +69,10 @@ class SelectedToolsProvider(BaseDynamicContextProvider):
         self._title = title
         self._toolset = toolset
 
-    def _get_tool_info(self, tool: BaseTool) -> str:
-        parsed_doc = parse_docstring(tool.__doc__)
-        return (
-            f"Tool: {tool.__qualname__}\n"
-            f"Summary: {parsed_doc.short_description}\n"
-            f"Description:{parsed_doc.long_description or ''}"
-        )
-
     def get_info(self) -> str:
         """Get information."""
-        return "\n\n".join(
-            [
-                self._get_tool_info(tool)
-                for tool in self._toolset.selected_tools
-            ]
+        return ", ".join(
+            [f"- {tool.__qualname__}" for tool in self._toolset.selected_tools]
         )
 
 
@@ -117,12 +97,12 @@ class AssistantAgent:
 
     def run(self, query: str) -> str:
         """Run the assistant agent."""
-        history = None
+        history = self.agent.history if self.agent else None
 
         while True:
             # (Re)create agent with selected toolset and history
             self._output_schema = MakeChainToolOutputSchema(
-                tools=self._toolset.selected_tools
+                toolset=self._toolset
             )
             self.agent = AtomicAgent[self._input_schema, self._output_schema](
                 config=self._config
