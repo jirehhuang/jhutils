@@ -28,11 +28,11 @@ ASSISTANT_BACKGROUND = [
     ),
 ]
 # Tool summaries are included in their docstrings and injected dynamically.
-# Output details are included in ChainToolOutputSchema.
+# Output details are included in ChainAssistantOutputSchema.
 # Tool input details are included in their respective input schemas, which are
-# injected via ChainToolOutputSchema.
+# injected via ChainAssistantOutputSchema.
 OUTPUT_INSTRUCTIONS = [
-    "Analyze the user input query to fill out ChainToolOutputSchema.",
+    "Analyze the user input query to fill out ChainAssistantOutputSchema.",
     "Make sure to follow the instructions in the schema EXACTLY.",
 ]
 
@@ -47,10 +47,10 @@ class QueryInputSchema(BaseIOSchema):
 
 
 # pylint: disable=invalid-name
-def MakeChainToolOutputSchema(  # noqa: N802
+def MakeChainAssistantOutputSchema(  # noqa: N802
     toolset: Toolset | None = None,
 ) -> Type[BaseIOSchema]:
-    """Construct a ChainToolOutputSchema for a given set of tools.
+    """Construct a ChainAssistantOutputSchema for a given set of tools.
 
     Parameters
     ----------
@@ -163,10 +163,10 @@ def MakeChainToolOutputSchema(  # noqa: N802
         ),
         "_validate": _validate,
     }
-    ChainToolOutputSchema = type(  # noqa: N806
-        "ChainToolOutputSchema", (BaseIOSchema,), class_dict
+    ChainAssistantOutputSchema = type(  # noqa: N806
+        "ChainAssistantOutputSchema", (BaseIOSchema,), class_dict
     )
-    return ChainToolOutputSchema
+    return ChainAssistantOutputSchema
 
 
 # pylint: disable=too-few-public-methods
@@ -231,7 +231,7 @@ class ToolChainingAssistant:
 
         while True:
             # (Re)create agent with selected toolset and history
-            self._output_schema = MakeChainToolOutputSchema(
+            self._output_schema = MakeChainAssistantOutputSchema(
                 toolset=self._toolset
             )
             self.agent = AtomicAgent[self._input_schema, self._output_schema](
