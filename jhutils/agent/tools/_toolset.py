@@ -2,7 +2,7 @@
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 
-from ._tools import AVAILABLE_MODES, TOOLS, AvailableTools, ToolList
+from ._tools import AVAILABLE_MODES, TOOLS, ToolList
 
 
 class Toolset:
@@ -62,21 +62,21 @@ class Toolset:
         self._mode = mode
 
     @property
-    def all_tool_names(self) -> list[AvailableTools]:
+    def all_tool_names(self) -> list[str]:
         """Get the names of all tools in the toolset."""
         return [tool.__qualname__ for tool in self._all_tools]
 
     @property
-    def available_tool_names(self) -> list[AvailableTools]:
+    def available_tool_names(self) -> list[str]:
         """Get the names of available tools in the toolset."""
         return [tool.__qualname__ for tool in self._available_tools]
 
     @property
-    def selected_tool_names(self) -> list[AvailableTools]:
+    def selected_tool_names(self) -> list[str]:
         """Get the names of selected tools in the toolset."""
         return [tool.__qualname__ for tool in self._selected_tools]
 
-    def get_tool(self, tool_name: AvailableTools) -> BaseTool:
+    def get_tool(self, tool_name: str) -> BaseTool:
         """Get a tool by its name."""
         for tool in self._all_tools:
             if tool.__qualname__ == tool_name:
@@ -97,15 +97,15 @@ class Toolset:
             f"Tool with schema '{tool_schema}' not found in the toolset."
         )
 
-    def get_input_schema(self, tool_name: AvailableTools) -> BaseIOSchema:
+    def get_input_schema(self, tool_name: str) -> BaseIOSchema:
         """Get the input schema constructor for a tool by its name."""
         return self.get_tool(tool_name).input_schema
 
-    def get_output_schema(self, tool_name: AvailableTools) -> BaseIOSchema:
+    def get_output_schema(self, tool_name: str) -> BaseIOSchema:
         """Get the output schema constructor for a tool by its name."""
         return self.get_tool(tool_name).output_schema
 
-    def get_config(self, tool_name: AvailableTools) -> BaseToolConfig:
+    def get_config(self, tool_name: str) -> BaseToolConfig:
         """Get the config constructor for a tool by its name."""
         return self.get_tool(tool_name).config_cls
 

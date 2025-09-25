@@ -1,6 +1,6 @@
 """Available tools."""
 
-from typing import Literal, TypeAlias
+from typing import TypeAlias
 
 from atomic_agents import BaseTool
 
@@ -11,10 +11,9 @@ from ._respond import RespondTool
 TOOLS = [AddTasksTool, AddShoppingItemsTool, RespondTool]
 TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
 
-AvailableTools = Literal["AddTasksTool", "AddShoppingItemsTool", "RespondTool"]
-ToolList: TypeAlias = list[BaseTool]
-
 AVAILABLE_MODES = {
     "default": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
 }
+
+ToolList: TypeAlias = list[BaseTool]
