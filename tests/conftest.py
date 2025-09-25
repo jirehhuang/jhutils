@@ -9,7 +9,7 @@ import pytest
 from dotenv import load_dotenv
 
 from jhutils import Mealie, Obsidian
-from jhutils.agents.tools import Toolset
+from jhutils.agent.tools import Toolset
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 

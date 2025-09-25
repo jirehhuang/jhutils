@@ -1,4 +1,4 @@
-"""Assistant agent."""
+"""Tool chaining assistant agent."""
 
 from typing import Literal, Optional, Type, TypeVar, Union, cast
 
@@ -206,8 +206,8 @@ class SelectedToolsProvider(BaseDynamicContextProvider):
         )
 
 
-class AssistantAgent:
-    """Assistant agent class."""
+class ToolChainingAssistant:
+    """Tool chaining assistant agent class."""
 
     _input_schema = QueryInputSchema
     _toolset = Toolset()

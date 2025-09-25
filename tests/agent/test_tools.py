@@ -3,12 +3,12 @@
 import numpy as np
 import pytest
 
-from jhutils.agents.tools import (
+from jhutils.agent.tools import (
     AddShoppingItemsTool,
     AddTasksTool,
     RespondTool,
 )
-from jhutils.agents.tools._toolset import (
+from jhutils.agent.tools._toolset import (
     AVAILABLE_MODES,
     TOOL_NAMES,
     TOOLS,
