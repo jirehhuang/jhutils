@@ -7,12 +7,12 @@ from jhutils.agent.tools import (
     AddShoppingItemsTool,
     AddTasksTool,
     RespondTool,
+    Toolset,
 )
-from jhutils.agent.tools._toolset import (
+from jhutils.agent.tools._tools import (
     AVAILABLE_MODES,
     TOOL_NAMES,
     TOOLS,
-    Toolset,
 )
 
 

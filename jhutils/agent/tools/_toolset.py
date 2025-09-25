@@ -1,23 +1,8 @@
 """Toolset class for managing tools."""
 
-from typing import Literal, TypeAlias
-
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 
-from ._add_shopping_items import AddShoppingItemsTool
-from ._add_tasks import AddTasksTool
-from ._respond import RespondTool
-
-TOOLS = [AddTasksTool, AddShoppingItemsTool, RespondTool]
-TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
-
-AvailableTools = Literal["AddTasksTool", "AddShoppingItemsTool", "RespondTool"]
-ToolList: TypeAlias = list[BaseTool]
-
-AVAILABLE_MODES = {
-    "default": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
-    "shopping": ["AddShoppingItemsTool", "RespondTool"],
-}
+from ._tools import AVAILABLE_MODES, TOOLS, AvailableTools, ToolList
 
 
 class Toolset:
