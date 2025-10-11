@@ -47,6 +47,63 @@ class QueryInputSchema(BaseIOSchema):
 
 
 # pylint: disable=invalid-name
+def MakeParseQueryOutputSchema(  # noqa: N802
+    toolset: Toolset | None = None,
+) -> Type[BaseIOSchema]:
+    """Construct a ParseQueryOutputSchema for a given set of tools.
+
+    Parameters
+    ----------
+    toolset
+        Toolset whose tools' names will be used to define the `queries` field.
+
+    Returns
+    -------
+    type[BaseIOSchema]
+        A dynamically created Pydantic schema class where `queries` is a dict
+        with keys as the tools' names and values as the corresponding queries.
+    """
+    if toolset is None:
+        toolset = _toolset
+
+    tool_name_literals = tuple(
+        Literal[tool_name] for tool_name in toolset.available_tool_names
+    )
+    queries_type = (
+        dict[tool_name_literals[0], str]  # type: ignore
+        if len(tool_name_literals) == 1
+        else (
+            dict[Union[*tool_name_literals], str]  # type: ignore
+            if len(tool_name_literals) > 1
+            else dict[str, str]
+        )
+    )
+
+    annotations = {
+        "queries": queries_type,
+    }
+    class_dict = {
+        "__annotations__": annotations,
+        "queries": Field(
+            ...,
+            description=(
+                "Parsed queries organized by relevant tool. "
+                "If no query is applicable for a tool, omit that tool from "
+                "the dictionary."
+            ),
+        ),
+        "__doc__": (
+            "Output schema for parsing a user query into individual queries "
+            "organized by relevant tool."
+        ),
+    }
+    ParseQueryOutputSchema = type(  # noqa: N806
+        "ParseQueryOutputSchema", (BaseIOSchema,), class_dict
+    )
+    return ParseQueryOutputSchema
+
+
+# pylint: disable=invalid-name
 def MakeChainToolOutputSchema(  # noqa: N802
     toolset: Toolset | None = None,
 ) -> Type[BaseIOSchema]:
