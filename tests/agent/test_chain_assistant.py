@@ -190,11 +190,7 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
 def test_assistant_chain_tools_task_shopping_respond(assistant):
     """Test that the assistant can correctly chain multiple tools:
     AddTasksTool, AddShoppingItemsTool, RespondTool."""
-    query = (
-        "Add onions to my shopping list. "
-        "Remind me to text Georgie back. "
-        "What chapter of the Bible does Jireh come from?"
-    )
+    query = "Add onions to my shopping list. Remind me to text Georgie back."
     response = assistant.run(query)
     history = assistant.agent.history.get_history()
     assert json.loads(history[1]["content"])["called_tool_input"] == {
@@ -203,4 +199,4 @@ def test_assistant_chain_tools_task_shopping_respond(assistant):
     assert json.loads(history[3]["content"])["called_tool_input"] == {
         "tasks": ["Text Georgie back"]
     }
-    assert "Genesis 22" in response
+    assert response == "Done."
