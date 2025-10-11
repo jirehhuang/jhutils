@@ -18,7 +18,7 @@ InputSchema = TypeVar("InputSchema", bound=BaseIOSchema)
 OutputSchema = TypeVar("OutputSchema", bound=BaseIOSchema)
 
 
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-4o-mini"
 MODEL_API_PARAMETERS = {"temperature": 0.0}
 
 ASSISTANT_BACKGROUND = [
