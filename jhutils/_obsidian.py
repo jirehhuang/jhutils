@@ -15,7 +15,7 @@ class Obsidian:
         self._api_url: str = (
             f"https://api.github.com/repos/{owner}/{repository}/contents"
         )
-        self._branch: str = branch
+        self._branch: str = branch or "main"
         self._files: Dict[str, Any] = {}
 
         self.session = requests.Session()
