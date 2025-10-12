@@ -1,3 +1,3 @@
 """Agents module."""
 
-from ._chain_assistant import ToolChainingAssistant
+from ._assistant import AssistantAgent

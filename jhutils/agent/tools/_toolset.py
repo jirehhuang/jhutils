@@ -1,6 +1,10 @@
 """Toolset class for managing tools."""
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
+from atomic_agents.context import (
+    BaseDynamicContextProvider,
+)
+from docstring_parser import parse as parse_docstring
 
 from ._tools import AVAILABLE_MODES, TOOLS, ToolList
 
@@ -112,3 +116,40 @@ class Toolset:
 
 # Static instance of Toolset for internal use
 _toolset = Toolset()
+
+
+# pylint: disable=too-few-public-methods
+class AvailableToolsProvider(BaseDynamicContextProvider):
+    """Dynamic context provider for Available Tool(s)."""
+
+    def __init__(self, toolset: Toolset, title: str = "Available Tool(s)"):
+        super().__init__(title)
+        self._toolset = toolset
+
+    def get_info(self) -> str:
+        """Get information."""
+        return "\n".join(
+            [
+                (
+                    f"- {tool.__qualname__}: "
+                    f"{parse_docstring(tool.__doc__).short_description}"
+                )
+                for tool in self._toolset.available_tools
+            ]
+        )
+
+
+# pylint: disable=too-few-public-methods
+class SelectedToolsProvider(BaseDynamicContextProvider):
+    """Dynamic context provider for Selected Tool(s)."""
+
+    def __init__(self, toolset: Toolset, title: str = "Selected Tool(s)"):
+        super().__init__(title)
+        self._title = title
+        self._toolset = toolset
+
+    def get_info(self) -> str:
+        """Get information."""
+        return ", ".join(
+            [f"- {tool.__qualname__}" for tool in self._toolset.selected_tools]
+        )

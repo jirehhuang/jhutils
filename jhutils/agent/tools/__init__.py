@@ -18,4 +18,11 @@ from ._respond import (
     RespondOutputSchema,
     RespondTool,
 )
-from ._toolset import Toolset
+from ._schemas import (
+    MakeChainToolOutputSchema,
+)
+from ._toolset import (
+    AvailableToolsProvider,
+    SelectedToolsProvider,
+    Toolset,
+)
