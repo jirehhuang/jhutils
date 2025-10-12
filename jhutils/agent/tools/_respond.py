@@ -2,8 +2,10 @@
 
 from typing import Optional
 
-from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
+from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field
+
+from ._base import BaseToolTestConfig
 
 
 class RespondInputSchema(BaseIOSchema):
@@ -34,7 +36,7 @@ class RespondOutputSchema(BaseIOSchema):
     response: str | None = Field(..., description="The response to the user.")
 
 
-class RespondConfig(BaseToolConfig):
+class RespondConfig(BaseToolTestConfig):
     """Configuration for RespondTool."""
 
 
@@ -62,4 +64,8 @@ class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
         -------
             RespondOutputSchema: The reflected response.
         """
+        # Placeholder
+        if not self.config.bool_test:
+            pass
+
         return RespondOutputSchema(response=params.response)

@@ -33,7 +33,7 @@ def fixture_add_tasks_input(add_tasks_tool):
 @pytest.fixture(name="assistant", scope="function")
 def fixture_assistant(openrouter_client):
     """Return an instance of AssistantAgent."""
-    return AssistantAgent(openrouter_client)
+    return AssistantAgent(openrouter_client, bool_test=True)
 
 
 def test_chain_schema_error_if_invalid_tool(add_tasks_input):

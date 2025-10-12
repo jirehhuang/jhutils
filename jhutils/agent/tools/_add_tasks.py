@@ -2,8 +2,10 @@
 
 from typing import Optional
 
-from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
+from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field, conlist
+
+from ._base import BaseToolTestConfig
 
 TasksList = conlist(str, min_length=1)
 
@@ -36,7 +38,7 @@ class AddTasksOutputSchema(BaseIOSchema):
     )
 
 
-class AddTasksConfig(BaseToolConfig):
+class AddTasksConfig(BaseToolTestConfig):
     """Configuration for AddTasksTool."""
 
 
@@ -65,6 +67,9 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
             AddTasksOutputSchema: The result of the action.
         """
         # Placeholder
+        if not self.config.bool_test:
+            pass
+
         joined_tasks = ", ".join(params.tasks)
         return AddTasksOutputSchema(
             result=f"Successfully added task(s): {joined_tasks}"

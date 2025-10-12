@@ -12,7 +12,7 @@ from ._tools import AVAILABLE_MODES, TOOLS, ToolList
 class Toolset:
     """Class for managing tools."""
 
-    _all_tools: ToolList = TOOLS
+    _all_tools: ToolList = TOOLS.copy()
 
     def __init__(self, mode: str = "default"):
         """Initialize the Toolset with a list of tools."""
