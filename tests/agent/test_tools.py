@@ -29,13 +29,13 @@ def test_add_shopping_items_tool():
     assert result.model_dump() == expected_result
 
 
-def test_add_tasks_tool():
+def test_add_tasks_tool(obsidian):
     """Test that running the AddTasksTool returns the expected result."""
     tasks = ["Do laundry", "Buy groceries", "Clean room"]
     expected_result = {
         "result": f"Successfully added task(s): {', '.join(tasks)}"
     }
-    tool = AddTasksTool()
+    tool = AddTasksTool(obsidian=obsidian)
     input_data = tool.input_schema(tasks=tasks)
     result = tool.run(input_data)
     assert result.model_dump() == expected_result
