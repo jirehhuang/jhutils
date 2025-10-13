@@ -61,10 +61,12 @@ class Obsidian:
         self._files.update({file_path: response})
         return self._files[file_path]
 
-    def add_file(self, file_path: str, content: str) -> Dict[str, Any]:
+    def add_file(
+        self, file_path: str, content: str, message: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Add a new file to the repository."""
         data = {
-            "message": f"add {file_path}",
+            "message": message or f"add {file_path}",
             "content": base64.b64encode(content.encode("utf-8")).decode(
                 "utf-8"
             ),
