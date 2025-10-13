@@ -5,6 +5,7 @@ from typing import Optional
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field, conlist
 
+from ..._obsidian import Obsidian
 from ._base import BaseToolTestConfig
 
 TasksList = conlist(str, min_length=1)
@@ -49,10 +50,16 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
     output_schema = AddTasksOutputSchema
     config_cls = AddTasksConfig
 
-    def __init__(self, config: Optional[AddTasksConfig] = None):
+    def __init__(
+        self,
+        obsidian: Obsidian,
+        config: Optional[AddTasksConfig] = None,
+    ):
         if config is None:
             config = AddTasksConfig()
         super().__init__(config)
+        self.bool_test = config.bool_test
+        self.obsidian = obsidian
 
     def run(self, params: AddTasksInputSchema) -> AddTasksOutputSchema:
         """Execute the AddTasksTool with the given parameters.
@@ -66,9 +73,8 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
         -------
             AddTasksOutputSchema: The result of the action.
         """
-        # Placeholder
-        if not self.config.bool_test:
-            pass
+        if not self.bool_test:
+            self.obsidian.add_tasks(params.tasks)
 
         joined_tasks = ", ".join(params.tasks)
         return AddTasksOutputSchema(
