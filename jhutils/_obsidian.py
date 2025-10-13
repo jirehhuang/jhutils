@@ -1,9 +1,14 @@
 """Obsidian class to interact with an Obsidian vault backed up on GitHub."""
 
 import base64
+import os
 from typing import Any, Dict, List, Optional
 
 import requests
+
+from jhutils._utils import _time_id
+
+INBOX_PATH = "Inbox"
 
 
 class Obsidian:
@@ -106,3 +111,11 @@ class Obsidian:
             "branch": self._branch,
         }
         return self._request("PUT", file_path, data=data)
+
+    def add_tasks(self, tasks: List[str]) -> dict:
+        """Add tasks to the Inbox folder as a markdown file."""
+        file_path = os.path.join(INBOX_PATH, f"task_{_time_id()}.md")
+        content = "\n".join(f"- [ ] {task}" for task in tasks)
+        return self.add_file(
+            file_path, content=content, message=f"task: add {file_path}"
+        )
