@@ -12,14 +12,17 @@ from ._add_tasks import (
     AddTasksOutputSchema,
     AddTasksTool,
 )
-from ._chain import (
-    MakeChainToolOutputSchema,
-    QueryInputSchema,
-)
 from ._respond import (
     RespondConfig,
     RespondInputSchema,
     RespondOutputSchema,
     RespondTool,
 )
-from ._toolset import Toolset
+from ._schemas import (
+    MakeChainToolOutputSchema,
+)
+from ._toolset import (
+    AvailableToolsProvider,
+    SelectedToolsProvider,
+    Toolset,
+)

@@ -152,3 +152,12 @@ class Mealie:
             endpoint="api/households/shopping/items",
             params={"ids": ids},
         )
+
+    def parse_items(self, items: List[str]) -> List[Dict[str, Any]]:
+        """Parse item names into food item dictionaries."""
+        response = self._request(
+            "POST",
+            endpoint="api/parser/ingredients",
+            data={"parser": "nlp", "ingredients": items},
+        )
+        return [item["ingredient"] for item in response["content"]]

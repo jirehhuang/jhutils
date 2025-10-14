@@ -1,9 +1,17 @@
 """General utility functions."""
 
 import textwrap
+from datetime import datetime
 from typing import Optional
 
+import pytz
 from docstring_parser import Docstring, DocstringParam, DocstringReturns, parse
+
+
+def _time_id(timezone="US/Pacific") -> str:
+    """Generate a unique time-based identifier."""
+    now = datetime.now(pytz.timezone(timezone))
+    return now.strftime("%Y-%m-%d_%H-%M-%S-%f")[:-3]
 
 
 def _format_param(p: DocstringParam) -> str:

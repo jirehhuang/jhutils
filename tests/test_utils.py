@@ -1,9 +1,12 @@
 """Test utilities."""
 
+from datetime import datetime
+
 import pytest
+import pytz
 from docstring_parser import parse
 
-from jhutils._utils import _convert_docstring
+from jhutils._utils import _convert_docstring, _time_id
 
 
 def func_numpy(a: int = 1, b: int = 2) -> int:
@@ -113,3 +116,17 @@ def test_convert_docstring_equivalence(func):
         assert (parsed_in.returns.description or "").strip() == (
             parsed_out.returns.description or ""
         ).strip()
+
+
+def test_time_id():
+    """Test that the _time_id function returns a string of the expected
+    format."""
+    tid = _time_id(timezone="utc")
+    assert isinstance(tid, str)
+    time_from_id = pytz.utc.localize(
+        datetime.strptime(tid, "%Y-%m-%d_%H-%M-%S-%f")
+    )
+    delta = 10
+    assert (
+        abs((datetime.now(pytz.utc) - time_from_id).total_seconds()) <= delta
+    )

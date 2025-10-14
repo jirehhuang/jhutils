@@ -67,3 +67,14 @@ def test_add_update_delete_file(obsidian):
         file["path"]
         for file in obsidian.list_files(os.path.dirname(file_path))
     ]
+
+
+def test_add_tasks(obsidian):
+    """Test that method .add_tasks() behaves as expected."""
+    tasks = [
+        "Visit parents",
+        "Call Andrew",
+        "Finish drafting announcements",
+    ]
+    response = obsidian.add_tasks(tasks)
+    assert "content" in response

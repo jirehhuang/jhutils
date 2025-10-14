@@ -9,7 +9,7 @@ import pytest
 from dotenv import load_dotenv
 
 from jhutils import Mealie, Obsidian
-from jhutils.agents.tools import Toolset
+from jhutils.agent.tools import Toolset
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
@@ -29,7 +29,7 @@ def fixture_mealie():
     )
 
 
-@pytest.fixture(name="obsidian", scope="function")
+@pytest.fixture(name="obsidian", scope="module")
 def fixture_obsidian():
     """Return Obsidian client object."""
     return Obsidian(
@@ -51,7 +51,7 @@ def fixture_openrouter_client():
     )
 
 
-@pytest.fixture(name="toolset", scope="function")
+@pytest.fixture(name="toolset", scope="module")
 def fixture_toolset():
-    """Return the default instance of Toolset."""
-    return Toolset()
+    """Return the dummy instance of Toolset."""
+    return Toolset(obsidian=None, mealie=None)

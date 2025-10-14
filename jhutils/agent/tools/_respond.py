@@ -41,8 +41,8 @@ class RespondConfig(BaseToolConfig):
 class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
     """Respond to the user, such as by answering a question or explaining."""
 
-    input_schema = RespondInputSchema
-    output_schema = RespondOutputSchema
+    input_schema = RespondInputSchema  # type: ignore
+    output_schema = RespondOutputSchema  # type: ignore
     config_cls = RespondConfig
 
     def __init__(self, config: Optional[RespondConfig] = None):

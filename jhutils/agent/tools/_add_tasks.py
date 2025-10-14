@@ -5,6 +5,8 @@ from typing import Optional
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
+from ..._obsidian import Obsidian
+
 TasksList = conlist(str, min_length=1)
 
 
@@ -43,14 +45,24 @@ class AddTasksConfig(BaseToolConfig):
 class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
     """Add one or more independent tasks to the task list."""
 
-    input_schema = AddTasksInputSchema
-    output_schema = AddTasksOutputSchema
+    input_schema = AddTasksInputSchema  # type: ignore
+    output_schema = AddTasksOutputSchema  # type: ignore
     config_cls = AddTasksConfig
 
-    def __init__(self, config: Optional[AddTasksConfig] = None):
+    def __init__(
+        self,
+        config: Optional[AddTasksConfig] = None,
+        obsidian: Obsidian | None = None,
+    ):
         if config is None:
             config = AddTasksConfig()
         super().__init__(config)
+        self._obsidian = obsidian
+
+    @property
+    def obsidian(self) -> Obsidian | None:
+        """Get the Obsidian instance."""
+        return self._obsidian
 
     def run(self, params: AddTasksInputSchema) -> AddTasksOutputSchema:
         """Execute the AddTasksTool with the given parameters.
@@ -64,7 +76,9 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
         -------
             AddTasksOutputSchema: The result of the action.
         """
-        # Placeholder
+        if isinstance(self.obsidian, Obsidian):
+            self.obsidian.add_tasks(params.tasks)  # pragma: no cover
+
         joined_tasks = ", ".join(params.tasks)
         return AddTasksOutputSchema(
             result=f"Successfully added task(s): {joined_tasks}"

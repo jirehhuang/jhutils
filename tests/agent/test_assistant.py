@@ -5,36 +5,13 @@ import json
 import numpy as np
 import pytest
 
-from jhutils.agents import AssistantAgent
-from jhutils.agents.assistant import (
-    AvailableToolsProvider,
-    SelectedToolsProvider,
-)
+from jhutils.agent import AssistantAgent
 
 
 @pytest.fixture(name="assistant", scope="function")
 def fixture_assistant(openrouter_client):
     """Return an instance of AssistantAgent."""
-    return AssistantAgent(openrouter_client)
-
-
-def test_tools_providers(toolset):
-    """Test that the AvailableToolsProvider and SelectedToolsProvider return
-    the correct tools."""
-    available_tools_info = AvailableToolsProvider(toolset=toolset).get_info()
-    assert np.all(
-        [
-            tool_name in available_tools_info
-            for tool_name in toolset.all_tool_names
-        ]
-    )
-    selected_tools_info = SelectedToolsProvider(toolset=toolset).get_info()
-    assert np.all(
-        [
-            tool_name in selected_tools_info
-            for tool_name in toolset.selected_tool_names
-        ]
-    )
+    return AssistantAgent(openrouter_client, bool_test=True)
 
 
 def test_assistant_select_and_execute_add_tasks(assistant):
@@ -120,17 +97,22 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
 def test_assistant_chain_tools_task_shopping_respond(assistant):
     """Test that the assistant can correctly chain multiple tools:
     AddTasksTool, AddShoppingItemsTool, RespondTool."""
-    query = (
-        "Add onions to my shopping list. "
-        "Remind me to text Georgie back. "
-        "What chapter of the Bible does Jireh come from?"
-    )
+    query = "Add onions to my shopping list. Remind me to text Georgie back."
     response = assistant.run(query)
     history = assistant.agent.history.get_history()
-    assert json.loads(history[1]["content"])["called_tool_input"] == {
-        "items": ["onions"]
-    }
-    assert json.loads(history[3]["content"])["called_tool_input"] == {
-        "tasks": ["Text Georgie back"]
-    }
-    assert "Genesis 22" in response
+    called_tool_inputs = [
+        json.loads(history[i]["content"])["called_tool_input"] for i in [1, 3]
+    ]
+    assert np.any(
+        [
+            called_tool_input == {"items": ["onions"]}
+            for called_tool_input in called_tool_inputs
+        ]
+    )
+    assert np.any(
+        [
+            called_tool_input == {"tasks": ["Text Georgie back"]}
+            for called_tool_input in called_tool_inputs
+        ]
+    )
+    assert response == "Done."

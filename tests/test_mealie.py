@@ -46,11 +46,14 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     items_before = mealie.load_shopping_items(force=True)
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [
-        {"isFood": False, "note": "non-food example"},
+        {"note": "test non-food example"},
         {
-            "isFood": True,
-            "note": "food example",
-            "foodId": mealie.foods[0]["id"],
+            "note": "example",
+            "foodId": next(
+                food["id"]
+                for food in mealie.foods
+                if food["name"] == "test food"
+            ),
         },
     ]
     response = mealie.add_shopping_items(items)
@@ -62,3 +65,15 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     )
     items_after = mealie.load_shopping_items(force=True)
     assert items_before == items_after
+
+
+def test_parse_items(mealie):
+    """Test that method .parse_items() correctly parses a list of
+    strings into a list of dictionaries."""
+    items = ["milk", "2 eggs", "flour (1kg)"]
+    parsed_items = mealie.parse_items(items)
+    assert [item["display"] for item in parsed_items] == [
+        "milk",
+        "2 eggs",
+        "1 kilogram flour",
+    ]

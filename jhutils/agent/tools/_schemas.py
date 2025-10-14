@@ -1,25 +1,16 @@
-"""Schemas for chaining multiple tool calls together."""
+"""Schemas that are composed dynamically based on the tools available."""
 
 from typing import Literal, Type, Union, cast
 
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field, model_validator
 
-from ._toolset import Toolset, _toolset
-
-
-class QueryInputSchema(BaseIOSchema):
-    """Input schema providing the user query."""
-
-    query: str = Field(
-        ...,
-        description=("The user input query to be analyzed and addressed."),
-    )
+from ._toolset import Toolset
 
 
 # pylint: disable=invalid-name
 def MakeChainToolOutputSchema(  # noqa: N802
-    toolset: Toolset | None = None,
+    toolset: Toolset,
 ) -> Type[BaseIOSchema]:
     """Construct a ChainToolOutputSchema for a given set of tools.
 
@@ -34,9 +25,6 @@ def MakeChainToolOutputSchema(  # noqa: N802
         A dynamically created Pydantic schema class where `called_tool_input`
         is a Union of the tools' input schemas.
     """
-    if toolset is None:
-        toolset = _toolset
-
     tool_input_schemas = tuple(
         cast(type[BaseTool], tool).input_schema
         for tool in toolset.selected_tools
@@ -76,8 +64,8 @@ def MakeChainToolOutputSchema(  # noqa: N802
             called_tool_input, toolset.get_input_schema("RespondTool")
         ) and (remainder != "" or next_tool is not None):
             raise ValueError(
-                "If `called_tool_input` calls `RespondTool`, `next_tool` must "
-                "be `None`."
+                "If `called_tool_input` calls `RespondTool`, `REMAINDER` must "
+                "be empty and `next_tool` must be `None`."
             )
 
         return self
@@ -138,3 +126,59 @@ def MakeChainToolOutputSchema(  # noqa: N802
         "ChainToolOutputSchema", (BaseIOSchema,), class_dict
     )
     return ChainToolOutputSchema
+
+
+# pylint: disable=invalid-name
+def MakeParseQueryOutputSchema(  # noqa: N802
+    toolset: Toolset,
+) -> Type[BaseIOSchema]:  # pragma: no cover
+    """Construct a ParseQueryOutputSchema for a given set of tools.
+
+    Parameters
+    ----------
+    toolset
+        Toolset whose tools' names will be used to define the `queries` field.
+
+    Returns
+    -------
+    type[BaseIOSchema]
+        A dynamically created Pydantic schema class where `queries` is a dict
+        with keys as the tools' names and values as the corresponding queries.
+    """
+    tool_name_literals = tuple(
+        Literal[tool_name] for tool_name in toolset.available_tool_names
+    )
+    queries_type = (
+        dict[tool_name_literals[0], str]  # type: ignore
+        if len(tool_name_literals) == 1
+        else (
+            dict[Union[*tool_name_literals], str]  # type: ignore
+            if len(tool_name_literals) > 1
+            else dict[str, str]
+        )
+    )
+
+    annotations = {
+        "queries": queries_type,
+    }
+    class_dict = {
+        "__annotations__": annotations,
+        "queries": Field(
+            ...,
+            description=(
+                "Parsed queries organized by relevant tool. "
+                "If no query is applicable for a tool, omit that tool from "
+                "the dictionary."
+            ),
+        ),
+        "__doc__": (
+            "Output schema for parsing a user query into individual queries "
+            "organized by relevant tool."
+        ),
+    }
+    ParseQueryOutputSchema = type(  # noqa: N806
+        "ParseQueryOutputSchema", (BaseIOSchema,), class_dict
+    )
+    raise NotImplementedError
+    # pylint: disable=unreachable
+    return ParseQueryOutputSchema  # pragma: no cover

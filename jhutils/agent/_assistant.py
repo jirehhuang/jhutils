@@ -1,18 +1,18 @@
-"""Assistant agent."""
+"""Tool chaining assistant agent."""
 
 from typing import Optional, TypeVar
 
 import instructor
 from atomic_agents import AgentConfig, AtomicAgent, BaseIOSchema
 from atomic_agents.context import (
-    BaseDynamicContextProvider,
     SystemPromptGenerator,
 )
-from docstring_parser import parse as parse_docstring
+from pydantic import Field
 
 from .tools import (
+    AvailableToolsProvider,
     MakeChainToolOutputSchema,
-    QueryInputSchema,
+    SelectedToolsProvider,
     Toolset,
 )
 
@@ -20,7 +20,7 @@ InputSchema = TypeVar("InputSchema", bound=BaseIOSchema)
 OutputSchema = TypeVar("OutputSchema", bound=BaseIOSchema)
 
 
-DEFAULT_MODEL = "gpt-4o"
+DEFAULT_MODEL = "gpt-4o-mini"
 MODEL_API_PARAMETERS = {"temperature": 0.0}
 
 ASSISTANT_BACKGROUND = [
@@ -39,50 +39,22 @@ OUTPUT_INSTRUCTIONS = [
 ]
 
 
-# pylint: disable=too-few-public-methods
-class AvailableToolsProvider(BaseDynamicContextProvider):
-    """Dynamic context provider for Available Tool(s)."""
+class QueryInputSchema(BaseIOSchema):
+    """Input schema providing the user query."""
 
-    def __init__(self, toolset: Toolset, title: str = "Available Tool(s)"):
-        super().__init__(title)
-        self._toolset = toolset
-
-    def get_info(self) -> str:
-        """Get information."""
-        return "\n".join(
-            [
-                (
-                    f"- {tool.__qualname__}: "
-                    f"{parse_docstring(tool.__doc__).short_description}"
-                )
-                for tool in self._toolset.available_tools
-            ]
-        )
+    query: str = Field(
+        ...,
+        description=("The user input query to be analyzed and addressed."),
+    )
 
 
 # pylint: disable=too-few-public-methods
-class SelectedToolsProvider(BaseDynamicContextProvider):
-    """Dynamic context provider for Selected Tool(s)."""
-
-    def __init__(self, toolset: Toolset, title: str = "Selected Tool(s)"):
-        super().__init__(title)
-        self._title = title
-        self._toolset = toolset
-
-    def get_info(self) -> str:
-        """Get information."""
-        return ", ".join(
-            [f"- {tool.__qualname__}" for tool in self._toolset.selected_tools]
-        )
-
-
 class AssistantAgent:
-    """Assistant agent class."""
+    """Tool chaining assistant agent class."""
 
     _input_schema = QueryInputSchema
-    _toolset = Toolset()
 
-    def __init__(self, client: instructor.Instructor):
+    def __init__(self, client: instructor.Instructor, **kwargs):
         self._config = AgentConfig(
             client=client,
             model=DEFAULT_MODEL,
@@ -92,6 +64,7 @@ class AssistantAgent:
                 output_instructions=OUTPUT_INSTRUCTIONS,
             ),
         )
+        self._toolset = Toolset(**kwargs)
         self._output_schema: Optional[BaseIOSchema] = None
         self.agent: Optional[AtomicAgent[BaseIOSchema, BaseIOSchema]] = None
 
@@ -118,9 +91,9 @@ class AssistantAgent:
 
             tool_response = None
             if response.called_tool_input is not None:
-                called_tool = self._toolset.get_tool_by_schema(
-                    response.called_tool_input
-                )()
+                called_tool = self._toolset.initialize_tool(
+                    tool_schema=response.called_tool_input
+                )
                 tool_response = called_tool.run(response.called_tool_input)
 
             if response.next_tool is None:

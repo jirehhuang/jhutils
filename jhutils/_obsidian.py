@@ -1,9 +1,14 @@
 """Obsidian class to interact with an Obsidian vault backed up on GitHub."""
 
 import base64
+import os
 from typing import Any, Dict, List, Optional
 
 import requests
+
+from jhutils._utils import _time_id
+
+INBOX_PATH = "Inbox"
 
 
 class Obsidian:
@@ -15,7 +20,7 @@ class Obsidian:
         self._api_url: str = (
             f"https://api.github.com/repos/{owner}/{repository}/contents"
         )
-        self._branch: str = branch
+        self._branch: str = branch or "main"
         self._files: Dict[str, Any] = {}
 
         self.session = requests.Session()
@@ -61,10 +66,12 @@ class Obsidian:
         self._files.update({file_path: response})
         return self._files[file_path]
 
-    def add_file(self, file_path: str, content: str) -> Dict[str, Any]:
+    def add_file(
+        self, file_path: str, content: str, message: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Add a new file to the repository."""
         data = {
-            "message": f"add {file_path}",
+            "message": message or f"add {file_path}",
             "content": base64.b64encode(content.encode("utf-8")).decode(
                 "utf-8"
             ),
@@ -104,3 +111,11 @@ class Obsidian:
             "branch": self._branch,
         }
         return self._request("PUT", file_path, data=data)
+
+    def add_tasks(self, tasks: List[str]) -> dict:
+        """Add tasks to the Inbox folder as a markdown file."""
+        file_path = os.path.join(INBOX_PATH, f"task_{_time_id()}.md")
+        content = "\n".join(f"- [ ] {task}" for task in tasks)
+        return self.add_file(
+            file_path, content=content, message=f"task: add {file_path}"
+        )
