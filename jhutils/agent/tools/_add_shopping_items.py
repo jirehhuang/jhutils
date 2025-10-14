@@ -5,6 +5,8 @@ from typing import Optional
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
+from jhutils._mealie import Mealie
+
 ItemsList = conlist(str, min_length=1)
 
 
@@ -40,14 +42,24 @@ class AddShoppingItemsTool(
 ):
     """Add one or more individual shopping items to the shopping list."""
 
-    input_schema = AddShoppingItemsInputSchema
-    output_schema = AddShoppingItemsOutputSchema
+    input_schema = AddShoppingItemsInputSchema  # type: ignore
+    output_schema = AddShoppingItemsOutputSchema  # type: ignore
     config_cls = AddShoppingItemsConfig
 
-    def __init__(self, config: Optional[AddShoppingItemsConfig] = None):
+    def __init__(
+        self,
+        config: Optional[AddShoppingItemsConfig] = None,
+        mealie: Mealie | None = None,
+    ):
         if config is None:
             config = AddShoppingItemsConfig()
         super().__init__(config)
+        self._mealie = mealie
+
+    @property
+    def mealie(self) -> Mealie | None:
+        """Get the Mealie instance."""
+        return self._mealie
 
     def run(
         self, params: AddShoppingItemsInputSchema
@@ -63,9 +75,10 @@ class AddShoppingItemsTool(
         -------
             AddShoppingItemsOutputSchema: The result of the action.
         """
-        # Placeholder
-        if not self.config.bool_test:
-            pass
+        if isinstance(self.mealie, Mealie):
+            self.mealie.add_shopping_items(  # pragma: no cover
+                self.mealie.parse_items(params.items)
+            )
 
         joined_items = ", ".join(params.items)
         return AddShoppingItemsOutputSchema(
