@@ -69,7 +69,8 @@ def test_chain_schema_error_if_no_remainder_and_next_tool(
 ):
     """Test that a ValueError is raised if there is no remainder and next_tool
     is not None."""
-    with pytest.raises(ValueError):
+    msg = "If `remainder` is empty, `next_tool` must be `None`."
+    with pytest.raises(ValueError, match=msg):
         chain_tool_output_schema(
             called_tool_input=add_tasks_input,
             remainder="",
@@ -81,7 +82,11 @@ def test_chain_schema_error_if_respond_not_last_tool(chain_tool_output_schema):
     """Test that a ValueError is raised if called_tool_input is
     RespondInputSchema and next_tool is not None."""
     respond_input = RespondTool().input_schema(response="This is a response.")
-    with pytest.raises(ValueError):
+    msg = (
+        "If `called_tool_input` calls `RespondTool`, `REMAINDER` must "
+        "be empty and `next_tool` must be `None`."
+    )
+    with pytest.raises(ValueError, match=msg):
         chain_tool_output_schema(
             called_tool_input=respond_input,
             remainder=REMAINDER,
