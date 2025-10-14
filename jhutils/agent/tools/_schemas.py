@@ -5,12 +5,12 @@ from typing import Literal, Type, Union, cast
 from atomic_agents import BaseIOSchema, BaseTool
 from pydantic import Field, model_validator
 
-from ._toolset import Toolset, _toolset
+from ._toolset import Toolset
 
 
 # pylint: disable=invalid-name
 def MakeChainToolOutputSchema(  # noqa: N802
-    toolset: Toolset | None = None,
+    toolset: Toolset,
 ) -> Type[BaseIOSchema]:
     """Construct a ChainToolOutputSchema for a given set of tools.
 
@@ -25,9 +25,6 @@ def MakeChainToolOutputSchema(  # noqa: N802
         A dynamically created Pydantic schema class where `called_tool_input`
         is a Union of the tools' input schemas.
     """
-    if toolset is None:
-        toolset = _toolset
-
     tool_input_schemas = tuple(
         cast(type[BaseTool], tool).input_schema
         for tool in toolset.selected_tools
@@ -133,8 +130,8 @@ def MakeChainToolOutputSchema(  # noqa: N802
 
 # pylint: disable=invalid-name
 def MakeParseQueryOutputSchema(  # noqa: N802
-    toolset: Toolset | None = None,
-) -> Type[BaseIOSchema]:
+    toolset: Toolset,
+) -> Type[BaseIOSchema]:  # pragma: no cover
     """Construct a ParseQueryOutputSchema for a given set of tools.
 
     Parameters
@@ -148,9 +145,6 @@ def MakeParseQueryOutputSchema(  # noqa: N802
         A dynamically created Pydantic schema class where `queries` is a dict
         with keys as the tools' names and values as the corresponding queries.
     """
-    if toolset is None:
-        toolset = _toolset
-
     tool_name_literals = tuple(
         Literal[tool_name] for tool_name in toolset.available_tool_names
     )
@@ -185,4 +179,5 @@ def MakeParseQueryOutputSchema(  # noqa: N802
     ParseQueryOutputSchema = type(  # noqa: N806
         "ParseQueryOutputSchema", (BaseIOSchema,), class_dict
     )
-    return ParseQueryOutputSchema
+    ParseQueryOutputSchema()
+    raise NotImplementedError
