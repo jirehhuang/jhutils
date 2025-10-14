@@ -29,7 +29,7 @@ def fixture_mealie():
     )
 
 
-@pytest.fixture(name="obsidian", scope="function")
+@pytest.fixture(name="obsidian", scope="module")
 def fixture_obsidian():
     """Return Obsidian client object."""
     return Obsidian(
@@ -53,5 +53,5 @@ def fixture_openrouter_client():
 
 @pytest.fixture(name="toolset", scope="function")
 def fixture_toolset():
-    """Return the default instance of Toolset."""
-    return Toolset()
+    """Return the dummy instance of Toolset."""
+    return Toolset(obsidian=None, mealie=None)
