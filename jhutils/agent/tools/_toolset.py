@@ -1,23 +1,39 @@
 """Toolset class for managing tools."""
 
+import inspect
+
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from atomic_agents.context import (
     BaseDynamicContextProvider,
 )
-from docstring_parser import parse as parse_docstring
+from docstring_parser import parse
 
 from ._tools import AVAILABLE_MODES, TOOLS, ToolList
 
 
 class Toolset:
-    """Class for managing tools."""
+    """Class for managing tools.
 
-    _all_tools: ToolList = TOOLS.copy()
+    Parameters
+    ----------
+    mode
+        The mode to initialize the toolset with. Determines the available
+        tools.
+    kwargs
+        Additional keyword arguments to pass to tool constructors.
+    """
 
-    def __init__(self, mode: str = "default"):
-        """Initialize the Toolset with a list of tools."""
-        self.mode = mode  # This sets _available_tools
+    def __init__(self, mode: str = "default", **kwargs):
+        """Initialize the Toolset with a list of tools and tool arguments."""
+        self._all_tools: ToolList = TOOLS.copy()
         self._selected_tools: ToolList = self._all_tools
+        self._kwargs = kwargs
+        self.mode = mode  # Sets _available_tools
+
+    @property
+    def kwargs(self):
+        """Getter for all tool constructor arguments."""
+        return self._kwargs
 
     @property
     def all_tools(self):
@@ -26,7 +42,10 @@ class Toolset:
 
     @property
     def available_tools(self):
-        """Getter for the available tools, determined by the mode."""
+        """Getter for the available tools.
+
+        The available tools are determined by the current mode.
+        """
         return self._available_tools
 
     @property
@@ -60,7 +79,7 @@ class Toolset:
             )
         self._available_tools = [
             tool
-            for tool in self._all_tools
+            for tool in self.all_tools
             if tool.__qualname__ in available_tool_names
         ]
         self._mode = mode
@@ -68,7 +87,7 @@ class Toolset:
     @property
     def all_tool_names(self) -> list[str]:
         """Get the names of all tools in the toolset."""
-        return [tool.__qualname__ for tool in self._all_tools]
+        return [tool.__qualname__ for tool in self.all_tools]
 
     @property
     def available_tool_names(self) -> list[str]:
@@ -80,42 +99,108 @@ class Toolset:
         """Get the names of selected tools in the toolset."""
         return [tool.__qualname__ for tool in self._selected_tools]
 
-    def get_tool(self, tool_name: str) -> BaseTool:
-        """Get a tool by its name."""
-        for tool in self._all_tools:
-            if tool.__qualname__ == tool_name:
-                return tool
-        raise ValueError(
-            f"Tool with name '{tool_name}' not found in the toolset."
-        )
+    def get_tool(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> BaseTool:
+        """Get a tool by its name, input schema, or input.
 
-    def get_tool_by_schema(self, tool_schema: BaseIOSchema) -> BaseTool:
-        """Get a tool by its input schema."""
-        for tool in self._all_tools:
-            if (
+        Parameters
+        ----------
+        tool_name
+            The name of the tool to retrieve.
+        tool_schema
+            The input schema of the tool to retrieve, or an instance of it.
+
+        Returns
+        -------
+        BaseTool
+            The tool class corresponding to the provided name or schema.
+        """
+        if not tool_name and not tool_schema:
+            raise ValueError(
+                'Either "tool_name" or "tool_schema" must be provided.'
+            )
+        for tool in self.all_tools:
+            if tool_name is not None and tool.__qualname__ == tool_name:
+                return tool
+            if tool_schema is not None and (
                 isinstance(tool_schema, tool.input_schema)
                 or tool.input_schema == tool_schema
             ):
                 return tool
+
+        if tool_name is None:
+            if hasattr(tool_schema, "__name__"):
+                tool_name = tool_schema.__name__  # type: ignore
+            else:
+                tool_name = tool_schema.__class__.__name__
         raise ValueError(
-            f"Tool with schema '{tool_schema}' not found in the toolset."
+            f'Tool with name "{tool_name}" not found in the toolset.'
         )
 
-    def get_input_schema(self, tool_name: str) -> BaseIOSchema:
-        """Get the input schema constructor for a tool by its name."""
-        return self.get_tool(tool_name).input_schema
+    def get_kwargs(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> dict:
+        """Retrieve the keyword arguments for a tool.
 
-    def get_output_schema(self, tool_name: str) -> BaseIOSchema:
-        """Get the output schema constructor for a tool by its name."""
-        return self.get_tool(tool_name).output_schema
+        Filtered to only those that are named arguments in the tool's __init__
+        method.
+        """
+        tool = self.get_tool(tool_name=tool_name, tool_schema=tool_schema)
+        sig = inspect.signature(tool.__init__)
+        valid_args = [
+            p.name
+            for p in sig.parameters.values()
+            if p.name not in {"self", "config"}
+        ]
+        return {k: v for k, v in self._kwargs.items() if k in valid_args}
 
-    def get_config(self, tool_name: str) -> BaseToolConfig:
-        """Get the config constructor for a tool by its name."""
-        return self.get_tool(tool_name).config_cls
+    def initialize_tool(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> BaseTool:
+        """Instantiate a tool by its name or schema."""
+        tool = self.get_tool(tool_name=tool_name, tool_schema=tool_schema)
+        tool_config = tool.config_cls()
+        tool_kwargs = self.get_kwargs(
+            tool_name=tool_name, tool_schema=tool_schema
+        )
+        return tool(config=tool_config, **tool_kwargs)
 
+    def get_input_schema(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> BaseIOSchema:
+        """Get the input schema constructor for a tool."""
+        return self.get_tool(
+            tool_name=tool_name, tool_schema=tool_schema
+        ).input_schema  # type: ignore
 
-# Static instance of Toolset for internal use
-_toolset = Toolset()
+    def get_output_schema(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> BaseIOSchema:
+        """Get the output schema constructor for a tool."""
+        return self.get_tool(
+            tool_name=tool_name, tool_schema=tool_schema
+        ).output_schema  # type: ignore
+
+    def get_config(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> BaseToolConfig:
+        """Get the config constructor for a tool."""
+        return self.get_tool(
+            tool_name=tool_name, tool_schema=tool_schema
+        ).config_cls  # type: ignore
 
 
 # pylint: disable=too-few-public-methods
@@ -132,7 +217,7 @@ class AvailableToolsProvider(BaseDynamicContextProvider):
             [
                 (
                     f"- {tool.__qualname__}: "
-                    f"{parse_docstring(tool.__doc__).short_description}"
+                    f"{parse(tool.__doc__).short_description}"  # type: ignore
                 )
                 for tool in self._toolset.available_tools
             ]
