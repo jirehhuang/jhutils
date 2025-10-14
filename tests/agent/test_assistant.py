@@ -6,35 +6,12 @@ import numpy as np
 import pytest
 
 from jhutils.agent import AssistantAgent
-from jhutils.agent.tools import (
-    AvailableToolsProvider,
-    SelectedToolsProvider,
-)
 
 
 @pytest.fixture(name="assistant", scope="function")
 def fixture_assistant(openrouter_client):
     """Return an instance of AssistantAgent."""
     return AssistantAgent(openrouter_client, bool_test=True)
-
-
-def test_tools_providers(toolset):
-    """Test that the AvailableToolsProvider and SelectedToolsProvider return
-    the correct tools."""
-    available_tools_info = AvailableToolsProvider(toolset=toolset).get_info()
-    assert np.all(
-        [
-            tool_name in available_tools_info
-            for tool_name in toolset.all_tool_names
-        ]
-    )
-    selected_tools_info = SelectedToolsProvider(toolset=toolset).get_info()
-    assert np.all(
-        [
-            tool_name in selected_tools_info
-            for tool_name in toolset.selected_tool_names
-        ]
-    )
 
 
 def test_assistant_select_and_execute_add_tasks(assistant):

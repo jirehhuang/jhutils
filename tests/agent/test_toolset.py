@@ -12,6 +12,10 @@ from jhutils.agent.tools._tools import (
     TOOL_NAMES,
     TOOLS,
 )
+from jhutils.agent.tools._toolset import (
+    AvailableToolsProvider,
+    SelectedToolsProvider,
+)
 
 
 @pytest.mark.parametrize(
@@ -148,3 +152,22 @@ def test_toolset_kwargs_initialize_tools(obsidian, mealie):
     assert add_tasks_tool.obsidian == obsidian
     add_shopping_items_tool = toolset.initialize_tool("AddShoppingItemsTool")
     assert add_shopping_items_tool.mealie == mealie
+
+
+def test_tools_providers(toolset):
+    """Test that the AvailableToolsProvider and SelectedToolsProvider return
+    the correct tools."""
+    available_tools_info = AvailableToolsProvider(toolset=toolset).get_info()
+    assert np.all(
+        [
+            tool_name in available_tools_info
+            for tool_name in toolset.all_tool_names
+        ]
+    )
+    selected_tools_info = SelectedToolsProvider(toolset=toolset).get_info()
+    assert np.all(
+        [
+            tool_name in selected_tools_info
+            for tool_name in toolset.selected_tool_names
+        ]
+    )
