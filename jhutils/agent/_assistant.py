@@ -53,9 +53,8 @@ class AssistantAgent:
     """Tool chaining assistant agent class."""
 
     _input_schema = QueryInputSchema
-    _toolset = Toolset()
 
-    def __init__(self, client: instructor.Instructor, bool_test: bool = False):
+    def __init__(self, client: instructor.Instructor, **kwargs):
         self._config = AgentConfig(
             client=client,
             model=DEFAULT_MODEL,
@@ -65,9 +64,9 @@ class AssistantAgent:
                 output_instructions=OUTPUT_INSTRUCTIONS,
             ),
         )
+        self._toolset = Toolset(**kwargs)
         self._output_schema: Optional[BaseIOSchema] = None
         self.agent: Optional[AtomicAgent[BaseIOSchema, BaseIOSchema]] = None
-        self._bool_test: bool = bool_test
 
     def run(self, query: str) -> str:
         """Run the assistant agent."""
@@ -92,13 +91,8 @@ class AssistantAgent:
 
             tool_response = None
             if response.called_tool_input is not None:
-                called_tool_cls = self._toolset.get_tool_by_schema(
-                    response.called_tool_input
-                )
-                called_tool = called_tool_cls(
-                    config=called_tool_cls.config_cls(
-                        bool_test=self._bool_test
-                    )
+                called_tool = self._toolset.initialize_tool(
+                    tool_schema=response.called_tool_input
                 )
                 tool_response = called_tool.run(response.called_tool_input)
 
