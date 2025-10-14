@@ -64,8 +64,8 @@ def MakeChainToolOutputSchema(  # noqa: N802
             called_tool_input, toolset.get_input_schema("RespondTool")
         ) and (remainder != "" or next_tool is not None):
             raise ValueError(
-                "If `called_tool_input` calls `RespondTool`, `next_tool` must "
-                "be `None`."
+                "If `called_tool_input` calls `RespondTool`, `REMAINDER` must "
+                "be empty and `next_tool` must be `None`."
             )
 
         return self
