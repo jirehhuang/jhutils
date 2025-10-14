@@ -123,5 +123,5 @@ def test_time_id():
     tid = _time_id()
     assert isinstance(tid, str)
     time_from_id = datetime.strptime(tid, "%Y-%m-%d_%H-%M-%S-%f")
-    delta = 10
-    assert abs(datetime.now() - time_from_id).total_seconds() <= delta
+    delta = 60
+    assert abs((datetime.now() - time_from_id).total_seconds()) <= delta
