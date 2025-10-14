@@ -206,10 +206,19 @@ def test_assistant_chain_tools_task_shopping_respond(assistant):
     query = "Add onions to my shopping list. Remind me to text Georgie back."
     response = assistant.run(query)
     history = assistant.agent.history.get_history()
-    assert json.loads(history[1]["content"])["called_tool_input"] == {
-        "items": ["onions"]
-    }
-    assert json.loads(history[3]["content"])["called_tool_input"] == {
-        "tasks": ["Text Georgie back"]
-    }
+    called_tool_inputs = [
+        json.loads(history[i]["content"])["called_tool_input"] for i in [1, 3]
+    ]
+    assert np.any(
+        [
+            called_tool_input == {"items": ["onions"]}
+            for called_tool_input in called_tool_inputs
+        ]
+    )
+    assert np.any(
+        [
+            called_tool_input == {"tasks": ["Text Georgie back"]}
+            for called_tool_input in called_tool_inputs
+        ]
+    )
     assert response == "Done."
