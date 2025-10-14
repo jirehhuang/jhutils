@@ -51,7 +51,7 @@ def fixture_openrouter_client():
     )
 
 
-@pytest.fixture(name="toolset", scope="function")
+@pytest.fixture(name="toolset", scope="module")
 def fixture_toolset():
     """Return the dummy instance of Toolset."""
     return Toolset(obsidian=None, mealie=None)
