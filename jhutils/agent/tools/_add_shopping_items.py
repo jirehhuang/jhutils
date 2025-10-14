@@ -2,10 +2,8 @@
 
 from typing import Optional
 
-from atomic_agents import BaseIOSchema, BaseTool
+from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
-
-from ._base import BaseToolTestConfig
 
 ItemsList = conlist(str, min_length=1)
 
@@ -33,7 +31,7 @@ class AddShoppingItemsOutputSchema(BaseIOSchema):
     )
 
 
-class AddShoppingItemsConfig(BaseToolTestConfig):
+class AddShoppingItemsConfig(BaseToolConfig):
     """Configuration for AddShoppingItemsTool."""
 
 

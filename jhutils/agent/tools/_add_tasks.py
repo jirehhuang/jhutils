@@ -2,11 +2,10 @@
 
 from typing import Optional
 
-from atomic_agents import BaseIOSchema, BaseTool
+from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
 from ..._obsidian import Obsidian
-from ._base import BaseToolTestConfig
 
 TasksList = conlist(str, min_length=1)
 
@@ -39,27 +38,31 @@ class AddTasksOutputSchema(BaseIOSchema):
     )
 
 
-class AddTasksConfig(BaseToolTestConfig):
+class AddTasksConfig(BaseToolConfig):
     """Configuration for AddTasksTool."""
 
 
 class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
     """Add one or more independent tasks to the task list."""
 
-    input_schema = AddTasksInputSchema
-    output_schema = AddTasksOutputSchema
+    input_schema = AddTasksInputSchema  # type: ignore
+    output_schema = AddTasksOutputSchema  # type: ignore
     config_cls = AddTasksConfig
 
     def __init__(
         self,
-        obsidian: Obsidian,
         config: Optional[AddTasksConfig] = None,
+        obsidian: Obsidian | None = None,
     ):
         if config is None:
             config = AddTasksConfig()
         super().__init__(config)
-        self.bool_test = config.bool_test
-        self.obsidian = obsidian
+        self._obsidian = obsidian
+
+    @property
+    def obsidian(self) -> Obsidian | None:
+        """Get the Obsidian instance."""
+        return self._obsidian
 
     def run(self, params: AddTasksInputSchema) -> AddTasksOutputSchema:
         """Execute the AddTasksTool with the given parameters.
@@ -73,8 +76,8 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
         -------
             AddTasksOutputSchema: The result of the action.
         """
-        if not self.bool_test:
-            self.obsidian.add_tasks(params.tasks)
+        if isinstance(self.obsidian, Obsidian):
+            self.obsidian.add_tasks(params.tasks)  # pragma: no cover
 
         joined_tasks = ", ".join(params.tasks)
         return AddTasksOutputSchema(
