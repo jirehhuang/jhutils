@@ -64,6 +64,20 @@ def test_chain_schema_none_valid_next_tool(
     assert schema.next_tool is None
 
 
+def test_chain_schema_error_if_remainder_and_no_next_tool(
+    add_tasks_input, chain_tool_output_schema
+):
+    """Test that a ValueError is raised if there is a remainder and next_tool
+    is None."""
+    msg = "If `remainder` is not empty, `next_tool` must not be `None`."
+    with pytest.raises(ValueError, match=msg):
+        chain_tool_output_schema(
+            called_tool_input=add_tasks_input,
+            remainder=REMAINDER,
+            next_tool=None,
+        )
+
+
 def test_chain_schema_error_if_no_remainder_and_next_tool(
     add_tasks_input, chain_tool_output_schema
 ):
