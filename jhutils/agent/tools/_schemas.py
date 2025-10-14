@@ -179,5 +179,6 @@ def MakeParseQueryOutputSchema(  # noqa: N802
     ParseQueryOutputSchema = type(  # noqa: N806
         "ParseQueryOutputSchema", (BaseIOSchema,), class_dict
     )
-    ParseQueryOutputSchema()
     raise NotImplementedError
+    # pylint: disable=unreachable
+    return ParseQueryOutputSchema  # pragma: no cover
