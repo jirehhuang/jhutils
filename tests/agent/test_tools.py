@@ -129,31 +129,45 @@ def test_toolset_get_tool_methods(toolset):
     for tool in TOOLS:
         tool_name = tool.__qualname__
         assert toolset.get_tool(tool_name) == tool
-        assert toolset.get_tool_by_schema(tool.input_schema) == tool
+        assert toolset.get_tool(tool_schema=tool.input_schema) == tool
         assert toolset.get_input_schema(tool_name) == tool.input_schema
         assert toolset.get_output_schema(tool_name) == tool.output_schema
         assert toolset.get_config(tool_name) == tool.config_cls
 
 
-def test_toolset_error_if_invalid_tool_name(toolset):
-    """Test that a ValueError is raised if an invalid tool name is provided."""
-    with pytest.raises(ValueError):
-        toolset.get_tool("InvalidTool")
-    with pytest.raises(ValueError):
-        toolset.get_input_schema("InvalidTool")
-    with pytest.raises(ValueError):
-        toolset.get_output_schema("InvalidTool")
-    with pytest.raises(ValueError):
-        toolset.get_config("InvalidTool")
-
-
-def test_toolset_error_if_invalid_tool_schema(toolset):
-    """Test that a ValueError is raised if an invalid tool schema is
+def test_toolset_error_if_get_missing_tool_name_and_schema(toolset):
+    """Test that a ValueError is raised if neither tool_name nor tool_schema is
     provided."""
+    msg = 'Either "tool_name" or "tool_schema" must be provided.'
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_tool(tool_name=None, tool_schema=None)
+
+
+def test_toolset_error_if_get_invalid_tool_name(toolset):
+    """Test that a ValueError is raised if an invalid tool name is provided."""
+    invalid_tool = "InvalidTool"
+    msg = f'Tool with name "{invalid_tool}" not found in the toolset.'
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_tool(tool_name=invalid_tool)
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_input_schema(tool_name=invalid_tool)
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_output_schema(tool_name=invalid_tool)
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_config(tool_name=invalid_tool)
+
+
+def test_toolset_error_if_get_invalid_tool_schema(toolset):
+    """Test that a ValueError is raised if an invalid tool schema class or
+    instance is provided."""
 
     class InvalidSchema:
         # pylint: disable=too-few-public-methods
         pass
 
-    with pytest.raises(ValueError):
-        toolset.get_tool_by_schema(InvalidSchema)  # type: ignore
+    msg = 'Tool with name "InvalidSchema" not found in the toolset.'
+
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_tool(tool_schema=InvalidSchema)  # type: ignore
+    with pytest.raises(ValueError, match=msg):
+        toolset.get_tool(tool_schema=InvalidSchema())  # type: ignore
