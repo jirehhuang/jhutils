@@ -46,11 +46,14 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
     items_before = mealie.load_shopping_items(force=True)
     mealie.shopping_list_id = mealie_shopping_list_id
     items = [
-        {"isFood": False, "note": "non-food example"},
+        {"note": "test non-food example"},
         {
-            "isFood": True,
-            "note": "food example",
-            "foodId": mealie.foods[0]["id"],
+            "note": "example",
+            "foodId": next(
+                food["id"]
+                for food in mealie.foods
+                if food["name"] == "test food"
+            ),
         },
     ]
     response = mealie.add_shopping_items(items)
