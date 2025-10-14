@@ -3,6 +3,7 @@
 from datetime import datetime
 
 import pytest
+import pytz
 from docstring_parser import parse
 
 from jhutils._utils import _convert_docstring, _time_id
@@ -120,8 +121,12 @@ def test_convert_docstring_equivalence(func):
 def test_time_id():
     """Test that the _time_id function returns a string of the expected
     format."""
-    tid = _time_id()
+    tid = _time_id(timezone="utc")
     assert isinstance(tid, str)
-    time_from_id = datetime.strptime(tid, "%Y-%m-%d_%H-%M-%S-%f")
-    delta = 60
-    assert abs((datetime.now() - time_from_id).total_seconds()) <= delta
+    time_from_id = pytz.utc.localize(
+        datetime.strptime(tid, "%Y-%m-%d_%H-%M-%S-%f")
+    )
+    delta = 10
+    assert (
+        abs((datetime.now(pytz.utc) - time_from_id).total_seconds()) <= delta
+    )
