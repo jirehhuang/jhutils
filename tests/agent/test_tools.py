@@ -102,6 +102,7 @@ def test_toolset_available_tools_getter(toolset):
     """Test that the Toolset.available_tools property getter works as
     expected."""
     assert np.all(toolset.available_tools == TOOLS)
+    assert np.all(toolset.available_tool_names == TOOL_NAMES)
 
 
 def test_toolset_selected_tools_getter_setter(toolset):
