@@ -171,3 +171,23 @@ def test_toolset_error_if_get_invalid_tool_schema(toolset):
         toolset.get_tool(tool_schema=InvalidSchema)  # type: ignore
     with pytest.raises(ValueError, match=msg):
         toolset.get_tool(tool_schema=InvalidSchema())  # type: ignore
+
+
+def test_default_toolset_initialize_tools(toolset):
+    """Test that the dummy Toolset without kwargs initializes tools
+    without constructor arguments."""
+    add_tasks_tool = toolset.initialize_tool("AddTasksTool")
+    assert add_tasks_tool.obsidian is None
+    add_shopping_items_tool = toolset.initialize_tool("AddShoppingItemsTool")
+    assert add_shopping_items_tool.mealie is None
+
+
+def test_toolset_kwargs_initialize_tools(obsidian, mealie):
+    """Test that Toolset with kwargs correctly passes them to tool
+    constructors."""
+    toolset = Toolset(obsidian=obsidian, mealie=mealie)
+    assert toolset.kwargs == {"obsidian": obsidian, "mealie": mealie}
+    add_tasks_tool = toolset.initialize_tool("AddTasksTool")
+    assert add_tasks_tool.obsidian == obsidian
+    add_shopping_items_tool = toolset.initialize_tool("AddShoppingItemsTool")
+    assert add_shopping_items_tool.mealie == mealie
