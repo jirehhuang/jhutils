@@ -1,6 +1,6 @@
 """Tool chaining assistant agent."""
 
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 import instructor
 from atomic_agents import AgentConfig, AtomicAgent, BaseIOSchema
@@ -65,8 +65,8 @@ class AssistantAgent:
             ),
         )
         self._toolset = Toolset(**kwargs)
-        self._output_schema: Optional[BaseIOSchema] = None
-        self.agent: Optional[AtomicAgent[BaseIOSchema, BaseIOSchema]] = None
+        self._output_schema: BaseIOSchema | None = None
+        self.agent: AtomicAgent[BaseIOSchema, BaseIOSchema] | None = None
 
     def run(self, query: str) -> str:
         """Run the assistant agent."""

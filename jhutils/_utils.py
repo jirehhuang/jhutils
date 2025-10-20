@@ -2,7 +2,6 @@
 
 import textwrap
 from datetime import datetime
-from typing import Optional
 
 import pytz
 from docstring_parser import Docstring, DocstringParam, DocstringReturns, parse
@@ -44,7 +43,7 @@ def _format_returns(ret: DocstringReturns) -> str:
     return "\n".join(formatted)
 
 
-def _convert_docstring(docstring: Optional[str]) -> str:
+def _convert_docstring(docstring: str | None) -> str:
     """Convert a docstring to normalized Google style.
 
     Parameters

@@ -2,7 +2,7 @@
 
 import base64
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import requests
 
@@ -31,8 +31,8 @@ class Obsidian:
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any] | List[Dict[str, Any]]] = None,
+        params: Dict[str, Any] | None = None,
+        data: Dict[str, Any] | List[Dict[str, Any]] | None = None,
     ) -> Dict[str, Any]:
         """Make API request to endpoint with error handling."""
         url = f"{self._api_url}/{endpoint.lstrip('/')}"
@@ -67,7 +67,7 @@ class Obsidian:
         return self._files[file_path]
 
     def add_file(
-        self, file_path: str, content: str, message: Optional[str] = None
+        self, file_path: str, content: str, message: str | None = None
     ) -> Dict[str, Any]:
         """Add a new file to the repository."""
         data = {
@@ -80,7 +80,7 @@ class Obsidian:
         return self._request("PUT", file_path, data=data)
 
     def delete_file(
-        self, file_path: str, sha: Optional[str] = None
+        self, file_path: str, sha: str | None = None
     ) -> Dict[str, Any]:
         """Delete a file from the repository."""
         if sha is None:
@@ -95,7 +95,7 @@ class Obsidian:
         return self._request("DELETE", file_path, data=data)
 
     def update_file(
-        self, file_path: str, content: str, sha: Optional[str] = None
+        self, file_path: str, content: str, sha: str | None = None
     ) -> Dict[str, Any]:
         """Update an existing file in the repository."""
         if sha is None:

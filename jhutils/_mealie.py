@@ -32,8 +32,8 @@ class Mealie:
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any] | List[Dict[str, Any]]] = None,
+        params: Dict[str, Any] | None = None,
+        data: Dict[str, Any] | List[Dict[str, Any]] | None = None,
     ) -> Dict[str, Any]:
         """Make API request to endpoint with error handling."""
         url = f"{self._api_url}/{endpoint.lstrip('/')}"

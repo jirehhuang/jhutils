@@ -1,7 +1,5 @@
 """Tool to add tasks to a task list."""
 
-from typing import Optional
-
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
@@ -51,7 +49,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
 
     def __init__(
         self,
-        config: Optional[AddTasksConfig] = None,
+        config: AddTasksConfig | None = None,
         obsidian: Obsidian | None = None,
     ):
         if config is None:

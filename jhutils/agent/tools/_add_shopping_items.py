@@ -1,7 +1,5 @@
 """Tool to add shopping items to a shopping list."""
 
-from typing import Optional
-
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
@@ -48,7 +46,7 @@ class AddShoppingItemsTool(
 
     def __init__(
         self,
-        config: Optional[AddShoppingItemsConfig] = None,
+        config: AddShoppingItemsConfig | None = None,
         mealie: Mealie | None = None,
     ):
         if config is None:
