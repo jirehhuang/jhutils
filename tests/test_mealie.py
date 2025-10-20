@@ -36,6 +36,7 @@ def test_add_shopping_items_no_list(mealie):
     """Test that a ValueError is raised when attempting to add items without a
     shopping list."""
     msg = "Item is missing required key shoppingListId"
+    mealie.shopping_list_id = None
     with pytest.raises(ValueError, match=msg):
         mealie.add_shopping_items([{"note": "potatoes"}])
 

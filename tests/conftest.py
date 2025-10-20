@@ -23,10 +23,7 @@ def fixture_mealie_shopping_list_id():
 @pytest.fixture(name="mealie", scope="function")
 def fixture_mealie():
     """Return Mealie client object."""
-    return Mealie(
-        api_url=os.getenv("MEALIE_API_URL", ""),
-        api_key=os.getenv("MEALIE_API_KEY", ""),
-    )
+    return Mealie.from_environ()
 
 
 @pytest.fixture(name="obsidian", scope="module")
