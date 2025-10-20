@@ -29,12 +29,7 @@ def fixture_mealie():
 @pytest.fixture(name="obsidian", scope="module")
 def fixture_obsidian():
     """Return Obsidian client object."""
-    return Obsidian(
-        owner=os.getenv("OBSIDIAN_VAULT_OWNER", ""),
-        repository=os.getenv("OBSIDIAN_VAULT_REPOSITORY", ""),
-        branch=os.getenv("OBSIDIAN_VAULT_BRANCH", ""),
-        github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
-    )
+    return Obsidian.from_environ()
 
 
 @pytest.fixture(name="openrouter_client", scope="function")
