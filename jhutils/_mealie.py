@@ -1,6 +1,6 @@
 """Mealie class."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import requests
 
@@ -11,11 +11,13 @@ N_ITEMS = 50
 class Mealie:
     """Client for interacting with the Mealie API."""
 
-    def __init__(self, api_url: str, api_key: str) -> None:
-        self._shopping_list_id: str | None = None
+    def __init__(
+        self, api_url: str, api_key: str, shopping_list_id: str | None = None
+    ) -> None:
+        self._shopping_list_id = shopping_list_id
 
         self._foods: List[Dict[str, Any]] = []
-        self._shopping_items: Optional[List[Dict[str, Any]]] = None
+        self._shopping_items: List[Dict[str, Any]] | None = None
 
         self._api_url: str = api_url.rstrip("/")
 
