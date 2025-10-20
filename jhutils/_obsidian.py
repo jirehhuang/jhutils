@@ -26,6 +26,18 @@ class Obsidian:
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"token {github_token}"})
 
+    @classmethod
+    def from_environ(cls) -> "Obsidian":
+        """Create Obsidian instance from environment variables."""
+        return cls(
+            owner=os.getenv("OBSIDIAN_VAULT_OWNER", "jirehhuang"),
+            repository=os.getenv(
+                "OBSIDIAN_VAULT_REPOSITORY", "obsidian-vault"
+            ),
+            branch=os.getenv("OBSIDIAN_VAULT_BRANCH", "main"),
+            github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
+        )
+
     # pylint: disable=duplicate-code
     def _request(
         self,
