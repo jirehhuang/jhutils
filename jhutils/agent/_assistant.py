@@ -1,8 +1,10 @@
 """Tool chaining assistant agent."""
 
+import os
 from typing import TypeVar
 
 import instructor
+import openai
 from atomic_agents import AgentConfig, AtomicAgent, BaseIOSchema
 from atomic_agents.context import (
     SystemPromptGenerator,
@@ -39,6 +41,18 @@ OUTPUT_INSTRUCTIONS = [
 ]
 
 
+def make_openai_client_from_environ() -> instructor.Instructor:
+    """Create Instructor client from environment variables."""
+    return instructor.from_openai(
+        openai.OpenAI(
+            base_url=os.getenv(
+                "OPENAI_BASE_URL", "https://openrouter.ai/api/v1"
+            ),
+            api_key=os.getenv("OPENAI_API_KEY"),
+        )
+    )
+
+
 class QueryInputSchema(BaseIOSchema):
     """Input schema providing the user query."""
 
@@ -67,6 +81,15 @@ class AssistantAgent:
         self._toolset = Toolset(**kwargs)
         self._output_schema: BaseIOSchema | None = None
         self.agent: AtomicAgent[BaseIOSchema, BaseIOSchema] | None = None
+
+    @classmethod
+    def from_environ(
+        cls, client: instructor.Instructor | None = None, **kwargs
+    ) -> "AssistantAgent":
+        """Create AssistantAgent instance from environment variables."""
+        if client is None:
+            client = make_openai_client_from_environ()
+        return cls(client=client, **kwargs)
 
     def run(self, query: str) -> str:
         """Run the assistant agent."""
