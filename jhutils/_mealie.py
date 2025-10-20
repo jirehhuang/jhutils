@@ -45,7 +45,7 @@ class Mealie:
         return cls(
             api_url=os.getenv("MEALIE_API_URL", ""),
             api_key=os.getenv("MEALIE_API_KEY", ""),
-            shopping_list_id=os.getenv("MEALIE_SHOPPING_LIST_ID", None),
+            shopping_list_id=os.getenv("MEALIE_SHOPPING_LIST_ID"),
         )
 
     def _request(
