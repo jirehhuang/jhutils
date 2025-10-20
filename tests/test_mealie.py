@@ -3,6 +3,24 @@
 import numpy as np
 import pytest
 
+from jhutils import Mealie
+
+
+def test_error_if_no_api_url():
+    """Test that a ValueError is raised if the api_url argument is not
+    provided."""
+    msg = '"api_url" required to initialize Mealie instance.'
+    with pytest.raises(ValueError, match=msg):
+        Mealie(api_url="", api_key="api_key")
+
+
+def test_error_if_no_api_key():
+    """Test that a ValueError is raised if the api_key argument is not
+    provided."""
+    msg = '"api_key" required to initialize Mealie instance.'
+    with pytest.raises(ValueError, match=msg):
+        Mealie(api_url="api_url", api_key="")
+
 
 def test_load_foods(mealie):
     """Test that method .load_foods() executes successfully."""
