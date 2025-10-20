@@ -17,12 +17,21 @@ class Obsidian:
     def __init__(
         self, owner: str, repository: str, branch: str, github_token: str
     ) -> None:
+        if not owner or not repository:
+            raise ValueError(
+                '"owner" and "repository" are required to initialize Obsidian '
+                "instance."
+            )
         self._api_url: str = (
             f"https://api.github.com/repos/{owner}/{repository}/contents"
         )
         self._branch: str = branch or "main"
         self._files: Dict[str, Any] = {}
 
+        if not github_token:
+            raise ValueError(
+                '"github_token" required to initialize Obsidian instance.'
+            )
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"token {github_token}"})
 
