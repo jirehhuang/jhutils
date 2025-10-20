@@ -20,8 +20,16 @@ class Mealie:
         self._foods: List[Dict[str, Any]] = []
         self._shopping_items: List[Dict[str, Any]] | None = None
 
+        if not api_url:
+            raise ValueError(
+                '"api_url" required to initialize Mealie instance.'
+            )
         self._api_url: str = api_url.rstrip("/")
 
+        if not api_key:
+            raise ValueError(
+                '"api_key" required to initialize Mealie instance.'
+            )
         self.session = requests.Session()
         self.session.headers.update(
             {
