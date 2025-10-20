@@ -1,5 +1,6 @@
 """Mealie class."""
 
+import os
 from typing import Any, Dict, List
 
 import requests
@@ -28,6 +29,15 @@ class Mealie:
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             }
+        )
+
+    @classmethod
+    def from_environ(cls) -> "Mealie":
+        """Create Mealie instance from environment variables."""
+        return cls(
+            api_url=os.getenv("MEALIE_API_URL", ""),
+            api_key=os.getenv("MEALIE_API_KEY", ""),
+            shopping_list_id=os.getenv("MEALIE_SHOPPING_LIST_ID", None),
         )
 
     def _request(
