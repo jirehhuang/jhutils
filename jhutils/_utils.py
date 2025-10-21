@@ -18,9 +18,6 @@ def _format_param(p: DocstringParam) -> str:
     type_str = f" ({p.type_name})" if p.type_name else ""
     desc = (p.description or "").strip()
 
-    if not desc:
-        return f"    {p.arg_name}{type_str}"
-
     lines = desc.splitlines()
     formatted = [f"    {p.arg_name}{type_str}: {lines[0]}"]
     for line in lines[1:]:
@@ -32,9 +29,6 @@ def _format_returns(ret: DocstringReturns) -> str:
     """Format a return section into Google style, preserving line breaks."""
     type_str = f" {ret.type_name}" if ret.type_name else ""
     desc = (ret.description or "").strip()
-
-    if not desc:
-        return f"    {type_str}".rstrip()
 
     lines = desc.splitlines()
     formatted = [f"    {type_str}: {lines[0]}".rstrip()]
