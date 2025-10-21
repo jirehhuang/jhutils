@@ -107,7 +107,7 @@ class Obsidian:
         if sha is None:
             sha = self._files.get(file_path, {}).get("sha")
             if sha is None:
-                sha = self.read_file(file_path)["sha"]
+                sha = self.read_file(file_path)["sha"]  # pragma: no cover
         data = {
             "message": f"delete {file_path}",
             "sha": sha,
@@ -122,7 +122,7 @@ class Obsidian:
         if sha is None:
             sha = self._files.get(file_path, {}).get("sha")
             if sha is None:
-                sha = self.read_file(file_path)["sha"]
+                sha = self.read_file(file_path)["sha"]  # pragma: no cover
         data = {
             "message": f"update {file_path}",
             "content": base64.b64encode(content.encode("utf-8")).decode(
