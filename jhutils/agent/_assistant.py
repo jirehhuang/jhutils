@@ -68,7 +68,7 @@ class AssistantAgent:
 
     _input_schema = QueryInputSchema
 
-    def __init__(self, client: instructor.Instructor, **kwargs):
+    def __init__(self, client: instructor.Instructor, toolset: Toolset):
         self._config = AgentConfig(
             client=client,
             model=DEFAULT_MODEL,
@@ -78,18 +78,27 @@ class AssistantAgent:
                 output_instructions=OUTPUT_INSTRUCTIONS,
             ),
         )
-        self._toolset = Toolset(**kwargs)
+        self._toolset = toolset
         self._output_schema: BaseIOSchema | None = None
         self.agent: AtomicAgent[BaseIOSchema, BaseIOSchema] | None = None
 
     @classmethod
     def from_environ(
-        cls, client: instructor.Instructor | None = None, **kwargs
+        cls,
+        client: instructor.Instructor | None = None,
+        toolset: Toolset | None = None,
     ) -> "AssistantAgent":
         """Create AssistantAgent instance from environment variables."""
         if client is None:
             client = make_openai_client_from_environ()
-        return cls(client=client, **kwargs)
+        if toolset is None:
+            toolset = Toolset.from_environ()
+        return cls(client=client, toolset=toolset)
+
+    @property
+    def toolset(self) -> Toolset:
+        """Get the toolset."""
+        return self._toolset
 
     def run(self, query: str) -> str:
         """Run the assistant agent."""
