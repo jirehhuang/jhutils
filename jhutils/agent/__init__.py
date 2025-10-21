@@ -1,3 +1,3 @@
 """Agents module."""
 
-from ._assistant import AssistantAgent
+from ._assistant import AssistantAgent, AssistantFactory

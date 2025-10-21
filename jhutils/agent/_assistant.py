@@ -141,3 +141,36 @@ class AssistantAgent:
                 self.toolset.get_tool(response.next_tool)
             ]
             history = self.agent.history
+
+
+class AssistantFactory:
+    """Factory class for initializing and accessing the assistant agent."""
+
+    def __init__(self):
+        """Initialize the manager with production mode flag."""
+        self._client: instructor.Instructor | None = None
+        self._toolset: Toolset | None = None
+        self._assistant: AssistantAgent | None = None
+
+    @property
+    def client(self) -> instructor.Instructor:
+        """Get the OpenAI client used by the assistant agent."""
+        if self._client is None:
+            self._client = make_openai_client_from_environ()
+        return self._client
+
+    @property
+    def toolset(self) -> Toolset:
+        """Get the toolset used by the assistant agent."""
+        if self._toolset is None:
+            self._toolset = Toolset.from_environ()
+        return self._toolset
+
+    @property
+    def assistant(self) -> AssistantAgent:
+        """Get the assistant agent."""
+        if self._assistant is None:
+            self._assistant = AssistantAgent(
+                client=self.client, toolset=self.toolset
+            )
+        return self._assistant
