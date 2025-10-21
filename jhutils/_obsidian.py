@@ -43,7 +43,10 @@ class Obsidian:
             repository=os.getenv(
                 "OBSIDIAN_VAULT_REPOSITORY", "obsidian-vault"
             ),
-            branch=os.getenv("OBSIDIAN_VAULT_BRANCH", "main"),
+            branch=os.getenv(
+                "OBSIDIAN_VAULT_BRANCH",
+                "test" if os.getenv("ALIAS") != "prod" else "main",
+            ),
             github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
         )
 
