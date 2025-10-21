@@ -8,6 +8,8 @@ from atomic_agents.context import (
 )
 from docstring_parser import parse
 
+from ..._mealie import Mealie
+from ..._obsidian import Obsidian
 from ._tools import AVAILABLE_MODES, TOOLS, ToolList
 
 
@@ -29,6 +31,15 @@ class Toolset:
         self._kwargs = kwargs
         self.mode = mode  # Sets _available_tools
         self._selected_tools: ToolList = self._available_tools
+
+    @classmethod
+    def from_environ(cls, mode: str = "default", **kwargs) -> "Toolset":
+        """Create a Toolset instance from environment variables."""
+        if not isinstance(kwargs.get("mealie"), Mealie):
+            kwargs["mealie"] = Mealie.from_environ()
+        if not isinstance(kwargs.get("obsidian"), Obsidian):
+            kwargs["obsidian"] = Obsidian.from_environ()
+        return cls(mode=mode, **kwargs)
 
     @property
     def kwargs(self):
