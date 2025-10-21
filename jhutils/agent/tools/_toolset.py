@@ -26,9 +26,9 @@ class Toolset:
     def __init__(self, mode: str = "default", **kwargs):
         """Initialize the Toolset with a list of tools and tool arguments."""
         self._all_tools: ToolList = TOOLS.copy()
-        self._selected_tools: ToolList = self._all_tools
         self._kwargs = kwargs
         self.mode = mode  # Sets _available_tools
+        self._selected_tools: ToolList = self._available_tools
 
     @property
     def kwargs(self):
@@ -201,6 +201,13 @@ class Toolset:
         return self.get_tool(
             tool_name=tool_name, tool_schema=tool_schema
         ).config_cls  # type: ignore
+
+    def reset_selected_tools(self):
+        """Reset the selected tools to available tools.
+
+        To avoid carrying over states between runs.
+        """
+        self._selected_tools = self._available_tools
 
 
 # pylint: disable=too-few-public-methods
