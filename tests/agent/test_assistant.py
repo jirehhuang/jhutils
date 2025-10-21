@@ -121,11 +121,12 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
     assert "response" in json.loads(history[1]["content"])["called_tool_input"]
 
 
-def test_assistant_chain_tools_task_shopping_respond(assistant):
+def test_assistant_chain_tools_task_shopping(assistant):
     """Test that the assistant can correctly chain multiple tools:
-    AddTasksTool, AddShoppingItemsTool, RespondTool."""
+    AddTasksTool and AddShoppingItemsTool."""
     query = "Add onions to my shopping list. Remind me to text Georgie back."
     response = assistant.run(query)
+    assert response == "Done."
     history = assistant.agent.history.get_history()
     called_tool_inputs = [
         json.loads(history[i]["content"])["called_tool_input"] for i in [1, 3]
@@ -142,4 +143,24 @@ def test_assistant_chain_tools_task_shopping_respond(assistant):
             for called_tool_input in called_tool_inputs
         ]
     )
-    assert response == "Done."
+
+
+def test_assistant_chain_tools_shopping_respond(assistant):
+    """Test that the assistant can correctly chain multiple tools:
+    AddTasksTool and RespondTool."""
+    query = (
+        "Remind me to Venmo Joshua for the magnet. "
+        "Also, give me a concise one-sentence explanation on the difference"
+        "between propitiation and expiation from a Reformed perspective."
+    )
+    response = assistant.run(query)
+    assert np.all(
+        [
+            phrase in response.lower()
+            for phrase in ["propitiation", "expiation"]
+        ]
+    )
+    history = assistant.agent.history.get_history()
+    assert json.loads(history[1]["content"])["called_tool_input"] == {
+        "tasks": ["Venmo Joshua for the magnet"]
+    }
