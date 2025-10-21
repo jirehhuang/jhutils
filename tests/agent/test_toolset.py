@@ -3,6 +3,8 @@
 import numpy as np
 import pytest
 
+from jhutils._mealie import Mealie
+from jhutils._obsidian import Obsidian
 from jhutils.agent.tools import (
     AddTasksTool,
     Toolset,
@@ -16,6 +18,24 @@ from jhutils.agent.tools._toolset import (
     AvailableToolsProvider,
     SelectedToolsProvider,
 )
+
+
+def test_dummy_toolset_has_no_tool_kwargs(toolset):
+    """Test that the dummy Toolset instance has no tool constructor arguments
+    in kwargs."""
+    assert toolset.mode == "default"
+    assert toolset.kwargs.get("mealie") is None
+    assert toolset.kwargs.get("obsidian") is None
+
+
+def test_toolset_construct_from_environ():
+    """Test that Toolset.from_environ constructs a Toolset instance
+    correctly from environment variables with tool kwargs."""
+    toolset = Toolset.from_environ()
+    assert isinstance(toolset, Toolset)
+    assert toolset.mode == "default"
+    assert isinstance(toolset.kwargs.get("mealie"), Mealie)
+    assert isinstance(toolset.kwargs.get("obsidian"), Obsidian)
 
 
 @pytest.mark.parametrize(
