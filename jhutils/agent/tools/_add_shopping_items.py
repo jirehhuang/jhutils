@@ -3,7 +3,7 @@
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
-from jhutils._mealie import Mealie
+from ..._mealie import Mealie
 
 ItemsList = conlist(str, min_length=1)
 

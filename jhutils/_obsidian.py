@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 
 import requests
 
-from jhutils._utils import _time_id
+from ._utils import _time_id
 
 INBOX_PATH = "Inbox"
 
