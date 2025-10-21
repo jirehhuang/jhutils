@@ -104,10 +104,13 @@ class AssistantAgent:
         """Run the assistant agent."""
         history = self.agent.history if self.agent else None
 
+        # Reset the selected tools to avoid being influenced by prior runs
+        self.toolset.reset_selected_tools()
+
         while True:
             # (Re)create agent with selected toolset and history
             self._output_schema = MakeChainToolOutputSchema(
-                toolset=self._toolset
+                toolset=self.toolset
             )
             self.agent = AtomicAgent[self._input_schema, self._output_schema](
                 config=self._config
@@ -116,14 +119,14 @@ class AssistantAgent:
                 self.agent.history = history
             for provider in [AvailableToolsProvider, SelectedToolsProvider]:
                 self.agent.register_context_provider(
-                    provider.__qualname__, provider(toolset=self._toolset)
+                    provider.__qualname__, provider(toolset=self.toolset)
                 )
 
             response = self.agent.run(self._input_schema(query=query))
 
             tool_response = None
             if response.called_tool_input is not None:
-                called_tool = self._toolset.initialize_tool(
+                called_tool = self.toolset.initialize_tool(
                     tool_schema=response.called_tool_input
                 )
                 tool_response = called_tool.run(response.called_tool_input)
@@ -134,7 +137,7 @@ class AssistantAgent:
                 return "Done."
 
             query = response.remainder
-            self._toolset.selected_tools = [
-                self._toolset.get_tool(response.next_tool)
+            self.toolset.selected_tools = [
+                self.toolset.get_tool(response.next_tool)
             ]
             history = self.agent.history
