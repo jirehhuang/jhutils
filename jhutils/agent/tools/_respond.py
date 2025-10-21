@@ -20,6 +20,8 @@ class RespondInputSchema(BaseIOSchema):
             "The concise response to be sent addressing the entirety of the "
             "user query. "
             "This input value will be directly reflected to the user. "
+            "Should be in paragraph format, without formatting, as if "
+            "responding verbally to the user. "
             "Do not make up answers for the sake of responding. "
             "If you do not know the answer, say so honestly."
         ),
