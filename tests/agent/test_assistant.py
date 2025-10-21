@@ -2,16 +2,43 @@
 
 import json
 
+import instructor
 import numpy as np
 import pytest
 
-from jhutils.agent import AssistantAgent
+from jhutils import Mealie, Obsidian
+from jhutils.agent import AssistantAgent, AssistantFactory
+from jhutils.agent.tools import Toolset
 
 
 @pytest.fixture(name="assistant", scope="function")
-def fixture_assistant(openrouter_client):
-    """Return an instance of AssistantAgent."""
-    return AssistantAgent(openrouter_client, bool_test=True)
+def fixture_assistant(openai_client, toolset):
+    """Return an instance of AssistantAgent with a dummy toolset instance so
+    that tool calling can be tested without making actual API calls."""
+    return AssistantAgent(client=openai_client, toolset=toolset)
+
+
+def test_assistant_from_environ():
+    """Test that AssistantAgent.from_environ constructs an AssistantAgent
+    instance correctly from environment variables without optional
+    arguments."""
+    assistant = AssistantAgent.from_environ()
+    assert isinstance(assistant, AssistantAgent)
+    assert isinstance(assistant.toolset.kwargs.get("mealie"), Mealie)
+    assert isinstance(assistant.toolset.kwargs.get("obsidian"), Obsidian)
+
+
+# pylint: disable=protected-access
+def test_assistant_factory():
+    """Test that AssistantFactory creates an AssistantAgent instance
+    correctly from environment variables."""
+    factory = AssistantFactory()
+    assert factory._client is None
+    assert factory._toolset is None
+    assert factory._assistant is None
+    assert isinstance(factory.assistant, AssistantAgent)
+    assert isinstance(factory._client, instructor.Instructor)
+    assert isinstance(factory._toolset, Toolset)
 
 
 def test_assistant_select_and_execute_add_tasks(assistant):
