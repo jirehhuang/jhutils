@@ -28,6 +28,19 @@ def test_load_foods(mealie):
     assert isinstance(foods, list)
 
 
+def test_load_shopping_lists(mealie):
+    """Test that method .load_shopping_lists() executes successfully."""
+    shopping_lists = mealie.load_shopping_lists(initial_per_page=1, force=True)
+    assert isinstance(shopping_lists, list)
+
+
+def test_get_shopping_list_id(mealie):
+    """Test that getting property shopping_list_id loads the first shopping
+    list if not set."""
+    mealie.shopping_list_id = None
+    assert isinstance(mealie.shopping_list_id, str)
+
+
 def test_set_shopping_list(mealie, mealie_shopping_list_id):
     """Test that method .set_shopping_list executes successfully."""
     mealie.shopping_list_id = mealie_shopping_list_id
