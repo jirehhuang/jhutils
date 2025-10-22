@@ -5,7 +5,7 @@ from typing import Any, Dict, List
 
 import requests
 
-N_FOODS = 500
+N_PER_PAGE = 500
 N_ITEMS = 50
 
 
@@ -17,7 +17,8 @@ class Mealie:
     ) -> None:
         self._shopping_list_id = shopping_list_id
 
-        self._foods: List[Dict[str, Any]] = []
+        self._foods: List[Dict[str, Any]] | None = None
+        self._shopping_lists: List[Dict[str, Any]] | None = None
         self._shopping_items: List[Dict[str, Any]] | None = None
 
         if not api_url:
@@ -67,8 +68,23 @@ class Mealie:
 
         return response_json
 
+    def _get_total_items(
+        self, endpoint: str, params: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """Retrieve total count from an endpoint."""
+        response = self._request("GET", endpoint, params=params)
+
+        total = response["total"]
+        if total > params.get("perPage", N_PER_PAGE):
+            response = self._request(
+                "GET",
+                endpoint,
+                params=params | {"perPage": total},
+            )
+        return response["items"]
+
     def load_foods(
-        self, initial_per_page: int = N_FOODS, force: bool = False
+        self, initial_per_page: int = N_PER_PAGE, force: bool = False
     ) -> List[Dict[str, Any]]:
         """Retrieve foods data."""
         if not self._foods or force:
@@ -78,17 +94,7 @@ class Mealie:
                 "orderBy": "name",
                 "orderDirection": "asc",
             }
-            response = self._request("GET", "api/foods", params=params)
-
-            total = response["total"]
-            if total > initial_per_page:
-                response = self._request(
-                    "GET",
-                    "api/foods",
-                    params=params | {"perPage": total},
-                )
-            self._foods = response["items"]
-
+            self._foods = self._get_total_items("api/foods", params)
         return self._foods
 
     @property
