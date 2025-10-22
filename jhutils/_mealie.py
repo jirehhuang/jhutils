@@ -102,9 +102,32 @@ class Mealie:
         """Getter for foods data."""
         return self.load_foods()
 
+    def load_shopping_lists(
+        self, initial_per_page: int = N_PER_PAGE, force: bool = False
+    ) -> List[Dict[str, Any]]:
+        """Retrieve shopping lists data."""
+        if not self._shopping_lists or force:
+            params = {
+                "page": 1,
+                "perPage": initial_per_page,
+                "orderBy": "updatedAt",
+                "orderDirection": "desc",
+            }
+            self._shopping_lists = self._get_total_items(
+                "api/households/shopping/lists", params
+            )
+        return self._shopping_lists
+
+    @property
+    def shopping_lists(self) -> List[Dict[str, Any]]:
+        """Getter for shopping lists data."""
+        return self.load_shopping_lists()
+
     @property
     def shopping_list_id(self) -> str | None:
         """Getter and setter for the shopping list ID."""
+        if not self._shopping_list_id:
+            self._shopping_list_id = self.shopping_lists[0]["id"]
         return self._shopping_list_id
 
     @shopping_list_id.setter
