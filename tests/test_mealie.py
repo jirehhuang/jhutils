@@ -46,7 +46,9 @@ def test_set_shopping_list(mealie, mealie_shopping_list_id):
     mealie.shopping_list_id = mealie_shopping_list_id
     assert mealie.shopping_list_id == mealie_shopping_list_id
     mealie.shopping_list_id = None
-    assert not mealie.shopping_list_id
+    assert mealie._shopping_list_id is None  # pylint: disable=protected-access
+    mealie.shopping_list_id = "id"
+    assert mealie.shopping_list_id == "id"
 
 
 def test_load_shopping_items(mealie):
