@@ -150,7 +150,7 @@ def test_assistant_chain_tools_shopping_respond(assistant):
     AddTasksTool and RespondTool."""
     query = (
         "Remind me to Venmo Joshua for the magnet. "
-        "Also, give me a concise one-sentence explanation on the difference"
+        "Also, give me a concise one-sentence explanation on the difference "
         "between propitiation and expiation from a Reformed perspective."
     )
     response = assistant.run(query)
