@@ -126,7 +126,7 @@ class Mealie:
     @property
     def shopping_list_id(self) -> str | None:
         """Getter and setter for the shopping list ID."""
-        if not self._shopping_list_id:
+        if not self._shopping_list_id and self.shopping_lists is not None:
             self._shopping_list_id = self.shopping_lists[0]["id"]
         return self._shopping_list_id
 
