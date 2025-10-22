@@ -3,6 +3,24 @@
 import numpy as np
 import pytest
 
+from jhutils import Mealie
+
+
+def test_error_if_no_api_url():
+    """Test that a ValueError is raised if the api_url argument is not
+    provided."""
+    msg = '"api_url" required to initialize Mealie instance.'
+    with pytest.raises(ValueError, match=msg):
+        Mealie(api_url="", api_key="api_key")
+
+
+def test_error_if_no_api_key():
+    """Test that a ValueError is raised if the api_key argument is not
+    provided."""
+    msg = '"api_key" required to initialize Mealie instance.'
+    with pytest.raises(ValueError, match=msg):
+        Mealie(api_url="api_url", api_key="")
+
 
 def test_load_foods(mealie):
     """Test that method .load_foods() executes successfully."""
@@ -10,12 +28,27 @@ def test_load_foods(mealie):
     assert isinstance(foods, list)
 
 
+def test_load_shopping_lists(mealie):
+    """Test that method .load_shopping_lists() executes successfully."""
+    shopping_lists = mealie.load_shopping_lists(initial_per_page=1, force=True)
+    assert isinstance(shopping_lists, list)
+
+
+def test_get_shopping_list_id(mealie):
+    """Test that getting property shopping_list_id loads the first shopping
+    list if not set."""
+    mealie.shopping_list_id = None
+    assert isinstance(mealie.shopping_list_id, str)
+
+
 def test_set_shopping_list(mealie, mealie_shopping_list_id):
     """Test that method .set_shopping_list executes successfully."""
     mealie.shopping_list_id = mealie_shopping_list_id
     assert mealie.shopping_list_id == mealie_shopping_list_id
     mealie.shopping_list_id = None
-    assert not mealie.shopping_list_id
+    assert mealie._shopping_list_id is None  # pylint: disable=protected-access
+    mealie.shopping_list_id = "id"
+    assert mealie.shopping_list_id == "id"
 
 
 def test_load_shopping_items(mealie):
@@ -36,6 +69,7 @@ def test_add_shopping_items_no_list(mealie):
     """Test that a ValueError is raised when attempting to add items without a
     shopping list."""
     msg = "Item is missing required key shoppingListId"
+    mealie.shopping_list_id = None
     with pytest.raises(ValueError, match=msg):
         mealie.add_shopping_items([{"note": "potatoes"}])
 

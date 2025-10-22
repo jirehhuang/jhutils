@@ -8,6 +8,8 @@ from atomic_agents.context import (
 )
 from docstring_parser import parse
 
+from ..._mealie import Mealie
+from ..._obsidian import Obsidian
 from ._tools import AVAILABLE_MODES, TOOLS, ToolList
 
 
@@ -26,9 +28,18 @@ class Toolset:
     def __init__(self, mode: str = "default", **kwargs):
         """Initialize the Toolset with a list of tools and tool arguments."""
         self._all_tools: ToolList = TOOLS.copy()
-        self._selected_tools: ToolList = self._all_tools
         self._kwargs = kwargs
         self.mode = mode  # Sets _available_tools
+        self._selected_tools: ToolList = self._available_tools
+
+    @classmethod
+    def from_environ(cls, mode: str = "default", **kwargs) -> "Toolset":
+        """Create a Toolset instance from environment variables."""
+        if not isinstance(kwargs.get("mealie"), Mealie):
+            kwargs["mealie"] = Mealie.from_environ()
+        if not isinstance(kwargs.get("obsidian"), Obsidian):
+            kwargs["obsidian"] = Obsidian.from_environ()
+        return cls(mode=mode, **kwargs)
 
     @property
     def kwargs(self):
@@ -201,6 +212,13 @@ class Toolset:
         return self.get_tool(
             tool_name=tool_name, tool_schema=tool_schema
         ).config_cls  # type: ignore
+
+    def reset_selected_tools(self):
+        """Reset the selected tools to available tools.
+
+        To avoid carrying over states between runs.
+        """
+        self._selected_tools = self._available_tools
 
 
 # pylint: disable=too-few-public-methods

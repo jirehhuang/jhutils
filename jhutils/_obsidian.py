@@ -2,11 +2,11 @@
 
 import base64
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 import requests
 
-from jhutils._utils import _time_id
+from ._utils import _time_id
 
 INBOX_PATH = "Inbox"
 
@@ -17,22 +17,46 @@ class Obsidian:
     def __init__(
         self, owner: str, repository: str, branch: str, github_token: str
     ) -> None:
+        if not owner or not repository:
+            raise ValueError(
+                '"owner" and "repository" are required to initialize Obsidian '
+                "instance."
+            )
         self._api_url: str = (
             f"https://api.github.com/repos/{owner}/{repository}/contents"
         )
         self._branch: str = branch or "main"
         self._files: Dict[str, Any] = {}
 
+        if not github_token:
+            raise ValueError(
+                '"github_token" required to initialize Obsidian instance.'
+            )
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"token {github_token}"})
+
+    @classmethod
+    def from_environ(cls) -> "Obsidian":
+        """Create Obsidian instance from environment variables."""
+        return cls(
+            owner=os.getenv("OBSIDIAN_VAULT_OWNER", "jirehhuang"),
+            repository=os.getenv(
+                "OBSIDIAN_VAULT_REPOSITORY", "obsidian-vault"
+            ),
+            branch=os.getenv(
+                "OBSIDIAN_VAULT_BRANCH",
+                "test" if os.getenv("ALIAS") != "prod" else "main",
+            ),
+            github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
+        )
 
     # pylint: disable=duplicate-code
     def _request(
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any] | List[Dict[str, Any]]] = None,
+        params: Dict[str, Any] | None = None,
+        data: Dict[str, Any] | List[Dict[str, Any]] | None = None,
     ) -> Dict[str, Any]:
         """Make API request to endpoint with error handling."""
         url = f"{self._api_url}/{endpoint.lstrip('/')}"
@@ -67,7 +91,7 @@ class Obsidian:
         return self._files[file_path]
 
     def add_file(
-        self, file_path: str, content: str, message: Optional[str] = None
+        self, file_path: str, content: str, message: str | None = None
     ) -> Dict[str, Any]:
         """Add a new file to the repository."""
         data = {
@@ -80,13 +104,13 @@ class Obsidian:
         return self._request("PUT", file_path, data=data)
 
     def delete_file(
-        self, file_path: str, sha: Optional[str] = None
+        self, file_path: str, sha: str | None = None
     ) -> Dict[str, Any]:
         """Delete a file from the repository."""
         if sha is None:
             sha = self._files.get(file_path, {}).get("sha")
             if sha is None:
-                sha = self.read_file(file_path)["sha"]
+                sha = self.read_file(file_path)["sha"]  # pragma: no cover
         data = {
             "message": f"delete {file_path}",
             "sha": sha,
@@ -95,13 +119,13 @@ class Obsidian:
         return self._request("DELETE", file_path, data=data)
 
     def update_file(
-        self, file_path: str, content: str, sha: Optional[str] = None
+        self, file_path: str, content: str, sha: str | None = None
     ) -> Dict[str, Any]:
         """Update an existing file in the repository."""
         if sha is None:
             sha = self._files.get(file_path, {}).get("sha")
             if sha is None:
-                sha = self.read_file(file_path)["sha"]
+                sha = self.read_file(file_path)["sha"]  # pragma: no cover
         data = {
             "message": f"update {file_path}",
             "content": base64.b64encode(content.encode("utf-8")).decode(

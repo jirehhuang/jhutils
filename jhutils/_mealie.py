@@ -1,24 +1,36 @@
 """Mealie class."""
 
-from typing import Any, Dict, List, Optional
+import os
+from typing import Any, Dict, List
 
 import requests
 
-N_FOODS = 500
+N_PER_PAGE = 500
 N_ITEMS = 50
 
 
 class Mealie:
     """Client for interacting with the Mealie API."""
 
-    def __init__(self, api_url: str, api_key: str) -> None:
-        self._shopping_list_id: str | None = None
+    def __init__(
+        self, api_url: str, api_key: str, shopping_list_id: str | None = None
+    ) -> None:
+        self._shopping_list_id = shopping_list_id
 
-        self._foods: List[Dict[str, Any]] = []
-        self._shopping_items: Optional[List[Dict[str, Any]]] = None
+        self._foods: List[Dict[str, Any]] | None = None
+        self._shopping_lists: List[Dict[str, Any]] | None = None
+        self._shopping_items: List[Dict[str, Any]] | None = None
 
+        if not api_url:
+            raise ValueError(
+                '"api_url" required to initialize Mealie instance.'
+            )
         self._api_url: str = api_url.rstrip("/")
 
+        if not api_key:
+            raise ValueError(
+                '"api_key" required to initialize Mealie instance.'
+            )
         self.session = requests.Session()
         self.session.headers.update(
             {
@@ -28,12 +40,21 @@ class Mealie:
             }
         )
 
+    @classmethod
+    def from_environ(cls) -> "Mealie":
+        """Create Mealie instance from environment variables."""
+        return cls(
+            api_url=os.getenv("MEALIE_API_URL", ""),
+            api_key=os.getenv("MEALIE_API_KEY", ""),
+            shopping_list_id=os.getenv("MEALIE_SHOPPING_LIST_ID"),
+        )
+
     def _request(
         self,
         method: str,
         endpoint: str,
-        params: Optional[Dict[str, Any]] = None,
-        data: Optional[Dict[str, Any] | List[Dict[str, Any]]] = None,
+        params: Dict[str, Any] | None = None,
+        data: Dict[str, Any] | List[Dict[str, Any]] | None = None,
     ) -> Dict[str, Any]:
         """Make API request to endpoint with error handling."""
         url = f"{self._api_url}/{endpoint.lstrip('/')}"
@@ -47,8 +68,23 @@ class Mealie:
 
         return response_json
 
+    def _get_total_items(
+        self, endpoint: str, params: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """Retrieve total count from an endpoint."""
+        response = self._request("GET", endpoint, params=params)
+
+        total = response["total"]
+        if total > params.get("perPage", N_PER_PAGE):
+            response = self._request(
+                "GET",
+                endpoint,
+                params=params | {"perPage": total},
+            )
+        return response["items"]
+
     def load_foods(
-        self, initial_per_page: int = N_FOODS, force: bool = False
+        self, initial_per_page: int = N_PER_PAGE, force: bool = False
     ) -> List[Dict[str, Any]]:
         """Retrieve foods data."""
         if not self._foods or force:
@@ -58,17 +94,7 @@ class Mealie:
                 "orderBy": "name",
                 "orderDirection": "asc",
             }
-            response = self._request("GET", "api/foods", params=params)
-
-            total = response["total"]
-            if total > initial_per_page:
-                response = self._request(
-                    "GET",
-                    "api/foods",
-                    params=params | {"perPage": total},
-                )
-            self._foods = response["items"]
-
+            self._foods = self._get_total_items("api/foods", params)
         return self._foods
 
     @property
@@ -76,9 +102,32 @@ class Mealie:
         """Getter for foods data."""
         return self.load_foods()
 
+    def load_shopping_lists(
+        self, initial_per_page: int = N_PER_PAGE, force: bool = False
+    ) -> List[Dict[str, Any]]:
+        """Retrieve shopping lists data."""
+        if not self._shopping_lists or force:
+            params = {
+                "page": 1,
+                "perPage": initial_per_page,
+                "orderBy": "updatedAt",
+                "orderDirection": "desc",
+            }
+            self._shopping_lists = self._get_total_items(
+                "api/households/shopping/lists", params
+            )
+        return self._shopping_lists
+
+    @property
+    def shopping_lists(self) -> List[Dict[str, Any]]:
+        """Getter for shopping lists data."""
+        return self.load_shopping_lists()
+
     @property
     def shopping_list_id(self) -> str | None:
         """Getter and setter for the shopping list ID."""
+        if not self._shopping_list_id and self.shopping_lists is not None:
+            self._shopping_list_id = self.shopping_lists[0]["id"]
         return self._shopping_list_id
 
     @shopping_list_id.setter

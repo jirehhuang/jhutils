@@ -2,7 +2,6 @@
 
 import textwrap
 from datetime import datetime
-from typing import Optional
 
 import pytz
 from docstring_parser import Docstring, DocstringParam, DocstringReturns, parse
@@ -19,9 +18,6 @@ def _format_param(p: DocstringParam) -> str:
     type_str = f" ({p.type_name})" if p.type_name else ""
     desc = (p.description or "").strip()
 
-    if not desc:
-        return f"    {p.arg_name}{type_str}"
-
     lines = desc.splitlines()
     formatted = [f"    {p.arg_name}{type_str}: {lines[0]}"]
     for line in lines[1:]:
@@ -34,9 +30,6 @@ def _format_returns(ret: DocstringReturns) -> str:
     type_str = f" {ret.type_name}" if ret.type_name else ""
     desc = (ret.description or "").strip()
 
-    if not desc:
-        return f"    {type_str}".rstrip()
-
     lines = desc.splitlines()
     formatted = [f"    {type_str}: {lines[0]}".rstrip()]
     for line in lines[1:]:
@@ -44,7 +37,7 @@ def _format_returns(ret: DocstringReturns) -> str:
     return "\n".join(formatted)
 
 
-def _convert_docstring(docstring: Optional[str]) -> str:
+def _convert_docstring(docstring: str | None) -> str:
     """Convert a docstring to normalized Google style.
 
     Parameters

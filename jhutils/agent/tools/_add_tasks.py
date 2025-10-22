@@ -1,7 +1,5 @@
 """Tool to add tasks to a task list."""
 
-from typing import Optional
-
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field, conlist
 
@@ -14,7 +12,8 @@ class AddTasksInputSchema(BaseIOSchema):
     """Input schema for AddTasksTool.
 
     Use this tool for adding one or more tasks, action items, or to-dos.
-    Do NOT use this tool for adding tasks to purchase shopping items.
+    All shopping items that need to be purchased should be added using the
+    AddShoppingItemsTool instead--NEVER with AddTasksTool.
     """
 
     tasks: TasksList = Field(  # type: ignore[valid-type]
@@ -24,6 +23,7 @@ class AddTasksInputSchema(BaseIOSchema):
             "The first word of each task should be capitalized. "
             "Each task should be written in the imperative mood, as if "
             "written by the user for the user to perform. "
+            "Do not end each task with punctuation. "
             "If requested by the user to add or remind of a task, extract the "
             "task and do not use 'add' or 'remind' as the task."
         ),
@@ -51,7 +51,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
 
     def __init__(
         self,
-        config: Optional[AddTasksConfig] = None,
+        config: AddTasksConfig | None = None,
         obsidian: Obsidian | None = None,
     ):
         if config is None:

@@ -1,7 +1,5 @@
 """Tool to respond to the user."""
 
-from typing import Optional
-
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from pydantic import Field
 
@@ -22,6 +20,8 @@ class RespondInputSchema(BaseIOSchema):
             "The concise response to be sent addressing the entirety of the "
             "user query. "
             "This input value will be directly reflected to the user. "
+            "Should be in paragraph format, without formatting, as if "
+            "responding verbally to the user. "
             "Do not make up answers for the sake of responding. "
             "If you do not know the answer, say so honestly."
         ),
@@ -45,7 +45,7 @@ class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
     output_schema = RespondOutputSchema  # type: ignore
     config_cls = RespondConfig
 
-    def __init__(self, config: Optional[RespondConfig] = None):
+    def __init__(self, config: RespondConfig | None = None):
         if config is None:
             config = RespondConfig()
         super().__init__(config)

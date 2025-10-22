@@ -4,6 +4,41 @@ import os
 
 import pytest
 
+from jhutils import Obsidian
+
+
+def test_error_if_no_owner_or_repository():
+    """Test that a ValueError is raised if the owner or repository argument is
+    not provided."""
+    msg = (
+        '"owner" and "repository" are required to initialize Obsidian '
+        "instance."
+    )
+    with pytest.raises(ValueError, match=msg):
+        Obsidian(
+            owner="",
+            repository="repository",
+            branch="branch",
+            github_token="token",
+        )
+    with pytest.raises(ValueError, match=msg):
+        Obsidian(
+            owner="owner", repository="", branch="branch", github_token="token"
+        )
+
+
+def test_error_if_no_github_token():
+    """Test that a ValueError is raised if the github_token argument is not
+    provided."""
+    msg = '"github_token" required to initialize Obsidian instance.'
+    with pytest.raises(ValueError, match=msg):
+        Obsidian(
+            owner="owner",
+            repository="repository",
+            branch="branch",
+            github_token="",
+        )
+
 
 def test_list_files(obsidian):
     """Test that method .list_files() executes successfully and contains

@@ -3,12 +3,11 @@
 import os
 from pathlib import Path
 
-import instructor
-import openai
 import pytest
 from dotenv import load_dotenv
 
 from jhutils import Mealie, Obsidian
+from jhutils.agent._assistant import make_openai_client_from_environ
 from jhutils.agent.tools import Toolset
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
@@ -23,35 +22,25 @@ def fixture_mealie_shopping_list_id():
 @pytest.fixture(name="mealie", scope="function")
 def fixture_mealie():
     """Return Mealie client object."""
-    return Mealie(
-        api_url=os.getenv("MEALIE_API_URL", ""),
-        api_key=os.getenv("MEALIE_API_KEY", ""),
-    )
+    return Mealie.from_environ()
 
 
 @pytest.fixture(name="obsidian", scope="module")
 def fixture_obsidian():
     """Return Obsidian client object."""
-    return Obsidian(
-        owner=os.getenv("OBSIDIAN_VAULT_OWNER", ""),
-        repository=os.getenv("OBSIDIAN_VAULT_REPOSITORY", ""),
-        branch=os.getenv("OBSIDIAN_VAULT_BRANCH", ""),
-        github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
-    )
+    return Obsidian.from_environ()
 
 
-@pytest.fixture(name="openrouter_client", scope="function")
-def fixture_openrouter_client():
-    """Return OpenRouter client object."""
-    return instructor.from_openai(
-        openai.OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-        )
-    )
+@pytest.fixture(name="openai_client", scope="function")
+def fixture_openai_client():
+    """Return OpenAI client object."""
+    return make_openai_client_from_environ()
 
 
 @pytest.fixture(name="toolset", scope="module")
 def fixture_toolset():
-    """Return the dummy instance of Toolset."""
+    """Return the dummy instance of Toolset that does not contain necessary
+    clients for full execution of certain tools."""
+    # This is useful for testing tool calling behavior without making actual
+    # API calls during testing.
     return Toolset(obsidian=None, mealie=None)

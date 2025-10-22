@@ -2,16 +2,43 @@
 
 import json
 
+import instructor
 import numpy as np
 import pytest
 
-from jhutils.agent import AssistantAgent
+from jhutils import Mealie, Obsidian
+from jhutils.agent import AssistantAgent, AssistantFactory
+from jhutils.agent.tools import Toolset
 
 
 @pytest.fixture(name="assistant", scope="function")
-def fixture_assistant(openrouter_client):
-    """Return an instance of AssistantAgent."""
-    return AssistantAgent(openrouter_client, bool_test=True)
+def fixture_assistant(openai_client, toolset):
+    """Return an instance of AssistantAgent with a dummy toolset instance so
+    that tool calling can be tested without making actual API calls."""
+    return AssistantAgent(client=openai_client, toolset=toolset)
+
+
+def test_assistant_from_environ():
+    """Test that AssistantAgent.from_environ constructs an AssistantAgent
+    instance correctly from environment variables without optional
+    arguments."""
+    assistant = AssistantAgent.from_environ()
+    assert isinstance(assistant, AssistantAgent)
+    assert isinstance(assistant.toolset.kwargs.get("mealie"), Mealie)
+    assert isinstance(assistant.toolset.kwargs.get("obsidian"), Obsidian)
+
+
+# pylint: disable=protected-access
+def test_assistant_factory():
+    """Test that AssistantFactory creates an AssistantAgent instance
+    correctly from environment variables."""
+    factory = AssistantFactory()
+    assert factory._client is None
+    assert factory._toolset is None
+    assert factory._assistant is None
+    assert isinstance(factory.assistant, AssistantAgent)
+    assert isinstance(factory._client, instructor.Instructor)
+    assert isinstance(factory._toolset, Toolset)
 
 
 def test_assistant_select_and_execute_add_tasks(assistant):
@@ -94,11 +121,12 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
     assert "response" in json.loads(history[1]["content"])["called_tool_input"]
 
 
-def test_assistant_chain_tools_task_shopping_respond(assistant):
+def test_assistant_chain_tools_task_shopping(assistant):
     """Test that the assistant can correctly chain multiple tools:
-    AddTasksTool, AddShoppingItemsTool, RespondTool."""
+    AddTasksTool and AddShoppingItemsTool."""
     query = "Add onions to my shopping list. Remind me to text Georgie back."
     response = assistant.run(query)
+    assert response == "Done."
     history = assistant.agent.history.get_history()
     called_tool_inputs = [
         json.loads(history[i]["content"])["called_tool_input"] for i in [1, 3]
@@ -115,4 +143,24 @@ def test_assistant_chain_tools_task_shopping_respond(assistant):
             for called_tool_input in called_tool_inputs
         ]
     )
-    assert response == "Done."
+
+
+def test_assistant_chain_tools_shopping_respond(assistant):
+    """Test that the assistant can correctly chain multiple tools:
+    AddTasksTool and RespondTool."""
+    query = (
+        "Remind me to Venmo Joshua for the magnet. "
+        "Also, give me a concise one-sentence explanation on the difference "
+        "between propitiation and expiation from a Reformed perspective."
+    )
+    response = assistant.run(query)
+    assert np.all(
+        [
+            phrase in response.lower()
+            for phrase in ["propitiation", "expiation"]
+        ]
+    )
+    history = assistant.agent.history.get_history()
+    assert json.loads(history[1]["content"])["called_tool_input"] == {
+        "tasks": ["Venmo Joshua for the magnet"]
+    }
