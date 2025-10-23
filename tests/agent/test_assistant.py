@@ -51,7 +51,7 @@ def test_assistant_select_and_execute_add_tasks(assistant):
         "I should send out the assigned groups. "
     )
     response = assistant.run(query)
-    assert response == "Done."
+    assert response.startswith("Added 4 tasks:")
     history = assistant.agent.history.get_history()
     assert json.loads(history[1]["content"]) == {
         "called_tool_input": {
@@ -76,7 +76,7 @@ def test_assistant_select_and_execute_add_shopping_items(assistant):
         "I should pick up green onions for garnish."
     )
     response = assistant.run(query)
-    assert response == "Done."
+    assert response.startswith("Added 6 items:")
     history = assistant.agent.history.get_history()
     assert json.loads(history[1]["content"]) == {
         "called_tool_input": {
@@ -124,9 +124,11 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
 def test_assistant_chain_tools_task_shopping(assistant):
     """Test that the assistant can correctly chain multiple tools:
     AddTasksTool and AddShoppingItemsTool."""
-    query = "Add onions to my shopping list. Remind me to text Georgie back."
+    query = (
+        "Add onions to my shopping list. Then, remind me to text Georgie back."
+    )
     response = assistant.run(query)
-    assert response == "Done."
+    assert response.startswith("Added 1 item:")
     history = assistant.agent.history.get_history()
     called_tool_inputs = [
         json.loads(history[i]["content"])["called_tool_input"] for i in [1, 3]
