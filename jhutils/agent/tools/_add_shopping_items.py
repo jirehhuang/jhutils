@@ -75,7 +75,7 @@ class AddShoppingItemsTool(
         """
         if isinstance(self.mealie, Mealie):
             self.mealie.add_shopping_items(  # pragma: no cover
-                self.mealie.parse_items(params.items)
+                self.mealie.parse_items(params.items, as_payload=True)
             )
 
         joined_items = ", ".join(params.items)
