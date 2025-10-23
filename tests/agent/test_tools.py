@@ -20,6 +20,16 @@ def test_add_shopping_items_tool():
     assert result.model_dump() == expected_result
 
 
+def test_add_shopping_items_tool_parsed(mealie):
+    """Test that running the AddShoppingItemsTool correctly parses a food."""
+    items = ["3 lb test food, from Costco"]
+    expected_result = {"result": "Added 1 item: test food"}
+    tool = AddShoppingItemsTool(mealie=mealie)
+    input_data = tool.input_schema(items=items)
+    result = tool.run(input_data)
+    assert result.model_dump() == expected_result
+
+
 def test_add_tasks_tool():
     """Test that running the AddTasksTool returns the expected result."""
     tasks = ["Do laundry", "Buy groceries", "Clean room"]
