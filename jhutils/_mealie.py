@@ -165,11 +165,11 @@ class Mealie:
                 if len(new_items) < per_page or not response["next"]:
                     break
 
-            if self._shopping_list_id:
+            if self.shopping_list_id:
                 items = [
                     item
                     for item in items
-                    if item["shoppingListId"] == self._shopping_list_id
+                    if item["shoppingListId"] == self.shopping_list_id
                 ]
             self._shopping_items = items
 
@@ -183,10 +183,8 @@ class Mealie:
     def add_shopping_items(self, items: List[Dict[str, Any]]):
         """Add items to the shopping list."""
         for item in items:
-            if self._shopping_list_id:
-                item.update({"shoppingListId": self._shopping_list_id})
-            if not item.get("shoppingListId"):
-                raise ValueError("Item is missing required key shoppingListId")
+            if self.shopping_list_id:
+                item.update({"shoppingListId": self.shopping_list_id})
 
         return self._request(
             "POST",
@@ -202,11 +200,67 @@ class Mealie:
             params={"ids": ids},
         )
 
-    def parse_items(self, items: List[str]) -> List[Dict[str, Any]]:
+    @staticmethod
+    def _parsed2payload(ingredient: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert parsed ingredient data into a payload dictionary."""
+        food = ingredient.get("food", {})
+        unit = ingredient.get("unit", {}) or {}
+
+        return {
+            "name": food.get("name", ""),
+            "quantity": ingredient.get("quantity", 1),
+            "unit": {
+                "id": unit.get("id", ""),
+                "name": unit.get("name", ""),
+                "pluralName": unit.get("pluralName", ""),
+                "description": unit.get("description", ""),
+                "extras": unit.get("extras", {}),
+                "fraction": unit.get("fraction", False),
+                "abbreviation": unit.get("abbreviation", ""),
+                "pluralAbbreviation": unit.get("pluralAbbreviation", ""),
+                "useAbbreviation": unit.get("useAbbreviation", False),
+                "aliases": unit.get("aliases", []),
+                "createdAt": unit.get("createdAt", ""),
+                "updatedAt": unit.get("updatedAt", ""),
+            },
+            "food": {
+                "id": food.get("id", ""),
+                "name": food.get("name", ""),
+                "pluralName": food.get("pluralName", ""),
+                "description": food.get("description", ""),
+                "extras": food.get("extras", {}),
+                "labelId": food.get("labelId", ""),
+                "aliases": food.get("aliases", []),
+                "householdsWithIngredientFood": food.get(
+                    "householdsWithIngredientFood", []
+                ),
+                "label": food.get("label", {}),
+                "createdAt": food.get("createdAt", ""),
+                "updatedAt": food.get("updatedAt", ""),
+            },
+            "note": ingredient.get("note", ""),
+            "shoppingListId": ingredient.get("shoppingListId", None),
+            "foodId": food.get("id", None),
+            "unitId": unit.get("id", None),
+            "checked": False,
+            "position": 0,
+            "extras": {},
+            "id": "",
+            "recipeReferences": [],
+        }
+
+    def parse_items(
+        self, items: List[str], as_payload: bool = False
+    ) -> List[Dict[str, Any]]:
         """Parse item names into food item dictionaries."""
         response = self._request(
             "POST",
             endpoint="api/parser/ingredients",
             data={"parser": "nlp", "ingredients": items},
         )
-        return [item["ingredient"] for item in response["content"]]
+        ingredients = [item["ingredient"] for item in response["content"]]
+        if as_payload:
+            ingredients = [
+                self._parsed2payload(ingredient) for ingredient in ingredients
+            ]
+        return ingredients
