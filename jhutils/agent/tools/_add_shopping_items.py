@@ -74,7 +74,7 @@ class AddShoppingItemsTool(
             AddShoppingItemsOutputSchema: The result of the action.
         """
         items = params.items
-        if isinstance(self.mealie, Mealie):  # pragma: no cover
+        if isinstance(self.mealie, Mealie):
             parsed_items = self.mealie.parse_items(
                 params.items, as_payload=True
             )
