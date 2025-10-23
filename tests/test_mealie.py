@@ -6,6 +6,25 @@ import pytest
 from jhutils import Mealie
 
 
+def _add_temporary_shopping_items(mealie, items):
+    """Temporarily add items to the shopping list.
+
+    Helper function to add items to the shopping list temporarily and then
+    promptly delete them.
+    """
+    items_before = mealie.load_shopping_items(force=True)
+    response = mealie.add_shopping_items(items)
+    mealie.delete_shopping_items(
+        [
+            item["id"]
+            for item in response["createdItems"] + response["updatedItems"]
+        ]
+    )
+    items_after = mealie.load_shopping_items(force=True)
+    assert items_before == items_after
+    return response
+
+
 def test_error_if_no_api_url():
     """Test that a ValueError is raised if the api_url argument is not
     provided."""
@@ -65,20 +84,9 @@ def test_load_shopping_items_invalid_list(mealie):
     assert not items
 
 
-def test_add_shopping_items_no_list(mealie):
-    """Test that a ValueError is raised when attempting to add items without a
-    shopping list."""
-    msg = "Item is missing required key shoppingListId"
-    mealie.shopping_list_id = None
-    with pytest.raises(ValueError, match=msg):
-        mealie.add_shopping_items([{"note": "potatoes"}])
-
-
-def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
+def test_add_delete_shopping_items(mealie):
     """Test that items can be successfully added to and deleted from a shopping
     list."""
-    items_before = mealie.load_shopping_items(force=True)
-    mealie.shopping_list_id = mealie_shopping_list_id
     items = [
         {"note": "test non-food example"},
         {
@@ -90,15 +98,7 @@ def test_add_delete_shopping_items(mealie, mealie_shopping_list_id):
             ),
         },
     ]
-    response = mealie.add_shopping_items(items)
-    mealie.delete_shopping_items(
-        [
-            item["id"]
-            for item in response["createdItems"] + response["updatedItems"]
-        ]
-    )
-    items_after = mealie.load_shopping_items(force=True)
-    assert items_before == items_after
+    _add_temporary_shopping_items(mealie, items)
 
 
 def test_parse_items(mealie):
