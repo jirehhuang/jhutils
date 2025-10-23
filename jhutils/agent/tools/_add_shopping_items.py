@@ -79,6 +79,7 @@ class AddShoppingItemsTool(
             )
 
         joined_items = ", ".join(params.items)
+        item_plural = "item" if len(params.items) == 1 else "items"
         return AddShoppingItemsOutputSchema(
-            result=f"Successfully added item(s): {joined_items}"
+            result=f"Added {len(params.items)} {item_plural}: {joined_items}"
         )
