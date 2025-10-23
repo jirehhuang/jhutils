@@ -102,6 +102,8 @@ class AssistantAgent:
 
     def run(self, query: str) -> str:
         """Run the assistant agent."""
+        result_text = []
+
         history = self.agent.history if self.agent else None
 
         # Reset the selected tools to avoid being influenced by prior runs
@@ -131,10 +133,13 @@ class AssistantAgent:
                 )
                 tool_response = called_tool.run(response.called_tool_input)
 
+            if tool_response and hasattr(tool_response, "result"):
+                result_text.append(tool_response.result)
+
             if response.next_tool is None:
                 if tool_response and hasattr(tool_response, "response"):
                     return tool_response.response
-                return "Done."
+                return "\n".join(result_text) or "Done."
 
             query = response.remainder
             self.toolset.selected_tools = [
