@@ -101,13 +101,19 @@ def test_add_delete_shopping_items(mealie):
     _add_temporary_shopping_items(mealie, items)
 
 
-def test_parse_items(mealie):
+def test_parse_and_add_items(mealie):
     """Test that method .parse_items() correctly parses a list of
-    strings into a list of dictionaries."""
-    items = ["milk", "2 eggs", "flour (1kg)"]
-    parsed_items = mealie.parse_items(items)
-    assert [item["display"] for item in parsed_items] == [
-        "milk",
-        "2 eggs",
-        "1 kilogram flour",
+    strings into a list of dictionaries and can be added to the shopping
+    list."""
+    items = [
+        "4 tbsp kosher salt, from Walmart",
+        "little sheep spicy broth",
+        "test food (1kg)",
     ]
+    parsed_items = mealie.parse_items(items, as_payload=True)
+    assert [item["name"] for item in parsed_items] == [
+        "kosher salt",
+        "Little Sheep spicy broth",
+        "test food",
+    ]
+    _add_temporary_shopping_items(mealie, parsed_items)
