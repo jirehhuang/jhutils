@@ -165,11 +165,11 @@ class Mealie:
                 if len(new_items) < per_page or not response["next"]:
                     break
 
-            if self._shopping_list_id:
+            if self.shopping_list_id:
                 items = [
                     item
                     for item in items
-                    if item["shoppingListId"] == self._shopping_list_id
+                    if item["shoppingListId"] == self.shopping_list_id
                 ]
             self._shopping_items = items
 
@@ -183,10 +183,8 @@ class Mealie:
     def add_shopping_items(self, items: List[Dict[str, Any]]):
         """Add items to the shopping list."""
         for item in items:
-            if self._shopping_list_id:
-                item.update({"shoppingListId": self._shopping_list_id})
-            if not item.get("shoppingListId"):
-                raise ValueError("Item is missing required key shoppingListId")
+            if self.shopping_list_id:
+                item.update({"shoppingListId": self.shopping_list_id})
 
         return self._request(
             "POST",
