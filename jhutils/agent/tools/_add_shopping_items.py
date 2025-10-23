@@ -73,13 +73,16 @@ class AddShoppingItemsTool(
         -------
             AddShoppingItemsOutputSchema: The result of the action.
         """
-        if isinstance(self.mealie, Mealie):
-            self.mealie.add_shopping_items(  # pragma: no cover
-                self.mealie.parse_items(params.items, as_payload=True)
+        items = params.items
+        if isinstance(self.mealie, Mealie):  # pragma: no cover
+            parsed_items = self.mealie.parse_items(
+                params.items, as_payload=True
             )
+            self.mealie.add_shopping_items(parsed_items)
+            items = [item["name"] for item in parsed_items]
 
-        joined_items = ", ".join(params.items)
-        item_plural = "item" if len(params.items) == 1 else "items"
+        joined_items = ", ".join(items)
+        item_plural = "item" if len(items) == 1 else "items"
         return AddShoppingItemsOutputSchema(
-            result=f"Added {len(params.items)} {item_plural}: {joined_items}"
+            result=f"Added {len(items)} {item_plural}: {joined_items}"
         )
