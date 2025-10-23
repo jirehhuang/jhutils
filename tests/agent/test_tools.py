@@ -13,10 +13,18 @@ def test_add_shopping_items_tool():
     """Test that running the AddShoppingItemsTool returns the expected
     result."""
     items = ["milk", "eggs", "bread"]
-    expected_result = {
-        "result": f"Successfully added item(s): {', '.join(items)}"
-    }
+    expected_result = {"result": f"Added 3 items: {', '.join(items)}"}
     tool = AddShoppingItemsTool(mealie=None)
+    input_data = tool.input_schema(items=items)
+    result = tool.run(input_data)
+    assert result.model_dump() == expected_result
+
+
+def test_add_shopping_items_tool_parsed(mealie):
+    """Test that running the AddShoppingItemsTool correctly parses a food."""
+    items = ["3 lb test food, from Costco"]
+    expected_result = {"result": "Added 1 item: test food"}
+    tool = AddShoppingItemsTool(mealie=mealie)
     input_data = tool.input_schema(items=items)
     result = tool.run(input_data)
     assert result.model_dump() == expected_result
@@ -25,9 +33,7 @@ def test_add_shopping_items_tool():
 def test_add_tasks_tool():
     """Test that running the AddTasksTool returns the expected result."""
     tasks = ["Do laundry", "Buy groceries", "Clean room"]
-    expected_result = {
-        "result": f"Successfully added task(s): {', '.join(tasks)}"
-    }
+    expected_result = {"result": f"Added 3 tasks: {', '.join(tasks)}"}
     tool = AddTasksTool(obsidian=None)
     input_data = tool.input_schema(tasks=tasks)
     result = tool.run(input_data)

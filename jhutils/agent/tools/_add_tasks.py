@@ -80,6 +80,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
             self.obsidian.add_tasks(params.tasks)  # pragma: no cover
 
         joined_tasks = ", ".join(params.tasks)
+        task_plural = "task" if len(params.tasks) == 1 else "tasks"
         return AddTasksOutputSchema(
-            result=f"Successfully added task(s): {joined_tasks}"
+            result=f"Added {len(params.tasks)} {task_plural}: {joined_tasks}"
         )

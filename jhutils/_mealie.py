@@ -250,7 +250,7 @@ class Mealie:
         }
 
     def parse_items(
-        self, items: List[str], as_payload: bool = False
+        self, items: List[str], as_payload: bool = True
     ) -> List[Dict[str, Any]]:
         """Parse item names into food item dictionaries."""
         response = self._request(
