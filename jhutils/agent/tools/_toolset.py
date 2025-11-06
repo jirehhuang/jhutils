@@ -25,7 +25,7 @@ class Toolset:
         Additional keyword arguments to pass to tool constructors.
     """
 
-    def __init__(self, mode: str = "default", **kwargs):
+    def __init__(self, mode: str = "general", **kwargs):
         """Initialize the Toolset with a list of tools and tool arguments."""
         self._all_tools: ToolList = TOOLS.copy()
         self._kwargs = kwargs
@@ -33,7 +33,7 @@ class Toolset:
         self._selected_tools: ToolList = self._available_tools
 
     @classmethod
-    def from_environ(cls, mode: str = "default", **kwargs) -> "Toolset":
+    def from_environ(cls, mode: str = "general", **kwargs) -> "Toolset":
         """Create a Toolset instance from environment variables."""
         if not isinstance(kwargs.get("mealie"), Mealie):
             kwargs["mealie"] = Mealie.from_environ()

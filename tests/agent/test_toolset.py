@@ -23,7 +23,7 @@ from jhutils.agent.tools._toolset import (
 def test_dummy_toolset_has_no_tool_kwargs(toolset):
     """Test that the dummy Toolset instance has no tool constructor arguments
     in kwargs."""
-    assert toolset.mode == "default"
+    assert toolset.mode == "general"
     assert toolset.kwargs.get("mealie") is None
     assert toolset.kwargs.get("obsidian") is None
 
@@ -33,7 +33,7 @@ def test_toolset_construct_from_environ():
     correctly from environment variables with tool kwargs."""
     toolset = Toolset.from_environ()
     assert isinstance(toolset, Toolset)
-    assert toolset.mode == "default"
+    assert toolset.mode == "general"
     assert isinstance(toolset.kwargs.get("mealie"), Mealie)
     assert isinstance(toolset.kwargs.get("obsidian"), Obsidian)
 
@@ -41,7 +41,7 @@ def test_toolset_construct_from_environ():
 @pytest.mark.parametrize(
     "mode, tool_names",
     [
-        ("default", AVAILABLE_MODES["default"]),
+        ("general", AVAILABLE_MODES["general"]),
         ("shopping", AVAILABLE_MODES["shopping"]),
     ],
 )
@@ -56,13 +56,13 @@ def test_toolset_constructs_with_mode(mode, tool_names):
 def test_toolset_mode_getter_setter(toolset):
     """Test that the Toolset.mode property getter and setter work as
     expected, as well as the tool_names property."""
-    assert toolset.mode == "default"
+    assert toolset.mode == "general"
     toolset.mode = "shopping"
     assert toolset.mode == "shopping"
     assert np.all(toolset.available_tool_names == AVAILABLE_MODES["shopping"])
-    toolset.mode = "default"
-    assert toolset.mode == "default"
-    assert np.all(toolset.available_tool_names == AVAILABLE_MODES["default"])
+    toolset.mode = "general"
+    assert toolset.mode == "general"
+    assert np.all(toolset.available_tool_names == AVAILABLE_MODES["general"])
 
 
 def test_toolset_error_if_invalid_mode(toolset):
@@ -154,7 +154,7 @@ def test_toolset_error_if_get_invalid_tool_schema(toolset):
         toolset.get_tool(tool_schema=InvalidSchema())  # type: ignore
 
 
-def test_default_toolset_initialize_tools(toolset):
+def test_general_toolset_initialize_tools(toolset):
     """Test that the dummy Toolset without kwargs initializes tools
     without constructor arguments."""
     add_tasks_tool = toolset.initialize_tool("AddTasksTool")

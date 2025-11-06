@@ -12,7 +12,7 @@ TOOLS = [AddTasksTool, AddShoppingItemsTool, RespondTool]
 TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
 
 AVAILABLE_MODES = {
-    "default": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
+    "general": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
 }
 
