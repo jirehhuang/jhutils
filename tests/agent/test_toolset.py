@@ -11,6 +11,7 @@ from jhutils.agent.tools import (
 )
 from jhutils.agent.tools._tools import (
     AVAILABLE_MODES,
+    SYSTEM_PROMPTS,
     TOOL_NAMES,
     TOOLS,
 )
@@ -28,6 +29,15 @@ def test_dummy_toolset_has_no_tool_kwargs(toolset):
     assert toolset.kwargs.get("obsidian") is None
 
 
+def test_dummy_toolset_gets_default_prompts(toolset):
+    """Test that the dummy Toolset instance gets default prompts because no
+    Obsidian client is provided. Also test that changing the mode updates to
+    the corresponding mode."""
+    assert toolset.system_prompt == SYSTEM_PROMPTS["general"]
+    toolset.mode = "shopping"
+    assert toolset.system_prompt == SYSTEM_PROMPTS["shopping"]
+
+
 def test_toolset_construct_from_environ():
     """Test that Toolset.from_environ constructs a Toolset instance
     correctly from environment variables with tool kwargs."""
@@ -36,6 +46,7 @@ def test_toolset_construct_from_environ():
     assert toolset.mode == "general"
     assert isinstance(toolset.kwargs.get("mealie"), Mealie)
     assert isinstance(toolset.kwargs.get("obsidian"), Obsidian)
+    assert isinstance(toolset.system_prompt, str)
 
 
 @pytest.mark.parametrize(
