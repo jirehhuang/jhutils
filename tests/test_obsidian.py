@@ -16,14 +16,14 @@ def test_error_if_no_owner_or_repository():
     )
     with pytest.raises(ValueError, match=msg):
         Obsidian(
+            github_token="token",
             owner="",
             repository="repository",
             branch="branch",
-            github_token="token",
         )
     with pytest.raises(ValueError, match=msg):
         Obsidian(
-            owner="owner", repository="", branch="branch", github_token="token"
+            github_token="token", owner="owner", repository="", branch="branch"
         )
 
 
@@ -33,10 +33,10 @@ def test_error_if_no_github_token():
     msg = '"github_token" required to initialize Obsidian instance.'
     with pytest.raises(ValueError, match=msg):
         Obsidian(
+            github_token="",
             owner="owner",
             repository="repository",
             branch="branch",
-            github_token="",
         )
 
 
