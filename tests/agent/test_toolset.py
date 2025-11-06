@@ -11,9 +11,9 @@ from jhutils.agent.tools import (
 )
 from jhutils.agent.tools._tools import (
     AVAILABLE_MODES,
-    SYSTEM_PROMPTS,
     TOOL_NAMES,
     TOOLS,
+    _get_default_system_prompt,
 )
 from jhutils.agent.tools._toolset import (
     AvailableToolsProvider,
@@ -33,9 +33,10 @@ def test_dummy_toolset_gets_default_prompts(toolset):
     """Test that the dummy Toolset instance gets default prompts because no
     Obsidian client is provided. Also test that changing the mode updates to
     the corresponding mode."""
-    assert toolset.system_prompt == SYSTEM_PROMPTS["general"]
     toolset.mode = "shopping"
-    assert toolset.system_prompt == SYSTEM_PROMPTS["shopping"]
+    assert toolset.system_prompt == _get_default_system_prompt("shopping")
+    toolset.mode = "general"
+    assert toolset.system_prompt == _get_default_system_prompt("general")
 
 
 def test_toolset_construct_from_environ():

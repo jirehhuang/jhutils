@@ -11,7 +11,12 @@ from docstring_parser import parse
 
 from ..._mealie import Mealie
 from ..._obsidian import Obsidian
-from ._tools import AVAILABLE_MODES, SYSTEM_PROMPTS, TOOLS, ToolList
+from ._tools import (
+    AVAILABLE_MODES,
+    TOOLS,
+    ToolList,
+    _get_default_system_prompt,
+)
 
 
 class Toolset:
@@ -66,7 +71,7 @@ class Toolset:
                 prompt_path = os.path.join(prompts_path, f"{self.mode}.md")
                 prompt = obsidian.read_file(prompt_path).get("content", None)
 
-        self._system_prompt = prompt or SYSTEM_PROMPTS[self.mode]
+        self._system_prompt = prompt or _get_default_system_prompt(self.mode)
         return self._system_prompt
 
     @property

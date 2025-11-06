@@ -17,20 +17,28 @@ AVAILABLE_MODES = {
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
 }
 
-# System prompts for manager agent. See Obsidian.prompts_path docstring.
-SYSTEM_PROMPTS = {
-    "general": textwrap.dedent(
-        """
-        You are a helpful general assistant.
-        Respond as concisely and completely as possible.
-        """
-    ),
-    "shopping": textwrap.dedent(
-        """
-        You are a helpful shopping assistant.
-        Respond as concisely and completely as possible.
-        """
-    ),
-}
-
 ToolList: TypeAlias = list[BaseTool]
+
+
+def _get_default_system_prompt(mode: str) -> str:
+    """Get the default system prompt for a given mode.
+
+    Get the default system prompt for a given mode for the manager agent.
+    See Obsidian.prompts_path docstring for details.
+
+    Parameters
+    ----------
+    mode
+        The mode to get the system prompt for.
+
+    Returns
+    -------
+    str
+        The default system prompt for the given mode.
+    """
+    return textwrap.dedent(
+        f"""
+        You are a helpful {mode} assistant.
+        Respond as concisely and completely as possible.
+        """
+    )
