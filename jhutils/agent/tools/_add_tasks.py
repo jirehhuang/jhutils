@@ -69,7 +69,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
 
         Parameters
         ----------
-        params : AddTasksInputSchema
+        params
             The input parameters for the tool.
 
         Returns
