@@ -1,5 +1,6 @@
 """Available tools."""
 
+import textwrap
 from typing import TypeAlias
 
 from atomic_agents import BaseTool
@@ -12,8 +13,36 @@ TOOLS = [AddTasksTool, AddShoppingItemsTool, RespondTool]
 TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
 
 AVAILABLE_MODES = {
-    "default": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
+    "general": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
+    "cooking": ["AddShoppingItemsTool"],
+    "review": [],
+    "theology": [],
+    "testing": [],
 }
 
 ToolList: TypeAlias = list[BaseTool]
+
+
+def _get_default_system_prompt(mode: str) -> str:
+    """Get the default system prompt for a given mode.
+
+    Get the default system prompt for a given mode for the manager agent.
+    See Obsidian.prompts_path docstring for details.
+
+    Parameters
+    ----------
+    mode
+        The mode to get the system prompt for.
+
+    Returns
+    -------
+    str
+        The default system prompt for the given mode.
+    """
+    return textwrap.dedent(
+        f"""
+        You are a helpful {mode} assistant.
+        Respond as concisely and completely as possible.
+        """
+    )

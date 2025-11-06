@@ -11,12 +11,40 @@ from ._utils import _time_id
 INBOX_PATH = "Inbox"
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 class Obsidian:
-    """Client for interacting with an Obsidian vault GitHub repository."""
+    """Client for interacting with an Obsidian vault GitHub repository.
 
-    def __init__(
-        self, owner: str, repository: str, branch: str, github_token: str
+    Parameters
+    ----------
+    github_token
+        GitHub token with access to the repository.
+    owner
+        Owner of the repository.
+    repository
+        Name of the repository.
+    branch
+        Branch of the repository.
+    prompts_path
+        Path to the folder in the repository containing system prompts for the
+        various assistant modes.
+    """
+
+    def __init__(  # noqa: PLR0913
+        self,
+        github_token: str,
+        owner: str,
+        repository: str,
+        branch: str,
+        prompts_path: str | None = None,
     ) -> None:
+        if not github_token:
+            raise ValueError(
+                '"github_token" required to initialize Obsidian instance.'
+            )
+        self.session = requests.Session()
+        self.session.headers.update({"Authorization": f"token {github_token}"})
+
         if not owner or not repository:
             raise ValueError(
                 '"owner" and "repository" are required to initialize Obsidian '
@@ -27,18 +55,13 @@ class Obsidian:
         )
         self._branch: str = branch or "main"
         self._files: Dict[str, Any] = {}
-
-        if not github_token:
-            raise ValueError(
-                '"github_token" required to initialize Obsidian instance.'
-            )
-        self.session = requests.Session()
-        self.session.headers.update({"Authorization": f"token {github_token}"})
+        self._prompts_path: str | None = prompts_path
 
     @classmethod
     def from_environ(cls) -> "Obsidian":
         """Create Obsidian instance from environment variables."""
         return cls(
+            github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
             owner=os.getenv("OBSIDIAN_VAULT_OWNER", "jirehhuang"),
             repository=os.getenv(
                 "OBSIDIAN_VAULT_REPOSITORY", "obsidian-vault"
@@ -47,7 +70,7 @@ class Obsidian:
                 "OBSIDIAN_VAULT_BRANCH",
                 "test" if os.getenv("ALIAS") != "prod" else "main",
             ),
-            github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
+            prompts_path=os.getenv("OBSIDIAN_VAULT_PROMPTS_PATH", None),
         )
 
     # pylint: disable=duplicate-code
@@ -69,6 +92,19 @@ class Obsidian:
             response_json = {"content": response_json}
 
         return response_json
+
+    @property
+    def prompts_path(self) -> str | None:
+        """Get the prompts path.
+
+        The prompts path is the folder in the repository where the system
+        prompts for the assistant are stored. This property is used by the
+        Toolset class to retrieve the system prompt for a given mode.
+
+        Note that this system prompt is not for the AssistantAgent class
+        itself, but for a manager agent delegating to the AssistantAgent.
+        """
+        return self._prompts_path
 
     @property
     def files(self) -> Dict[str, Any]:

@@ -66,7 +66,7 @@ class AddShoppingItemsTool(
 
         Parameters
         ----------
-        params : AddShoppingItemsInputSchema
+        params
             The input parameters for the tool.
 
         Returns

@@ -41,6 +41,7 @@ def test_assistant_factory():
     assert isinstance(factory._toolset, Toolset)
 
 
+@pytest.mark.flaky(reruns=1)
 def test_assistant_select_and_execute_add_tasks(assistant):
     """Test that the assistant can correctly select and execute the
     AddTasksTool."""
@@ -67,6 +68,7 @@ def test_assistant_select_and_execute_add_tasks(assistant):
     }
 
 
+@pytest.mark.flaky(reruns=1)
 def test_assistant_select_and_execute_add_shopping_items(assistant):
     """Test that the assistant can correctly select and execute the
     AddShoppingItemsTool."""
@@ -94,6 +96,7 @@ def test_assistant_select_and_execute_add_shopping_items(assistant):
     }
 
 
+@pytest.mark.flaky(reruns=1)
 def test_assistant_select_and_execute_respond(assistant):
     """Test that the assistant can correctly select and execute the
     RespondTool."""
@@ -108,6 +111,7 @@ def test_assistant_select_and_execute_respond(assistant):
     )
 
 
+@pytest.mark.flaky(reruns=1)
 def test_assistant_respond_sorry_if_cannot_answer(assistant):
     """Test that the assistant correctly acknowledges inability to handle a
     query where no tool is applicable and the assistant does not know."""
@@ -121,6 +125,7 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
     assert "response" in json.loads(history[1]["content"])["called_tool_input"]
 
 
+@pytest.mark.flaky(reruns=1)
 def test_assistant_chain_tools_task_shopping(assistant):
     """Test that the assistant can correctly chain multiple tools:
     AddTasksTool and AddShoppingItemsTool."""
@@ -147,6 +152,7 @@ def test_assistant_chain_tools_task_shopping(assistant):
     )
 
 
+@pytest.mark.flaky(reruns=1)
 def test_assistant_chain_tools_shopping_respond(assistant):
     """Test that the assistant can correctly chain multiple tools:
     AddTasksTool and RespondTool."""

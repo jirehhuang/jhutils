@@ -42,7 +42,7 @@ def _convert_docstring(docstring: str | None) -> str:
 
     Parameters
     ----------
-    docstring : str or None
+    docstring
         Input docstring (NumPy or Google style).
 
     Returns

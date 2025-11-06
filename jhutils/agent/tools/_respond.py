@@ -55,7 +55,7 @@ class RespondTool(BaseTool[RespondInputSchema, RespondOutputSchema]):
 
         Parameters
         ----------
-        params : RespondInputSchema
+        params
             The input parameters for the tool.
 
         Returns
