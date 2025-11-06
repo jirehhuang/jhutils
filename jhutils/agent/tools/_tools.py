@@ -15,6 +15,10 @@ TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
 AVAILABLE_MODES = {
     "general": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
+    "cooking": ["AddShoppingItemsTool"],
+    "review": [],
+    "theology": [],
+    "testing": [],
 }
 
 ToolList: TypeAlias = list[BaseTool]
