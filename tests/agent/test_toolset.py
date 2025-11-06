@@ -52,10 +52,7 @@ def test_toolset_construct_from_environ():
 
 @pytest.mark.parametrize(
     "mode, tool_names",
-    [
-        ("general", AVAILABLE_MODES["general"]),
-        ("shopping", AVAILABLE_MODES["shopping"]),
-    ],
+    list(AVAILABLE_MODES.items()),
 )
 def test_toolset_constructs_with_mode(mode, tool_names):
     """Test that Toolset constructs correctly with different modes, as well
