@@ -1,6 +1,7 @@
 """Toolset class for managing tools."""
 
 import inspect
+import os
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
 from atomic_agents.context import (
@@ -10,7 +11,7 @@ from docstring_parser import parse
 
 from ..._mealie import Mealie
 from ..._obsidian import Obsidian
-from ._tools import AVAILABLE_MODES, TOOLS, ToolList
+from ._tools import AVAILABLE_MODES, SYSTEM_PROMPTS, TOOLS, ToolList
 
 
 class Toolset:
@@ -29,8 +30,9 @@ class Toolset:
         """Initialize the Toolset with a list of tools and tool arguments."""
         self._all_tools: ToolList = TOOLS.copy()
         self._kwargs = kwargs
-        self.mode = mode  # Sets _available_tools
+        self.mode = mode  # Sets _available_tools and _system_prompt
         self._selected_tools: ToolList = self._available_tools
+        self._system_prompt: str | None = None
 
     @classmethod
     def from_environ(cls, mode: str = "general", **kwargs) -> "Toolset":
@@ -40,6 +42,32 @@ class Toolset:
         if not isinstance(kwargs.get("obsidian"), Obsidian):
             kwargs["obsidian"] = Obsidian.from_environ()
         return cls(mode=mode, **kwargs)
+
+    @property
+    def system_prompt(self):
+        """Get the prompt for the toolset based on the mode."""
+        return self._get_system_prompt()
+
+    def _get_system_prompt(self) -> str:
+        """Retrieve the system prompt based on the current mode.
+
+        Attempts to retrieve the Obsidian object from the toolset kwargs.
+        If successful and contains a non-empty prompts_path, attempts to read
+        the prompt file for the current mode from the Obsidian vault. Falls
+        back to the default system prompt if any step fails.
+        """
+        prompt = None
+
+        obsidian = self.kwargs.get("obsidian", None)
+        if isinstance(obsidian, Obsidian):
+            prompts_path = obsidian.prompts_path
+
+            if prompts_path:
+                prompt_path = os.path.join(prompts_path, f"{self.mode}.md")
+                prompt = obsidian.read_file(prompt_path).get("content", None)
+
+        self._system_prompt = prompt or SYSTEM_PROMPTS[self.mode]
+        return self._system_prompt
 
     @property
     def kwargs(self):
@@ -83,7 +111,7 @@ class Toolset:
     def mode(self, mode: str):
         """Update the mode and the corresponding active tools."""
         available_tool_names = AVAILABLE_MODES.get(mode, None)
-        if not available_tool_names:
+        if available_tool_names is None:
             raise ValueError(
                 f"Mode '{mode}' is not supported. "
                 f"Available modes: {AVAILABLE_MODES.keys()}"
@@ -94,6 +122,7 @@ class Toolset:
             if tool.__qualname__ in available_tool_names
         ]
         self._mode = mode
+        self._get_system_prompt()
 
     @property
     def all_tool_names(self) -> list[str]:
