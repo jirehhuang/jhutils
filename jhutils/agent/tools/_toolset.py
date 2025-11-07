@@ -51,7 +51,7 @@ class Toolset:
     @property
     def system_prompt(self):
         """Get the prompt for the toolset based on the mode."""
-        return self._get_system_prompt()
+        return self._system_prompt or self._get_system_prompt()
 
     def _get_system_prompt(self) -> str:
         """Retrieve the system prompt based on the current mode.
