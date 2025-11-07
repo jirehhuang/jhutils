@@ -5,6 +5,7 @@ from datetime import datetime
 
 import pytz
 from docstring_parser import Docstring, DocstringParam, DocstringReturns, parse
+from rapidfuzz import fuzz, process
 
 
 def _time_id(timezone="US/Pacific") -> str:
@@ -85,3 +86,46 @@ def _convert_docstring(docstring: str | None) -> str:
         lines.append("")
 
     return "\n".join(lines).strip()
+
+
+def _match_phrase(query: str, phrases: list[str], return_index: bool = False):
+    """Return best match from phrases.
+
+    Based on an exact (case-insensitive) match first, then fuzzy match using
+    WRatio score.
+
+    Parameters
+    ----------
+    query
+        The input text query.
+    phrases
+        Candidate phrases to search.
+    return_index
+        If True, return index of matched phrase; otherwise return the matched
+        string.
+
+    Returns
+    -------
+    str or int or None
+        The matched phrase or index, or ``None`` if no candidates exist.
+    """
+    if not phrases:
+        return None
+
+    # Case-insensitive exact match
+    lower_map = {p.lower(): i for i, p in enumerate(phrases)}
+    q_lower = query.lower()
+
+    if q_lower in lower_map:
+        idx = lower_map[q_lower]
+        return idx if return_index else phrases[idx]
+
+    # Fuzzy match fallback (WRatio)
+    result = process.extractOne(query, phrases, scorer=fuzz.WRatio)
+
+    if result is None:
+        return None
+
+    # Always return best fuzzy match, no threshold applied here
+    match, _, idx = result
+    return idx if return_index else match
