@@ -6,7 +6,8 @@ import pytest
 import pytz
 from docstring_parser import parse
 
-from jhutils._utils import _convert_docstring, _time_id
+from jhutils._utils import _convert_docstring, _match_phrase, _time_id
+from jhutils.agent.tools._tools import AVAILABLE_MODES
 
 
 def func_numpy(a: int = 1, b: int = 2) -> int:
@@ -130,3 +131,18 @@ def test_time_id():
     assert (
         abs((datetime.now(pytz.utc) - time_from_id).total_seconds()) <= delta
     )
+
+
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        ("activate testing mode", "testing"),
+        ("go back to general mode", "general"),
+        ("I'm going shopping", "shopping"),
+        ("I'm about to cook dinner", "cooking"),
+        ("I want to talk about the Bible", "theology"),
+    ],
+)
+def test_match_modes(query: str, expected: str):
+    """Test that queries can correctly match available modes."""
+    assert _match_phrase(query, list(AVAILABLE_MODES.keys())) == expected
