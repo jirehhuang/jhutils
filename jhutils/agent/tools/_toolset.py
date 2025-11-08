@@ -9,6 +9,8 @@ from atomic_agents.context import (
 )
 from docstring_parser import parse
 
+from jhutils._utils import _match_phrase
+
 from ..._mealie import Mealie
 from ..._obsidian import Obsidian
 from ._tools import (
@@ -51,7 +53,7 @@ class Toolset:
     @property
     def system_prompt(self):
         """Get the prompt for the toolset based on the mode."""
-        return self._get_system_prompt()
+        return self._system_prompt or self._get_system_prompt()
 
     def _get_system_prompt(self) -> str:
         """Retrieve the system prompt based on the current mode.
@@ -128,6 +130,33 @@ class Toolset:
         ]
         self._mode = mode
         self._get_system_prompt()
+
+    def match_mode(self, query: str) -> str | None:
+        """Match query to available modes to identify and update mode.
+
+        Convenience method to match a user query to available modes using
+        ``_match_phrase``, and update the mode if a match is found.
+
+        Parameters
+        ----------
+        query
+            The query phrase to match against available modes.
+
+        Returns
+        -------
+        str | None
+            The matched mode name, or None if no match is found.
+        """
+        available_modes = list(AVAILABLE_MODES.keys())
+        mode = _match_phrase(
+            query, phrases=available_modes, min_score=85, as_index=False
+        )
+
+        if isinstance(mode, str) and mode in set(available_modes):
+            self.mode = mode
+
+        # Type checker does not infer that mode cannot be int
+        return mode  # type: ignore[return-value]
 
     @property
     def all_tool_names(self) -> list[str]:
