@@ -139,10 +139,41 @@ def test_time_id():
         ("activate testing mode", "testing"),
         ("go back to general mode", "general"),
         ("I'm going shopping", "shopping"),
-        ("I'm about to cook dinner", "cooking"),
-        ("I want to talk about the Bible", "theology"),
+        ("start cooking soon", "cooking"),
+        ("theology mode", "theology"),
     ],
 )
 def test_match_modes(query: str, expected: str):
     """Test that queries can correctly match available modes."""
-    assert _match_phrase(query, list(AVAILABLE_MODES.keys())) == expected
+    assert (
+        _match_phrase(
+            query,
+            phrases=list(AVAILABLE_MODES.keys()),
+            min_score=85,
+            as_index=False,
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        ("just some random text", None),
+        ("completely unrelated sentence", None),
+        ("Bible study mode", None),
+        ("non-existent mode", None),
+    ],
+)
+def test_fail_to_match_modes(query: str, expected: str):
+    """Test that no mode is matched if the minimum score is not met.
+    Can be used to calibrate the default min_score threshold."""
+    assert (
+        _match_phrase(
+            query,
+            phrases=list(AVAILABLE_MODES.keys()),
+            min_score=85,
+            as_index=False,
+        )
+        == expected
+    )
