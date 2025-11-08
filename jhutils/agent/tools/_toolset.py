@@ -155,7 +155,8 @@ class Toolset:
         if isinstance(mode, str) and mode in set(available_modes):
             self.mode = mode
 
-        return mode  # type: ignore
+        # Type checker does not infer that mode cannot be int
+        return mode  # type: ignore[return-value]
 
     @property
     def all_tool_names(self) -> list[str]:
