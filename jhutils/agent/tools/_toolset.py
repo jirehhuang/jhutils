@@ -148,7 +148,9 @@ class Toolset:
             The matched mode name, or None if no match is found.
         """
         available_modes = list(AVAILABLE_MODES.keys())
-        mode = _match_phrase(query, available_modes)
+        mode = _match_phrase(
+            query, phrases=available_modes, min_score=85, as_index=False
+        )
 
         if isinstance(mode, str) and mode in set(available_modes):
             self.mode = mode
