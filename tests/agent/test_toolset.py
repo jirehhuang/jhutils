@@ -39,6 +39,13 @@ def test_dummy_toolset_gets_default_prompts(toolset):
     assert toolset.system_prompt == _get_default_system_prompt("general")
 
 
+def test_match_mode(toolset):
+    """Test that Toolset.match_mode correctly matches modes from user
+    queries."""
+    assert toolset.match_mode("activate testing mode") == "testing"
+    assert toolset.match_mode("go back to general mode") == "general"
+
+
 def test_toolset_construct_from_environ():
     """Test that Toolset.from_environ constructs a Toolset instance
     correctly from environment variables with tool kwargs."""
