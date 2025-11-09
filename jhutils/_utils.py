@@ -91,8 +91,8 @@ def _convert_docstring(docstring: str | None) -> str:
 def _match_phrase(
     query: str,
     phrases: list[str],
-    min_score: float = 85,
     as_index: bool = False,
+    score_cutoff: float = 85,
 ):
     """Return best match from phrases.
 
@@ -105,11 +105,11 @@ def _match_phrase(
         The input text query.
     phrases
         Candidate phrases to search.
-    min_score
-        Minimum WRatio score for a fuzzy match to be considered valid.
     as_index
         If True, return index of matched phrase; otherwise return the matched
         string.
+    score_cutoff
+        Minimum WRatio score for a fuzzy match to be considered valid.
 
     Returns
     -------
@@ -128,14 +128,13 @@ def _match_phrase(
         return idx if as_index else phrases[idx]
 
     # Fuzzy match fallback (WRatio)
-    result = process.extractOne(query, phrases, scorer=fuzz.WRatio)
+    result = process.extractOne(
+        query, phrases, scorer=fuzz.WRatio, score_cutoff=score_cutoff
+    )
 
     if result is None:
         return None
 
-    match, score, idx = result
-
-    if score < min_score:
-        return None
+    match, _, idx = result
 
     return idx if as_index else match

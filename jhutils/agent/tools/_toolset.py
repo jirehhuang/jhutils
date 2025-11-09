@@ -149,7 +149,7 @@ class Toolset:
         """
         available_modes = list(AVAILABLE_MODES.keys())
         mode = _match_phrase(
-            query, phrases=available_modes, min_score=85, as_index=False
+            query, phrases=available_modes, as_index=False, score_cutoff=85
         )
 
         if isinstance(mode, str) and mode in set(available_modes):
@@ -276,6 +276,35 @@ class Toolset:
             tool_name=tool_name, tool_schema=tool_schema
         ).config_cls  # type: ignore
 
+    def get_function_schema(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> dict[str, object]:
+        """Get the function schema for a tool.
+
+        Convert the input schema of a tool to the arguments of a function
+        schema: ``pipecat.adapters.schemas.function_schema.FunctionSchema``.
+        """
+        tool = self.get_tool(tool_name=tool_name, tool_schema=tool_schema)
+        tool_name = tool.__qualname__
+        return {
+            "name": tool_name,
+            "description": parse(
+                str(tool.input_schema.__doc__)
+            ).long_description,
+            "properties": {
+                "instructions": {
+                    "type": "string",
+                    "description": (
+                        f"Clear instructions for what to use {tool_name} "
+                        "to accomplish, with all relevant details."
+                    ),
+                }
+            },
+            "required": ["instructions"],
+        }
+
     def reset_selected_tools(self):
         """Reset the selected tools to available tools.
 
@@ -288,7 +317,9 @@ class Toolset:
 class AvailableToolsProvider(BaseDynamicContextProvider):
     """Dynamic context provider for Available Tool(s)."""
 
-    def __init__(self, toolset: Toolset, title: str = "Available Tool(s)"):
+    def __init__(
+        self, toolset: Toolset, title: str = "Available Tool(s) for NEXT step"
+    ):
         super().__init__(title)
         self._toolset = toolset
 
@@ -301,6 +332,7 @@ class AvailableToolsProvider(BaseDynamicContextProvider):
                     f"{parse(tool.__doc__).short_description}"  # type: ignore
                 )
                 for tool in self._toolset.available_tools
+                # Note that excluding selected tools confuses the agent
             ]
         )
 
@@ -309,7 +341,11 @@ class AvailableToolsProvider(BaseDynamicContextProvider):
 class SelectedToolsProvider(BaseDynamicContextProvider):
     """Dynamic context provider for Selected Tool(s)."""
 
-    def __init__(self, toolset: Toolset, title: str = "Selected Tool(s)"):
+    def __init__(
+        self,
+        toolset: Toolset,
+        title: str = "Selected Tool(s) for CURRENT step",
+    ):
         super().__init__(title)
         self._title = title
         self._toolset = toolset

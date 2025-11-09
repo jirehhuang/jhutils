@@ -109,7 +109,7 @@ def MakeChainToolOutputSchema(  # noqa: N802
             "- *Skip tool call and select next tool:* "
             "If (a) no tool from the Selected Tool(s) is applicable to "
             "address the user query, AND "
-            "if (b) a tool from the Available Tool(s) may be applicable, then "
+            "if (b) a tool from the Available Tool(s) is applicable, then "
             "*skip* with `called_tool_input=None` and select the next tool "
             "with `next_tool`.\n"
             "- *Trigger exit with explanation*: "

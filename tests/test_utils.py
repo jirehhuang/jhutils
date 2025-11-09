@@ -133,6 +133,18 @@ def test_time_id():
     )
 
 
+def test_match_none_if_no_phrases():
+    """Test that _match_phrase returns None if no phrases are provided."""
+    assert _match_phrase("test query", phrases=[]) is None
+
+
+def test_exact_match_phrase():
+    """Test that exact matches are correctly identified."""
+    phrases = ["apple", "banana", "cherry"]
+    for phrase in phrases:
+        assert _match_phrase(phrase, phrases=phrases) == phrase
+
+
 @pytest.mark.parametrize(
     "query,expected",
     [
@@ -143,14 +155,14 @@ def test_time_id():
         ("theology mode", "theology"),
     ],
 )
-def test_match_modes(query: str, expected: str):
+def test_fuzzy_match_modes(query: str, expected: str):
     """Test that queries can correctly match available modes."""
     assert (
         _match_phrase(
             query,
             phrases=list(AVAILABLE_MODES.keys()),
-            min_score=85,
             as_index=False,
+            score_cutoff=85,
         )
         == expected
     )
@@ -167,13 +179,13 @@ def test_match_modes(query: str, expected: str):
 )
 def test_fail_to_match_modes(query: str, expected: str):
     """Test that no mode is matched if the minimum score is not met.
-    Can be used to calibrate the default min_score threshold."""
+    Can be used to calibrate the default score_cutoff threshold."""
     assert (
         _match_phrase(
             query,
             phrases=list(AVAILABLE_MODES.keys()),
-            min_score=85,
             as_index=False,
+            score_cutoff=85,
         )
         == expected
     )
