@@ -190,6 +190,13 @@ def test_toolset_kwargs_initialize_tools(obsidian, mealie):
     assert add_shopping_items_tool.mealie == mealie
 
 
+def test_toolset_get_function_schema(toolset):
+    """Test that Toolset.get_function_schema correctly retrieves the
+    function schema for a given tool name."""
+    add_tasks_schema = toolset.get_function_schema("AddTasksTool")
+    assert "Use this tool" in add_tasks_schema.get("description")
+
+
 def test_tools_providers(toolset):
     """Test that the AvailableToolsProvider and SelectedToolsProvider return
     the correct tools."""
