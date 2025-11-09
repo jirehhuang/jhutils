@@ -15,6 +15,12 @@ class AddShoppingItemsInputSchema(BaseIOSchema):
     For example, all groceries and regular purchases.
     """
 
+    # Because the tool schemas are aggregated in MakeChainToolOutputSchema
+    # via the tool_input_type type, the preceding docstring is used to
+    # determine when to use this tool.
+
+    # The following description is used to provide details informing how to
+    # specify the input if using this tool.
     items: ItemsList = Field(  # type: ignore[valid-type]
         ...,
         description=(
@@ -26,6 +32,9 @@ class AddShoppingItemsInputSchema(BaseIOSchema):
 class AddShoppingItemsOutputSchema(BaseIOSchema):
     """Output schema for AddShoppingItemsTool."""
 
+    # The preceding docstring is not used for calling the tool.
+
+    # The following description is not used for calling the tool.
     result: str = Field(
         ..., description="Confirmation message after adding the items."
     )
@@ -40,6 +49,8 @@ class AddShoppingItemsTool(
 ):
     """Add one or more individual shopping items to the shopping list."""
 
+    # The one-line summary in the docstring is used by AvailableToolsProvider
+    # to help determine whether or not to select this tool next (next_tool).
     input_schema = AddShoppingItemsInputSchema  # type: ignore
     output_schema = AddShoppingItemsOutputSchema  # type: ignore
     config_cls = AddShoppingItemsConfig
