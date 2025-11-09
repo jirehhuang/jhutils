@@ -302,6 +302,7 @@ class Toolset:
                     ),
                 }
             },
+            "required": ["instructions"],
         }
 
     def reset_selected_tools(self):
