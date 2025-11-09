@@ -166,8 +166,8 @@ def test_fuzzy_match_modes(query: str, expected: str):
         _match_phrase(
             query,
             phrases=list(AVAILABLE_MODES.keys()),
-            min_score=85,
             as_index=False,
+            score_cutoff=85,
         )
         == expected
     )
@@ -184,13 +184,13 @@ def test_fuzzy_match_modes(query: str, expected: str):
 )
 def test_fail_to_match_modes(query: str, expected: str):
     """Test that no mode is matched if the minimum score is not met.
-    Can be used to calibrate the default min_score threshold."""
+    Can be used to calibrate the default score_cutoff threshold."""
     assert (
         _match_phrase(
             query,
             phrases=list(AVAILABLE_MODES.keys()),
-            min_score=85,
             as_index=False,
+            score_cutoff=85,
         )
         == expected
     )

@@ -149,7 +149,7 @@ class Toolset:
         """
         available_modes = list(AVAILABLE_MODES.keys())
         mode = _match_phrase(
-            query, phrases=available_modes, min_score=85, as_index=False
+            query, phrases=available_modes, as_index=False, score_cutoff=85
         )
 
         if isinstance(mode, str) and mode in set(available_modes):
