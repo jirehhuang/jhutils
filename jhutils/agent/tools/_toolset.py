@@ -288,7 +288,9 @@ class Toolset:
 class AvailableToolsProvider(BaseDynamicContextProvider):
     """Dynamic context provider for Available Tool(s)."""
 
-    def __init__(self, toolset: Toolset, title: str = "Available Tool(s)"):
+    def __init__(
+        self, toolset: Toolset, title: str = "Available Tool(s) for NEXT step"
+    ):
         super().__init__(title)
         self._toolset = toolset
 
@@ -301,6 +303,7 @@ class AvailableToolsProvider(BaseDynamicContextProvider):
                     f"{parse(tool.__doc__).short_description}"  # type: ignore
                 )
                 for tool in self._toolset.available_tools
+                # Note that excluding selected tools confuses the agent
             ]
         )
 
@@ -309,7 +312,11 @@ class AvailableToolsProvider(BaseDynamicContextProvider):
 class SelectedToolsProvider(BaseDynamicContextProvider):
     """Dynamic context provider for Selected Tool(s)."""
 
-    def __init__(self, toolset: Toolset, title: str = "Selected Tool(s)"):
+    def __init__(
+        self,
+        toolset: Toolset,
+        title: str = "Selected Tool(s) for CURRENT step",
+    ):
         super().__init__(title)
         self._title = title
         self._toolset = toolset
