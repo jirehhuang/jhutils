@@ -276,6 +276,34 @@ class Toolset:
             tool_name=tool_name, tool_schema=tool_schema
         ).config_cls  # type: ignore
 
+    def get_function_schema(
+        self,
+        tool_name: str | None = None,
+        tool_schema: BaseIOSchema | None = None,
+    ) -> dict[str, object]:
+        """Get the function schema for a tool.
+
+        Convert the input schema of a tool to the arguments of a function
+        schema: ``pipecat.adapters.schemas.function_schema.FunctionSchema``.
+        """
+        tool = self.get_tool(tool_name=tool_name, tool_schema=tool_schema)
+        tool_name = tool.__qualname__
+        return {
+            "name": tool_name,
+            "description": parse(
+                str(tool.input_schema.__doc__)
+            ).long_description,
+            "properties": {
+                "instructions": {
+                    "type": "string",
+                    "description": (
+                        f"Clear instructions for what to use {tool_name} "
+                        "to accomplish, with all relevant details."
+                    ),
+                }
+            },
+        }
+
     def reset_selected_tools(self):
         """Reset the selected tools to available tools.
 
