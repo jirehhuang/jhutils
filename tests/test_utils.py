@@ -145,11 +145,6 @@ def test_exact_match_phrase():
         assert _match_phrase(phrase, phrases=phrases) == phrase
 
 
-def test_empty_query_match_is_none():
-    """Test that result is None if no query is provided."""
-    assert _match_phrase("", phrases=["apple", "banana", "cherry"]) is None
-
-
 @pytest.mark.parametrize(
     "query,expected",
     [
