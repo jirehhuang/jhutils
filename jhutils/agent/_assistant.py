@@ -100,14 +100,23 @@ class AssistantAgent:
         """Get the toolset."""
         return self._toolset
 
-    def run(self, query: str) -> str:
-        """Run the assistant agent."""
+    def run(self, query: str, reset_selected_tools: bool = True) -> str:
+        """Run the assistant agent.
+
+        Parameters
+        ----------
+        query
+            The user input query to be analyzed and addressed.
+        reset_selected_tools
+            Whether to reset the selected tools before running the agent.
+        """
         result_text = []
 
         history = self.agent.history if self.agent else None
 
         # Reset the selected tools to avoid being influenced by prior runs
-        self.toolset.reset_selected_tools()
+        if reset_selected_tools:
+            self.toolset.reset_selected_tools()
 
         while True:
             # (Re)create agent with selected toolset and history
