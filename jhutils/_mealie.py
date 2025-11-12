@@ -5,6 +5,8 @@ from typing import Any, Dict, List
 
 import requests
 
+from ._utils import _match_phrase
+
 N_PER_PAGE = 500
 N_ITEMS = 50
 
@@ -20,6 +22,7 @@ class Mealie:
         self._foods: List[Dict[str, Any]] | None = None
         self._shopping_lists: List[Dict[str, Any]] | None = None
         self._shopping_items: List[Dict[str, Any]] | None = None
+        self._recipes: List[Dict[str, Any]] | None = None
 
         if not api_url:
             raise ValueError(
@@ -179,6 +182,40 @@ class Mealie:
     def shopping_items(self) -> List[Dict[str, Any]]:
         """Get shopping items."""
         return self.load_shopping_items()
+
+    def load_recipes(self) -> List[Dict[str, Any]]:
+        """Retrieve recipes data."""
+        params = {
+            "page": 1,
+            "perPage": N_PER_PAGE,
+            "orderBy": "name",
+            "orderDirection": "asc",
+        }
+        self._recipes = self._get_total_items("api/recipes", params)
+        return self._recipes
+
+    @property
+    def recipes(self) -> List[Dict[str, Any]]:
+        """Getter for recipes data."""
+        return self.load_recipes()
+
+    @property
+    def recipe_names(self) -> List[str]:
+        """Get a list of recipe names."""
+        return [recipe.get("name", "Unknown") for recipe in self.recipes]
+
+    def get_recipe(self, recipe_name: str) -> Dict[str, Any] | str | None:
+        """Get a recipe by name."""
+        recipe_index = _match_phrase(
+            recipe_name, phrases=self.recipe_names, as_index=True
+        )
+        recipe = (
+            self.recipes[recipe_index]
+            if isinstance(recipe_index, int)
+            else None
+        )
+
+        return recipe
 
     def add_shopping_items(self, items: List[Dict[str, Any]]):
         """Add items to the shopping list."""
