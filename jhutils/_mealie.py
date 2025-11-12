@@ -206,7 +206,7 @@ class Mealie:
         """Get a list of recipe names."""
         return [recipe.get("name", "Unknown") for recipe in self.recipes]
 
-    def get_recipe(self, recipe_name: str) -> Dict[str, Any] | str | None:
+    def get_recipe(self, recipe_name: str) -> dict[str, Any] | None:
         """Get a recipe by name."""
         recipe_index = _match_phrase(
             recipe_name, phrases=self.recipe_names, as_index=True
@@ -217,7 +217,10 @@ class Mealie:
             else None
         )
 
-        return recipe
+        if recipe is None:
+            return None
+
+        return self._request("GET", f"api/recipes/{recipe["slug"]}")
 
     def add_shopping_items(self, items: List[Dict[str, Any]]):
         """Add items to the shopping list."""
