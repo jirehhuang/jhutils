@@ -183,15 +183,17 @@ class Mealie:
         """Get shopping items."""
         return self.load_shopping_items()
 
-    def load_recipes(self) -> List[Dict[str, Any]]:
+    def load_recipes(self, force: bool = False) -> list[dict[str, Any]]:
         """Retrieve recipes data."""
-        params = {
-            "page": 1,
-            "perPage": N_PER_PAGE,
-            "orderBy": "name",
-            "orderDirection": "asc",
-        }
-        self._recipes = self._get_total_items("api/recipes", params)
+        if self._recipes is None or force:
+            params = {
+                "page": 1,
+                "perPage": N_PER_PAGE,
+                "orderBy": "name",
+                "orderDirection": "asc",
+            }
+            self._recipes = self._get_total_items("api/recipes", params)
+
         return self._recipes
 
     @property
