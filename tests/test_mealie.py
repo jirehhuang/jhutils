@@ -92,6 +92,12 @@ def test_load_recipes(mealie):
     assert len(mealie.recipe_names) == len(mealie.recipes)
 
 
+def test_get_recipe(mealie):
+    """Test that method .get_recipe() executes successfully."""
+    recipe_name = mealie.recipes[0]["name"]
+    assert isinstance(mealie.get_recipe(recipe_name), dict)
+
+
 def test_add_delete_shopping_items(mealie):
     """Test that items can be successfully added to and deleted from a shopping
     list."""
