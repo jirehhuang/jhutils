@@ -84,6 +84,14 @@ def test_load_shopping_items_invalid_list(mealie):
     assert not items
 
 
+def test_load_recipes(mealie):
+    """Test that recipes property can be successfully retrieved."""
+    recipes = mealie.load_recipes()
+    assert np.array_equal(recipes, mealie.recipes)
+    assert isinstance(mealie.recipe_names, list)
+    assert len(mealie.recipe_names) == len(mealie.recipes)
+
+
 def test_add_delete_shopping_items(mealie):
     """Test that items can be successfully added to and deleted from a shopping
     list."""
