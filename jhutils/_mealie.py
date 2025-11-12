@@ -1,7 +1,7 @@
 """Mealie class."""
 
 import os
-from typing import Any, Dict, List
+from typing import Any
 
 import requests
 
@@ -19,10 +19,10 @@ class Mealie:
     ) -> None:
         self._shopping_list_id = shopping_list_id
 
-        self._foods: List[Dict[str, Any]] | None = None
-        self._shopping_lists: List[Dict[str, Any]] | None = None
-        self._shopping_items: List[Dict[str, Any]] | None = None
-        self._recipes: List[Dict[str, Any]] | None = None
+        self._foods: list[dict[str, Any]] | None = None
+        self._shopping_lists: list[dict[str, Any]] | None = None
+        self._shopping_items: list[dict[str, Any]] | None = None
+        self._recipes: list[dict[str, Any]] | None = None
 
         if not api_url:
             raise ValueError(
@@ -56,9 +56,9 @@ class Mealie:
         self,
         method: str,
         endpoint: str,
-        params: Dict[str, Any] | None = None,
-        data: Dict[str, Any] | List[Dict[str, Any]] | None = None,
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] | None = None,
+        data: dict[str, Any] | list[dict[str, Any]] | None = None,
+    ) -> dict[str, Any]:
         """Make API request to endpoint with error handling."""
         url = f"{self._api_url}/{endpoint.lstrip('/')}"
 
@@ -72,8 +72,8 @@ class Mealie:
         return response_json
 
     def _get_total_items(
-        self, endpoint: str, params: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, endpoint: str, params: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Retrieve total count from an endpoint."""
         response = self._request("GET", endpoint, params=params)
 
@@ -88,7 +88,7 @@ class Mealie:
 
     def load_foods(
         self, initial_per_page: int = N_PER_PAGE, force: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Retrieve foods data."""
         if not self._foods or force:
             params = {
@@ -101,13 +101,13 @@ class Mealie:
         return self._foods
 
     @property
-    def foods(self) -> List[Dict[str, Any]]:
+    def foods(self) -> list[dict[str, Any]]:
         """Getter for foods data."""
         return self.load_foods()
 
     def load_shopping_lists(
         self, initial_per_page: int = N_PER_PAGE, force: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Retrieve shopping lists data."""
         if not self._shopping_lists or force:
             params = {
@@ -122,7 +122,7 @@ class Mealie:
         return self._shopping_lists
 
     @property
-    def shopping_lists(self) -> List[Dict[str, Any]]:
+    def shopping_lists(self) -> list[dict[str, Any]]:
         """Getter for shopping lists data."""
         return self.load_shopping_lists()
 
@@ -142,7 +142,7 @@ class Mealie:
 
     def load_shopping_items(
         self, per_page: int = N_ITEMS, force: bool = False
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Retrieve unchecked items from Mealie shopping lists."""
         if self._shopping_items is None or force:
             page = 1
@@ -172,14 +172,14 @@ class Mealie:
                 items = [
                     item
                     for item in items
-                    if item["shoppingListId"] == self.shopping_list_id
+                    if item["shoppinglistId"] == self.shopping_list_id
                 ]
             self._shopping_items = items
 
         return self._shopping_items
 
     @property
-    def shopping_items(self) -> List[Dict[str, Any]]:
+    def shopping_items(self) -> list[dict[str, Any]]:
         """Get shopping items."""
         return self.load_shopping_items()
 
@@ -197,12 +197,12 @@ class Mealie:
         return self._recipes
 
     @property
-    def recipes(self) -> List[Dict[str, Any]]:
+    def recipes(self) -> list[dict[str, Any]]:
         """Getter for recipes data."""
         return self.load_recipes()
 
     @property
-    def recipe_names(self) -> List[str]:
+    def recipe_names(self) -> list[str]:
         """Get a list of recipe names."""
         return [recipe.get("name", "Unknown") for recipe in self.recipes]
 
@@ -222,11 +222,11 @@ class Mealie:
 
         return self._request("GET", f"api/recipes/{recipe["slug"]}")
 
-    def add_shopping_items(self, items: List[Dict[str, Any]]):
+    def add_shopping_items(self, items: list[dict[str, Any]]):
         """Add items to the shopping list."""
         for item in items:
             if self.shopping_list_id:
-                item.update({"shoppingListId": self.shopping_list_id})
+                item.update({"shoppinglistId": self.shopping_list_id})
 
         return self._request(
             "POST",
@@ -234,7 +234,7 @@ class Mealie:
             data=items,
         )
 
-    def delete_shopping_items(self, ids: List[str]):
+    def delete_shopping_items(self, ids: list[str]):
         """Delete items from the shopping list by ID."""
         return self._request(
             "DELETE",
@@ -243,7 +243,7 @@ class Mealie:
         )
 
     @staticmethod
-    def _parsed2payload(ingredient: Dict[str, Any]) -> Dict[str, Any]:
+    def _parsed2payload(ingredient: dict[str, Any]) -> dict[str, Any]:
         """Convert parsed ingredient data into a payload dictionary."""
         food = ingredient.get("food", {})
         unit = ingredient.get("unit", {}) or {}
@@ -281,7 +281,7 @@ class Mealie:
                 "updatedAt": food.get("updatedAt", ""),
             },
             "note": ingredient.get("note", ""),
-            "shoppingListId": ingredient.get("shoppingListId", None),
+            "shoppinglistId": ingredient.get("shoppinglistId", None),
             "foodId": food.get("id", None),
             "unitId": unit.get("id", None),
             "checked": False,
@@ -292,8 +292,8 @@ class Mealie:
         }
 
     def parse_items(
-        self, items: List[str], as_payload: bool = True
-    ) -> List[Dict[str, Any]]:
+        self, items: list[str], as_payload: bool = True
+    ) -> list[dict[str, Any]]:
         """Parse item names into food item dictionaries."""
         response = self._request(
             "POST",
