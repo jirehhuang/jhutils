@@ -94,8 +94,23 @@ def test_load_recipes(mealie):
 
 def test_get_recipe(mealie):
     """Test that method .get_recipe() executes successfully."""
-    recipe_name = mealie.recipes[0]["name"]
+    recipe_name = mealie.recipes[2]["name"]
     assert isinstance(mealie.get_recipe(recipe_name), dict)
+
+
+def test_get_scaled_recipe(mealie):
+    """Test that method .get_recipe() correctly scales the recipe."""
+    recipe_name = mealie.recipes[2]["name"]
+    recipe = mealie.get_recipe(recipe_name, scale_factor=1)
+    scaled_recipe = mealie.get_recipe(recipe_name, scale_factor=7)
+    assert (
+        scaled_recipe["recipeIngredient"][0]["quantity"]
+        == 7 * recipe["recipeIngredient"][0]["quantity"]
+    )
+    assert scaled_recipe["recipeIngredient"][0]["display"].startswith("7 x ")
+
+    scaled_recipe = mealie.get_recipe(recipe_name, target_servings=123)
+    assert " x " in scaled_recipe["recipeIngredient"][0]["display"]
 
 
 def test_read_recipe(mealie):
@@ -103,6 +118,13 @@ def test_read_recipe(mealie):
     recipe_name = mealie.recipe_names[2]
     markdown_recipe = mealie.read_recipe(recipe_name)
     assert f"# {recipe_name}" in markdown_recipe
+
+
+def test_read_scaled_recipe(mealie):
+    """Test that method .read_recipe() correctly scales the recipe."""
+    recipe_name = mealie.recipes[2]["name"]
+    assert "7 x " in mealie.read_recipe(recipe_name, scale_factor=7)
+    assert " x " in mealie.read_recipe(recipe_name, target_servings=123)
 
 
 def test_add_delete_shopping_items(mealie):
