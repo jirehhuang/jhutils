@@ -332,7 +332,7 @@ class Mealie:
         recipe_name: str,
         scale_factor: float = 1,
         target_servings: int | None = None,
-    ) -> str | None:
+    ) -> str:
         """Read a recipe as Markdown, with optional scaling.
 
         Parameters
