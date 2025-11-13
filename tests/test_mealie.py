@@ -98,6 +98,13 @@ def test_get_recipe(mealie):
     assert isinstance(mealie.get_recipe(recipe_name), dict)
 
 
+def test_read_recipe(mealie):
+    """Test that method .read_recipe() executes successfully."""
+    recipe_name = mealie.recipe_names[2]
+    markdown_recipe = mealie.read_recipe(recipe_name)
+    assert f"# {recipe_name}" in markdown_recipe
+
+
 def test_add_delete_shopping_items(mealie):
     """Test that items can be successfully added to and deleted from a shopping
     list."""
