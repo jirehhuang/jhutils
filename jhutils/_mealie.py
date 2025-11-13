@@ -324,18 +324,6 @@ class Mealie:
 
         return recipe
 
-    def add_shopping_items(self, items: list[dict[str, Any]]):
-        """Add items to the shopping list."""
-        for item in items:
-            if self.shopping_list_id:
-                item.update({"shoppingListId": self.shopping_list_id})
-
-        return self._request(
-            "POST",
-            endpoint="api/households/shopping/items/create-bulk",
-            data=items,
-        )
-
     def read_recipe(
         self,
         recipe_name: str,
@@ -364,6 +352,18 @@ class Mealie:
             return f"Recipe '{recipe_name}' not found."
 
         return _recipe_as_markdown(recipe)
+
+    def add_shopping_items(self, items: list[dict[str, Any]]):
+        """Add items to the shopping list."""
+        for item in items:
+            if self.shopping_list_id:
+                item.update({"shoppingListId": self.shopping_list_id})
+
+        return self._request(
+            "POST",
+            endpoint="api/households/shopping/items/create-bulk",
+            data=items,
+        )
 
     def delete_shopping_items(self, ids: list[str]):
         """Delete items from the shopping list by ID."""
