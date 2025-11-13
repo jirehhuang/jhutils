@@ -233,7 +233,7 @@ class Mealie:
                 items = [
                     item
                     for item in items
-                    if item["shoppinglistId"] == self.shopping_list_id
+                    if item["shoppingListId"] == self.shopping_list_id
                 ]
             self._shopping_items = items
 
@@ -287,7 +287,7 @@ class Mealie:
         """Add items to the shopping list."""
         for item in items:
             if self.shopping_list_id:
-                item.update({"shoppinglistId": self.shopping_list_id})
+                item.update({"shoppingListId": self.shopping_list_id})
 
         return self._request(
             "POST",
@@ -351,7 +351,7 @@ class Mealie:
                 "updatedAt": food.get("updatedAt", ""),
             },
             "note": ingredient.get("note", ""),
-            "shoppinglistId": ingredient.get("shoppinglistId", None),
+            "shoppingListId": ingredient.get("shoppingListId", None),
             "foodId": food.get("id", None),
             "unitId": unit.get("id", None),
             "checked": False,
