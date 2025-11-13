@@ -287,7 +287,10 @@ class Mealie:
             number of servings.
         """
         recipe_index = _match_phrase(
-            recipe_name, phrases=self.recipe_names, as_index=True
+            recipe_name,
+            phrases=self.recipe_names,
+            as_index=True,
+            score_cutoff=85,
         )
         recipe = (
             self.recipes[recipe_index]
