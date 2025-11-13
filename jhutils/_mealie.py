@@ -3,6 +3,7 @@
 import os
 from typing import Any
 
+import numpy as np
 import requests
 
 from ._utils import _match_phrase
@@ -267,8 +268,24 @@ class Mealie:
         """Get a list of recipe names."""
         return [recipe.get("name", "Unknown") for recipe in self.recipes]
 
-    def get_recipe(self, recipe_name: str) -> dict[str, Any] | None:
-        """Get a recipe by name."""
+    def get_recipe(
+        self,
+        recipe_name: str,
+        scale_factor: float = 1,
+        target_servings: int | None = None,
+    ) -> dict[str, Any] | None:
+        """Get a recipe by name, with optional scaling.
+
+        Parameters
+        ----------
+        recipe_name
+            The name of the recipe to retrieve.
+        scale_factor
+            Factor by which to scale ingredient quantities.
+        target_servings
+            If provided and ``scale_factor`` is not 1, scale the recipe to this
+            number of servings.
+        """
         recipe_index = _match_phrase(
             recipe_name, phrases=self.recipe_names, as_index=True
         )
@@ -281,7 +298,31 @@ class Mealie:
         if recipe is None:
             return None
 
-        return self._request("GET", f"api/recipes/{recipe["slug"]}")
+        recipe = self._request("GET", f"api/recipes/{recipe['slug']}")
+
+        recipe_servings = recipe["recipeServings"]
+        if (
+            recipe_servings
+            and np.isclose(scale_factor, 1)
+            and target_servings is not None
+        ):
+            scale_factor = target_servings / recipe_servings
+
+        if not np.isclose(scale_factor, 1):
+            for ingredient in recipe["recipeIngredient"]:
+                if ingredient["quantity"]:
+                    ingredient["quantity"] *= scale_factor
+
+                ingredient["display"] = (
+                    str(scale_factor) + " x " + ingredient["display"]
+                )
+
+            if recipe_servings:
+                recipe["recipeServings"] = int(
+                    round(recipe_servings * scale_factor)
+                )
+
+        return recipe
 
     def add_shopping_items(self, items: list[dict[str, Any]]):
         """Add items to the shopping list."""
@@ -295,9 +336,29 @@ class Mealie:
             data=items,
         )
 
-    def read_recipe(self, recipe_name: str) -> str | dict[str, Any] | None:
-        """Get a recipe by name, optionally as markdown."""
-        recipe = self.get_recipe(recipe_name)
+    def read_recipe(
+        self,
+        recipe_name: str,
+        scale_factor: float = 1,
+        target_servings: int | None = None,
+    ) -> str | None:
+        """Read a recipe as Markdown, with optional scaling.
+
+        Parameters
+        ----------
+        recipe_name
+            The name of the recipe to retrieve.
+        scale_factor
+            Factor by which to scale ingredient quantities.
+        target_servings
+            If provided and ``scale_factor`` is not 1, scale the recipe to this
+            number of servings.
+        """
+        recipe = self.get_recipe(
+            recipe_name,
+            scale_factor=scale_factor,
+            target_servings=target_servings,
+        )
 
         if recipe is None:
             return f"Recipe '{recipe_name}' not found."
