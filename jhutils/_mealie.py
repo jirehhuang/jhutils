@@ -11,6 +11,67 @@ N_PER_PAGE = 500
 N_ITEMS = 50
 
 
+def _recipe_as_markdown(recipe: dict[str, Any]) -> str:
+    """Convert a recipe dictionary to a markdown string.
+
+    # Title
+
+    Description (optional)
+
+    ## Ingredients
+
+    - ingredient 1
+    - ingredient 2
+    ...
+
+    ## Instructions
+
+    ### Step title (optional)
+
+    1. Step summary:
+    Instruction text
+
+    Step 2:
+    Instruction text for step with no summary
+
+    ## Notes (optional)
+
+    1. Note title:
+    Note text
+    """
+    lines = [f"# {recipe["name"]}"]
+
+    description = recipe["description"].strip()
+    if description:
+        lines.append(f"\n{description}")
+
+    lines.append("\n## Ingredients\n")
+    for ingredient in recipe["recipeIngredient"]:
+        lines.append(f"- {ingredient['display']}".strip())
+
+    lines.append("\n## Instructions\n")
+    instructions = recipe["recipeInstructions"]
+    for idx, instruction in enumerate(instructions, start=1):
+        title = instruction["title"].strip()
+        if title:
+            lines.append(f"### {title}\n")
+
+        summary = instruction["summary"].strip()
+        lines.append(f"{idx}. {summary}:" if summary else f"Step {idx}:")
+
+        lines.append(f"{instruction['text'].strip()}\n")
+
+    notes = recipe["notes"]
+    if len(notes):
+        lines.append("## Notes\n")
+        for idx, note in enumerate(notes, start=1):
+            title = note["title"].strip()
+            lines.append(f"{idx}. {title}:" if title else f"Note {idx}:")
+            lines.append(f"{note['text'].strip()}\n")
+
+    return "\n".join(lines)
+
+
 class Mealie:
     """Client for interacting with the Mealie API."""
 
@@ -233,6 +294,15 @@ class Mealie:
             endpoint="api/households/shopping/items/create-bulk",
             data=items,
         )
+
+    def read_recipe(self, recipe_name: str) -> str | dict[str, Any] | None:
+        """Get a recipe by name, optionally as markdown."""
+        recipe = self.get_recipe(recipe_name)
+
+        if recipe is None:
+            return f"Recipe '{recipe_name}' not found."
+
+        return _recipe_as_markdown(recipe)
 
     def delete_shopping_items(self, ids: list[str]):
         """Delete items from the shopping list by ID."""
