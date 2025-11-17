@@ -96,6 +96,19 @@ def test_assistant_select_and_execute_add_shopping_items(assistant):
     }
 
 
+def test_assistant_select_and_execute_read_recipe(assistant):
+    """Test that the assistant can correctly select and execute the
+    ReadRecipeTool."""
+    query = "How do I make Al Pastor tacos?"
+    expected_start = "Mealie instance not available to read recipe"
+
+    assistant.toolset.match_mode("cooking")
+    response = assistant.run(query)
+
+    assert response.startswith(expected_start)
+    assert "Al Pastor" in response
+
+
 @pytest.mark.flaky(reruns=1)
 def test_assistant_select_and_execute_respond(assistant):
     """Test that the assistant can correctly select and execute the
