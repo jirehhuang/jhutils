@@ -5,6 +5,8 @@ import pytest
 
 from jhutils import Mealie
 
+TEST_RECIPE_NAME = "Al Pastor"
+
 
 def _add_temporary_shopping_items(mealie, items):
     """Temporarily add items to the shopping list.
@@ -94,13 +96,13 @@ def test_load_recipes(mealie):
 
 def test_get_recipe(mealie):
     """Test that method .get_recipe() executes successfully."""
-    recipe_name = mealie.recipes[2]["name"]
+    recipe_name = TEST_RECIPE_NAME
     assert isinstance(mealie.get_recipe(recipe_name), dict)
 
 
 def test_get_scaled_recipe(mealie):
     """Test that method .get_recipe() correctly scales the recipe."""
-    recipe_name = mealie.recipes[2]["name"]
+    recipe_name = TEST_RECIPE_NAME
     recipe = mealie.get_recipe(recipe_name, scale_factor=1)
     scaled_recipe = mealie.get_recipe(recipe_name, scale_factor=7)
     assert (
@@ -115,14 +117,14 @@ def test_get_scaled_recipe(mealie):
 
 def test_read_recipe(mealie):
     """Test that method .read_recipe() executes successfully."""
-    recipe_name = mealie.recipe_names[2]
+    recipe_name = TEST_RECIPE_NAME
     markdown_recipe = mealie.read_recipe(recipe_name)
     assert f"# {recipe_name}" in markdown_recipe
 
 
 def test_read_scaled_recipe(mealie):
     """Test that method .read_recipe() correctly scales the recipe."""
-    recipe_name = mealie.recipes[2]["name"]
+    recipe_name = TEST_RECIPE_NAME
     assert "7 x " in mealie.read_recipe(recipe_name, scale_factor=7)
     assert " x " in mealie.read_recipe(recipe_name, target_servings=123)
 
