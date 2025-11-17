@@ -12,12 +12,19 @@ N_PER_PAGE = 500
 N_ITEMS = 50
 
 
+# pylint: disable=too-many-locals
 def _recipe_as_markdown(recipe: dict[str, Any]) -> str:
     """Convert a recipe dictionary to a markdown string.
 
     # Title
 
     Description (optional)
+
+    - Servings: X (optional)
+    - Total Time: Z (optional)
+    - Prep Time: X (optional)
+    - Cook Time: Y (optional, not working in Mealie API)
+    - Yield: X yield text (optional)
 
     ## Ingredients
 
@@ -45,6 +52,26 @@ def _recipe_as_markdown(recipe: dict[str, Any]) -> str:
     description = recipe["description"].strip()
     if description:
         lines.append(f"\n{description}")
+
+    metadata = {
+        "recipeServings": "Servings",
+        "totalTime": "Total Time",
+        "prepTime": "Prep Time",
+        "cookTime": "Cook Time",
+        "recipeYieldQuantity": "Yield",
+    }
+    for key, label in metadata.items():
+        value = recipe[key]
+
+        if value:
+            line = f"- {label}: {value}"
+
+            if key == "recipeServings":
+                line = "\n" + line
+            elif key == "recipeYieldQuantity":
+                line += f' {recipe.get("recipeYield", "").strip()}\n'
+
+            lines.append(line)
 
     lines.append("\n## Ingredients\n")
     for ingredient in recipe["recipeIngredient"]:
