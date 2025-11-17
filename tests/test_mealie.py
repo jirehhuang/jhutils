@@ -120,6 +120,11 @@ def test_read_recipe(mealie):
     recipe_name = TEST_RECIPE_NAME
     markdown_recipe = mealie.read_recipe(recipe_name)
     assert f"# {recipe_name}" in markdown_recipe
+    assert "- Servings:" in markdown_recipe
+    assert "- Total Time:" in markdown_recipe
+    assert "- Prep Time:" in markdown_recipe
+    assert "- Cook Time:" not in markdown_recipe  # Not working in Mealie API
+    assert "- Yield:" in markdown_recipe
 
 
 def test_read_scaled_recipe(mealie):
