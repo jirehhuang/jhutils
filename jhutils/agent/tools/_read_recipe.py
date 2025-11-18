@@ -18,7 +18,7 @@ class ReadRecipeInputSchema(BaseIOSchema):
         ...,
         description=("Name of the recipe to retrieve."),
     )
-    scale_factor: int = Field(
+    scale_factor: float = Field(
         default=1,
         description=(
             "The factor by which to scale the recipe ingredients (default: 1)."
