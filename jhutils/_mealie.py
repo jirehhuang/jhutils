@@ -344,7 +344,7 @@ class Mealie:
                     ingredient["quantity"] *= scale_factor
 
                     ingredient["display"] = (
-                        str(scale_factor) + " x " + ingredient["display"]
+                        f"{scale_factor:.2g} x {ingredient['display']}"
                     )
 
             if recipe_servings:
