@@ -1,11 +1,9 @@
 """Tool to read recipe."""
 
 from atomic_agents import BaseIOSchema, BaseTool, BaseToolConfig
-from pydantic import Field, conlist
+from pydantic import Field
 
 from ..._mealie import Mealie
-
-ItemsList = conlist(str, min_length=1)
 
 
 class ReadRecipeInputSchema(BaseIOSchema):
