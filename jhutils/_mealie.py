@@ -343,9 +343,9 @@ class Mealie:
                 if ingredient["quantity"]:
                     ingredient["quantity"] *= scale_factor
 
-                ingredient["display"] = (
-                    str(scale_factor) + " x " + ingredient["display"]
-                )
+                    ingredient["display"] = (
+                        str(scale_factor) + " x " + ingredient["display"]
+                    )
 
             if recipe_servings:
                 recipe["recipeServings"] = int(
