@@ -310,7 +310,7 @@ class Mealie:
         scale_factor
             Factor by which to scale ingredient quantities.
         target_servings
-            If provided and ``scale_factor`` is not 1, scale the recipe to this
+            If provided and ``scale_factor`` is 1, scale the recipe to this
             number of servings.
         """
         recipe_index = _match_phrase(
@@ -369,7 +369,7 @@ class Mealie:
         scale_factor
             Factor by which to scale ingredient quantities.
         target_servings
-            If provided and ``scale_factor`` is not 1, scale the recipe to this
+            If provided and ``scale_factor`` is 1, scale the recipe to this
             number of servings.
         """
         recipe = self.get_recipe(
