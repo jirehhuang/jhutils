@@ -90,7 +90,7 @@ def _recipe_as_markdown(recipe: dict[str, Any]) -> str:
         lines.append(f"{instruction['text'].strip()}\n")
 
     notes = recipe["notes"]
-    if len(notes):
+    if notes:
         lines.append("## Notes\n")
         for idx, note in enumerate(notes, start=1):
             title = note["title"].strip()
