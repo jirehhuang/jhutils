@@ -12,6 +12,8 @@ from jhutils.agent.tools import Toolset
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
+TEST_RECIPE_NAME = "Al Pastor"
+
 
 @pytest.fixture(name="mealie_shopping_list_id", scope="session")
 def fixture_mealie_shopping_list_id():

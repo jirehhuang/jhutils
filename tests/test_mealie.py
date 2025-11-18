@@ -4,8 +4,7 @@ import numpy as np
 import pytest
 
 from jhutils import Mealie
-
-TEST_RECIPE_NAME = "Al Pastor"
+from tests.conftest import TEST_RECIPE_NAME
 
 
 def _add_temporary_shopping_items(mealie, items):

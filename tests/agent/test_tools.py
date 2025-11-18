@@ -8,7 +8,7 @@ from jhutils.agent.tools import (
     RespondTool,
 )
 from jhutils.agent.tools._read_recipe import ReadRecipeTool
-from tests.test_mealie import TEST_RECIPE_NAME
+from tests.conftest import TEST_RECIPE_NAME
 
 
 def test_add_shopping_items_tool():
