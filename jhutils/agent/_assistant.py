@@ -116,7 +116,7 @@ class AssistantAgent:
             Whether to reset the selected tools before running the agent.
         max_chain
             The maximum number of tool calls to make in addressing the query.
-        
+
         Raises
         ------
         RuntimeError
