@@ -24,7 +24,7 @@ def fixture_add_tasks_input(add_tasks_tool):
     return add_tasks_tool.input_schema(tasks=["Test the schema"])
 
 
-@pytest.fixture(name="chain_tool_output_schema", scope="module")
+@pytest.fixture(name="chain_tool_output_schema", scope="function")
 def fixture_chain_tool_output_schema(toolset):
     """Return an instance of MakeChainToolOutputSchema."""
     return MakeChainToolOutputSchema(toolset=toolset)
