@@ -9,6 +9,7 @@ from jhutils.agent.tools import (
     AddTasksTool,
     Toolset,
 )
+from jhutils.agent.tools._add_shopping_items import AddShoppingItemsTool
 from jhutils.agent.tools._tools import (
     AVAILABLE_MODES,
     TOOL_NAMES,
@@ -104,10 +105,12 @@ def test_toolset_available_tools_getter(toolset):
 def test_toolset_selected_tools_getter_setter(toolset):
     """Test that the Toolset.selected_tools property getter and setter work as
     expected."""
-    assert np.all(toolset.selected_tool_names == AVAILABLE_MODES["general"])
-    toolset.selected_tools = [AddTasksTool]
-    assert toolset.selected_tools == [AddTasksTool]
-    assert toolset.selected_tool_names == ["AddTasksTool"]
+    toolset.match_mode("cooking")
+    assert np.all(toolset.selected_tool_names == AVAILABLE_MODES[toolset.mode])
+
+    toolset.selected_tools = [AddShoppingItemsTool]
+    assert toolset.selected_tools == [AddShoppingItemsTool]
+    assert toolset.selected_tool_names == ["AddShoppingItemsTool"]
 
 
 def test_toolset_error_if_invalid_selected_tools(toolset):
