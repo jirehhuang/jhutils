@@ -100,7 +100,12 @@ class AssistantAgent:
         """Get the toolset."""
         return self._toolset
 
-    def run(self, query: str, reset_selected_tools: bool = True) -> str:
+    def run(
+        self,
+        query: str,
+        reset_selected_tools: bool = True,
+        max_chain: int = 5,
+    ) -> str:
         """Run the assistant agent.
 
         Parameters
@@ -109,6 +114,13 @@ class AssistantAgent:
             The user input query to be analyzed and addressed.
         reset_selected_tools
             Whether to reset the selected tools before running the agent.
+        max_chain
+            The maximum number of tool calls to make in addressing the query.
+        
+        Raises
+        ------
+        RuntimeError
+            If the maximum chain length is exceeded.
         """
         result_text = []
 
@@ -118,7 +130,7 @@ class AssistantAgent:
         if reset_selected_tools:
             self.toolset.reset_selected_tools()
 
-        while True:
+        for _ in range(max_chain):
             # (Re)create agent with selected toolset and history
             self._output_schema = MakeChainToolOutputSchema(
                 toolset=self.toolset
@@ -155,6 +167,12 @@ class AssistantAgent:
                 self.toolset.get_tool(response.next_tool)
             ]
             history = self.agent.history
+
+        raise RuntimeError(
+            f"Maximum chain length of {max_chain} exceeded "
+            f'in mode: "{self.toolset.mode}". '
+            f'Failed to address remaining query: "{query}"'
+        )
 
 
 class AssistantFactory:
