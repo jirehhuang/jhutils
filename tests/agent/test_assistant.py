@@ -41,6 +41,21 @@ def test_assistant_factory():
     assert isinstance(factory._toolset, Toolset)
 
 
+def test_error_if_max_chain_exceeded(assistant):
+    """Test that AssistantAgent.run raises RuntimeError if maximum chain
+    length is exceeded."""
+    query = (
+        "Add test food to my shopping list. "
+        "Then, add task to go to the grocery store."
+    )
+    msg = (
+        'Maximum chain length of 1 exceeded in mode: "general". '
+        'Failed to address remaining query: "'
+    )
+    with pytest.raises(RuntimeError, match=msg):
+        assistant.run(query, max_chain=1)
+
+
 @pytest.mark.flaky(reruns=1)
 def test_assistant_select_and_execute_add_tasks(assistant):
     """Test that the assistant can correctly select and execute the
