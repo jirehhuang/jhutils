@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 
 from jhutils import Mealie
+from tests.conftest import TEST_RECIPE_NAME
 
 
 def _add_temporary_shopping_items(mealie, items):
@@ -82,6 +83,54 @@ def test_load_shopping_items_invalid_list(mealie):
     mealie.shopping_list_id = "invalid_id"
     items = mealie.shopping_items
     assert not items
+
+
+def test_load_recipes(mealie):
+    """Test that recipes property can be successfully retrieved."""
+    recipes = mealie.load_recipes()
+    assert np.array_equal(recipes, mealie.recipes)
+    assert isinstance(mealie.recipe_names, list)
+    assert len(mealie.recipe_names) == len(mealie.recipes)
+
+
+def test_get_recipe(mealie):
+    """Test that method .get_recipe() executes successfully."""
+    recipe_name = TEST_RECIPE_NAME
+    assert isinstance(mealie.get_recipe(recipe_name), dict)
+
+
+def test_get_scaled_recipe(mealie):
+    """Test that method .get_recipe() correctly scales the recipe."""
+    recipe_name = TEST_RECIPE_NAME
+    recipe = mealie.get_recipe(recipe_name, scale_factor=1)
+    scaled_recipe = mealie.get_recipe(recipe_name, scale_factor=7)
+    assert (
+        scaled_recipe["recipeIngredient"][0]["quantity"]
+        == 7 * recipe["recipeIngredient"][0]["quantity"]
+    )
+    assert scaled_recipe["recipeIngredient"][0]["display"].startswith("7 x ")
+
+    scaled_recipe = mealie.get_recipe(recipe_name, target_servings=123)
+    assert " x " in scaled_recipe["recipeIngredient"][0]["display"]
+
+
+def test_read_recipe(mealie):
+    """Test that method .read_recipe() executes successfully."""
+    recipe_name = TEST_RECIPE_NAME
+    markdown_recipe = mealie.read_recipe(recipe_name)
+    assert f"# {recipe_name}" in markdown_recipe
+    assert "- Servings:" in markdown_recipe
+    assert "- Total Time:" in markdown_recipe
+    assert "- Prep Time:" in markdown_recipe
+    assert "- Cook Time:" not in markdown_recipe  # Not working in Mealie API
+    assert "- Yield:" in markdown_recipe
+
+
+def test_read_scaled_recipe(mealie):
+    """Test that method .read_recipe() correctly scales the recipe."""
+    recipe_name = TEST_RECIPE_NAME
+    assert "7 x " in mealie.read_recipe(recipe_name, scale_factor=7)
+    assert " x " in mealie.read_recipe(recipe_name, target_servings=123)
 
 
 def test_add_delete_shopping_items(mealie):

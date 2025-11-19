@@ -37,8 +37,7 @@ class Toolset:
         """Initialize the Toolset with a list of tools and tool arguments."""
         self._all_tools: ToolList = TOOLS.copy()
         self._kwargs = kwargs
-        self.mode = mode  # Sets _available_tools and _system_prompt
-        self._selected_tools: ToolList = self._available_tools
+        self.mode = mode  # Sets _available/_selected_tools and _system_prompt
         self._system_prompt: str | None = None
 
     @classmethod
@@ -128,6 +127,7 @@ class Toolset:
             for tool in self.all_tools
             if tool.__qualname__ in available_tool_names
         ]
+        self._selected_tools = self._available_tools.copy()
         self._mode = mode
         self._get_system_prompt()
 

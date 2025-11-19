@@ -7,15 +7,16 @@ from atomic_agents import BaseTool
 
 from ._add_shopping_items import AddShoppingItemsTool
 from ._add_tasks import AddTasksTool
+from ._read_recipe import ReadRecipeTool
 from ._respond import RespondTool
 
-TOOLS = [AddTasksTool, AddShoppingItemsTool, RespondTool]
+TOOLS = [AddTasksTool, AddShoppingItemsTool, ReadRecipeTool, RespondTool]
 TOOL_NAMES = [tool.__qualname__ for tool in TOOLS]
 
 AVAILABLE_MODES = {
     "general": ["AddTasksTool", "AddShoppingItemsTool", "RespondTool"],
     "shopping": ["AddShoppingItemsTool", "RespondTool"],
-    "cooking": ["AddShoppingItemsTool"],
+    "cooking": ["AddShoppingItemsTool", "ReadRecipeTool"],
     "review": [],
     "theology": [],
     "testing": [],

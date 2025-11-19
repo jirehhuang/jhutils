@@ -7,6 +7,8 @@ from jhutils.agent.tools import (
     AddTasksTool,
     RespondTool,
 )
+from jhutils.agent.tools._read_recipe import ReadRecipeTool
+from tests.conftest import TEST_RECIPE_NAME
 
 
 def test_add_shopping_items_tool():
@@ -28,6 +30,15 @@ def test_add_shopping_items_tool_parsed(mealie):
     input_data = tool.input_schema(items=items)
     result = tool.run(input_data)
     assert result.model_dump() == expected_result
+
+
+def test_read_recipe_tool(mealie):
+    """Test that running the ReadRecipe correctly retrieves recipe."""
+    expected_start = "# Al Pastor\n\nA guide to making classic tacos"
+    tool = ReadRecipeTool(mealie=mealie)
+    input_data = tool.input_schema(recipe_name=TEST_RECIPE_NAME)
+    result = tool.run(input_data)
+    assert result.model_dump()["result"].startswith(expected_start)
 
 
 def test_add_tasks_tool():

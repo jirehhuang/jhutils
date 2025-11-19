@@ -52,6 +52,7 @@ def test_error_if_max_chain_exceeded(assistant):
         'Maximum chain length of 1 exceeded in mode: "general". '
         'Failed to address remaining query: "'
     )
+    assistant.toolset.match_mode("general")
     with pytest.raises(RuntimeError, match=msg):
         assistant.run(query, max_chain=1)
 
@@ -66,8 +67,10 @@ def test_assistant_select_and_execute_add_tasks(assistant):
         "Remind me to respond to Chris' email about lunch. "
         "I should send out the assigned groups. "
     )
+    assistant.toolset.match_mode("general")
     response = assistant.run(query)
     assert response.startswith("Added 4 tasks:")
+
     history = assistant.agent.history.get_history()
     assert json.loads(history[1]["content"]) == {
         "called_tool_input": {
@@ -111,6 +114,35 @@ def test_assistant_select_and_execute_add_shopping_items(assistant):
     }
 
 
+def test_assistant_select_and_execute_read_recipe(assistant):
+    """Test that the assistant can correctly select and execute the
+    ReadRecipeTool."""
+    query = "How do I make Al Pastor tacos?"
+    expected_start = "Mealie instance not available to read recipe"
+
+    assistant.toolset.match_mode("cooking")
+    response = assistant.run(query)
+
+    assert response.startswith(expected_start)
+    assert "Al Pastor" in response
+
+
+@pytest.mark.flaky(reruns=1)
+def test_assistant_chain_read_recipe_and_add_shopping_item(assistant):
+    """Test that the assistant can correctly chain multiple tools:
+    ReadRecipeTool and AddShoppingItemsTool."""
+    query = (
+        "Walk me through how to make Al Pastor tacos. "
+        "Also, add shredded cheese to the shopping list."
+    )
+    assistant.toolset.match_mode("cooking")
+    response = assistant.run(query)
+
+    assert "Mealie instance not available to read recipe" in response
+    assert "Al Pastor" in response
+    assert "Added 1 item: shredded cheese" in response
+
+
 @pytest.mark.flaky(reruns=1)
 def test_assistant_select_and_execute_respond(assistant):
     """Test that the assistant can correctly select and execute the
@@ -132,7 +164,10 @@ def test_assistant_respond_sorry_if_cannot_answer(assistant):
     query where no tool is applicable and the assistant does not know."""
     query = "What did Grace make for dinner last Tuesday?"
     expected_phrases = ["sorry", "don't know", "do not know"]
+
+    assistant.toolset.match_mode("general")
     response = assistant.run(query)
+
     assert any(
         expected_phrase in response for expected_phrase in expected_phrases
     )
@@ -147,8 +182,10 @@ def test_assistant_chain_tools_task_shopping(assistant):
     query = (
         "Add onions to my shopping list. Then, remind me to text Georgie back."
     )
+    assistant.toolset.match_mode("general")
     response = assistant.run(query)
     assert response.startswith("Added 1 item:")
+
     history = assistant.agent.history.get_history()
     called_tool_inputs = [
         json.loads(history[i]["content"])["called_tool_input"] for i in [1, 3]
@@ -176,6 +213,7 @@ def test_assistant_chain_tools_shopping_respond(assistant):
         "Also, give me a concise one-sentence explanation on the difference "
         "between propitiation and expiation from a Reformed perspective."
     )
+    assistant.toolset.match_mode("general")
     response = assistant.run(query)
     assert np.all(
         [
