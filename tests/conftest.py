@@ -39,7 +39,7 @@ def fixture_openai_client():
     return make_openai_client_from_environ()
 
 
-@pytest.fixture(name="toolset", scope="module")
+@pytest.fixture(name="toolset", scope="function")
 def fixture_toolset():
     """Return the dummy instance of Toolset that does not contain necessary
     clients for full execution of certain tools."""
