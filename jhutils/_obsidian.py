@@ -62,14 +62,11 @@ class Obsidian:
         """Create Obsidian instance from environment variables."""
         return cls(
             github_token=os.getenv("OBSIDIAN_VAULT_TOKEN", ""),
-            owner=os.getenv("OBSIDIAN_VAULT_OWNER", "jirehhuang"),
+            owner=os.getenv("OBSIDIAN_VAULT_OWNER", ""),
             repository=os.getenv(
                 "OBSIDIAN_VAULT_REPOSITORY", "obsidian-vault"
             ),
-            branch=os.getenv(
-                "OBSIDIAN_VAULT_BRANCH",
-                "test" if os.getenv("ALIAS") != "prod" else "main",
-            ),
+            branch=os.getenv("OBSIDIAN_VAULT_BRANCH", "main"),
             prompts_path=os.getenv("OBSIDIAN_VAULT_PROMPTS_PATH", None),
         )
 
