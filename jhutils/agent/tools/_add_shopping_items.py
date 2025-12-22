@@ -57,8 +57,8 @@ class AddShoppingItemsTool(
 
     def __init__(
         self,
+        mealie: Mealie,
         config: AddShoppingItemsConfig | None = None,
-        mealie: Mealie | None = None,
     ):
         if config is None:
             config = AddShoppingItemsConfig()
@@ -66,7 +66,7 @@ class AddShoppingItemsTool(
         self._mealie = mealie
 
     @property
-    def mealie(self) -> Mealie | None:
+    def mealie(self) -> Mealie:
         """Get the Mealie instance."""
         return self._mealie
 
@@ -85,12 +85,9 @@ class AddShoppingItemsTool(
             AddShoppingItemsOutputSchema: The result of the action.
         """
         items = params.items
-        if isinstance(self.mealie, Mealie):
-            parsed_items = self.mealie.parse_items(
-                params.items, as_payload=True
-            )
-            self.mealie.add_shopping_items(parsed_items)
-            items = [item["name"] for item in parsed_items]
+        parsed_items = self.mealie.parse_items(params.items, as_payload=True)
+        self.mealie.add_shopping_items(parsed_items)
+        items = [item["name"] for item in parsed_items]
 
         joined_items = ", ".join(items)
         item_plural = "item" if len(items) == 1 else "items"

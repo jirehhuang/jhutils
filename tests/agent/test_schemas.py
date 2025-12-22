@@ -7,15 +7,8 @@ from jhutils.agent.tools import (
     MakeChainToolOutputSchema,
     RespondTool,
 )
-from jhutils.agent.tools._add_tasks import AddTasksTool
 
 REMAINDER = "Unaddressed part of the user query."
-
-
-@pytest.fixture(name="add_tasks_tool", scope="module")
-def fixture_add_tasks_tool():
-    """Return an instance of AddTasksTool."""
-    return AddTasksTool()
 
 
 @pytest.fixture(name="add_tasks_input", scope="module")

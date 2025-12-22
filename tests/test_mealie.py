@@ -7,7 +7,7 @@ from jhutils import Mealie
 from tests.conftest import TEST_RECIPE_NAME
 
 
-def _add_temporary_shopping_items(mealie, items):
+def add_temporary_shopping_items(mealie, items):
     """Temporarily add items to the shopping list.
 
     Helper function to add items to the shopping list temporarily and then
@@ -141,13 +141,11 @@ def test_add_delete_shopping_items(mealie):
         {
             "note": "example",
             "foodId": next(
-                food["id"]
-                for food in mealie.foods
-                if food["name"] == "test food"
+                food["id"] for food in mealie.foods if food["name"] == "cheese"
             ),
         },
     ]
-    _add_temporary_shopping_items(mealie, items)
+    add_temporary_shopping_items(mealie, items)
 
 
 def test_parse_and_add_items(mealie):
@@ -155,14 +153,14 @@ def test_parse_and_add_items(mealie):
     strings into a list of dictionaries and can be added to the shopping
     list."""
     items = [
-        "4 tbsp kosher salt, from Walmart",
-        "little sheep spicy broth",
-        "test food (1kg)",
+        "4 tbsp coconut oil, from Costco",
+        "american cheese, for burgers",
+        "calamari steak (1kg)",
     ]
     parsed_items = mealie.parse_items(items, as_payload=True)
-    assert [item["name"] for item in parsed_items] == [
-        "kosher salt",
-        "Little Sheep spicy broth",
-        "test food",
+    assert [item["name"].lower() for item in parsed_items] == [
+        "coconut oil",
+        "american cheese",
+        "calamari steak",
     ]
-    _add_temporary_shopping_items(mealie, parsed_items)
+    add_temporary_shopping_items(mealie, parsed_items)
