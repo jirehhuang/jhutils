@@ -85,12 +85,9 @@ class AddShoppingItemsTool(
             AddShoppingItemsOutputSchema: The result of the action.
         """
         items = params.items
-        if isinstance(self.mealie, Mealie):
-            parsed_items = self.mealie.parse_items(
-                params.items, as_payload=True
-            )
-            self.mealie.add_shopping_items(parsed_items)
-            items = [item["name"] for item in parsed_items]
+        parsed_items = self.mealie.parse_items(params.items, as_payload=True)
+        self.mealie.add_shopping_items(parsed_items)
+        items = [item["name"] for item in parsed_items]
 
         joined_items = ", ".join(items)
         item_plural = "item" if len(items) == 1 else "items"

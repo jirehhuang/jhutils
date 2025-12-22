@@ -76,8 +76,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
         -------
             AddTasksOutputSchema: The result of the action.
         """
-        if isinstance(self.obsidian, Obsidian):
-            self.obsidian.add_tasks(params.tasks)  # pragma: no cover
+        self.obsidian.add_tasks(params.tasks)
 
         joined_tasks = ", ".join(params.tasks)
         task_plural = "task" if len(params.tasks) == 1 else "tasks"
