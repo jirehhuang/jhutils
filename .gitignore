@@ -70,3 +70,4 @@ tmp/
 
 # Secrets
 .env
+.env.test
