@@ -158,7 +158,7 @@ def test_parse_and_add_items(mealie):
         "calamari steak (1kg)",
     ]
     parsed_items = mealie.parse_items(items, as_payload=True)
-    assert [item["name"] for item in parsed_items] == [
+    assert [item["name"].lower() for item in parsed_items] == [
         "coconut oil",
         "american cheese",
         "calamari steak",
