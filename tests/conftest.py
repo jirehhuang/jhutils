@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from jhutils import Mealie, Obsidian
 from jhutils.agent._assistant import make_openai_client_from_environ
 from jhutils.agent.tools import Toolset
+from jhutils.agent.tools._add_tasks import AddTasksTool
 
 env_path = Path(__file__).resolve().parents[1]
 dotenv_file = (
@@ -46,9 +47,13 @@ def fixture_openai_client():
 
 
 @pytest.fixture(name="toolset", scope="function")
-def fixture_toolset():
+def fixture_toolset(obsidian, mealie):
     """Return the dummy instance of Toolset that does not contain necessary
     clients for full execution of certain tools."""
-    # This is useful for testing tool calling behavior without making actual
-    # API calls during testing.
-    return Toolset(obsidian=None, mealie=None)
+    return Toolset(obsidian=obsidian, mealie=mealie)
+
+
+@pytest.fixture(name="add_tasks_tool", scope="module")
+def fixture_add_tasks_tool(obsidian):
+    """Return an instance of AddTasksTool."""
+    return AddTasksTool(obsidian=obsidian)
