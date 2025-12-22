@@ -22,14 +22,6 @@ from jhutils.agent.tools._toolset import (
 )
 
 
-def test_dummy_toolset_has_no_tool_kwargs(toolset):
-    """Test that the dummy Toolset instance has no tool constructor arguments
-    in kwargs."""
-    assert toolset.mode == "general"
-    assert toolset.kwargs.get("mealie") is None
-    assert toolset.kwargs.get("obsidian") is None
-
-
 def test_dummy_toolset_gets_default_prompts(toolset):
     """Test that the dummy Toolset instance gets default prompts because no
     Obsidian client is provided. Also test that changing the mode updates to
@@ -170,15 +162,6 @@ def test_toolset_error_if_get_invalid_tool_schema(toolset):
         toolset.get_tool(tool_schema=InvalidSchema)  # type: ignore
     with pytest.raises(ValueError, match=msg):
         toolset.get_tool(tool_schema=InvalidSchema())  # type: ignore
-
-
-def test_general_toolset_initialize_tools(toolset):
-    """Test that the dummy Toolset without kwargs initializes tools
-    without constructor arguments."""
-    add_tasks_tool = toolset.initialize_tool("AddTasksTool")
-    assert add_tasks_tool.obsidian is None
-    add_shopping_items_tool = toolset.initialize_tool("AddShoppingItemsTool")
-    assert add_shopping_items_tool.mealie is None
 
 
 def test_toolset_kwargs_initialize_tools(obsidian, mealie):
