@@ -38,7 +38,7 @@ class Toolset:
         self._all_tools: ToolList = TOOLS.copy()
         self._kwargs = kwargs
         self.mode = mode  # Sets _available/_selected_tools and _system_prompt
-        self._system_prompt: str | None = None
+        self._system_prompt: str = ""
 
     @classmethod
     def from_environ(cls, mode: str = "general", **kwargs) -> "Toolset":
@@ -50,7 +50,7 @@ class Toolset:
         return cls(mode=mode, **kwargs)
 
     @property
-    def system_prompt(self):
+    def system_prompt(self) -> str:
         """Get the prompt for the toolset based on the mode."""
         return self._system_prompt or self._get_system_prompt()
 
@@ -62,7 +62,7 @@ class Toolset:
         the prompt file for the current mode from the Obsidian vault. Falls
         back to the default system prompt if any step fails.
         """
-        prompt = None
+        prompt = ""
 
         obsidian = self.kwargs.get("obsidian", None)
         if isinstance(obsidian, Obsidian):
@@ -70,10 +70,11 @@ class Toolset:
 
             if prompts_path:
                 prompt_path = os.path.join(prompts_path, f"{self.mode}.md")
-                prompt = obsidian.read_file(prompt_path).get("content", None)
+                file = obsidian.read_file(prompt_path, none_if_404=True) or {}
+                prompt = file.get("content", "")
 
         self._system_prompt = prompt or _get_default_system_prompt(self.mode)
-        return self._system_prompt
+        return self.system_prompt
 
     @property
     def kwargs(self):

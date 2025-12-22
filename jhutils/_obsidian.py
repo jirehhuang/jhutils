@@ -114,14 +114,25 @@ class Obsidian:
         self._files.update({path: response["content"]})
         return self._files[path]
 
-    def read_file(self, file_path: str) -> Dict[str, Any]:
+    def read_file(
+        self, file_path: str, none_if_404: bool = False
+    ) -> Dict[str, Any] | None:
         """Read a file from the repository."""
-        response = self._request("GET", f"{file_path}?ref={self._branch}")
-        response.update(
-            {"content": base64.b64decode(response["content"]).decode("utf-8")}
-        )
-        self._files.update({file_path: response})
-        return self._files[file_path]
+        try:
+            response = self._request("GET", f"{file_path}?ref={self._branch}")
+            response.update(
+                {
+                    "content": base64.b64decode(response["content"]).decode(
+                        "utf-8"
+                    )
+                }
+            )
+            self._files.update({file_path: response})
+            return self._files[file_path]
+        except requests.exceptions.HTTPError as e:
+            if none_if_404:
+                return None
+            raise e
 
     def add_file(
         self, file_path: str, content: str, message: str | None = None
@@ -142,8 +153,10 @@ class Obsidian:
         """Delete a file from the repository."""
         if sha is None:
             sha = self._files.get(file_path, {}).get("sha")
+            # pragma: no cover
             if sha is None:
-                sha = self.read_file(file_path)["sha"]  # pragma: no cover
+                file = self.read_file(file_path) or {}
+                sha = file.get("sha")
         data = {
             "message": f"delete {file_path}",
             "sha": sha,
@@ -157,8 +170,10 @@ class Obsidian:
         """Update an existing file in the repository."""
         if sha is None:
             sha = self._files.get(file_path, {}).get("sha")
+            # pragma: no cover
             if sha is None:
-                sha = self.read_file(file_path)["sha"]  # pragma: no cover
+                file = self.read_file(file_path) or {}
+                sha = file.get("sha")
         data = {
             "message": f"update {file_path}",
             "content": base64.b64encode(content.encode("utf-8")).decode(
