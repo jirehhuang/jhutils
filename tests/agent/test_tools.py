@@ -34,7 +34,7 @@ def test_add_shopping_items_tool_parsed(mealie):
 
 def test_read_recipe_tool(mealie):
     """Test that running the ReadRecipe correctly retrieves recipe."""
-    expected_start = "# Al Pastor\n\nA guide to making classic tacos"
+    expected_start = "# Complex Recipe\n\nA guide to making classic tacos"
     tool = ReadRecipeTool(mealie=mealie)
     input_data = tool.input_schema(recipe_name=TEST_RECIPE_NAME)
     result = tool.run(input_data)
