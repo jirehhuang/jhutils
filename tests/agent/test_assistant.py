@@ -118,7 +118,7 @@ def test_assistant_select_and_execute_read_recipe(assistant):
     """Test that the assistant can correctly select and execute the
     ReadRecipeTool."""
     query = "How do I make the complex recipe?"
-    expected_start = "Mealie instance not available to read recipe"
+    expected_start = "# Complex Recipe\n\nThis recipe has a description."
 
     assistant.toolset.match_mode("cooking")
     response = assistant.run(query)
@@ -138,9 +138,9 @@ def test_assistant_chain_read_recipe_and_add_shopping_item(assistant):
     assistant.toolset.match_mode("cooking")
     response = assistant.run(query)
 
-    assert "Mealie instance not available to read recipe" in response
-    assert "Complex Recipe" in response
-    assert "Added 1 item: shredded cheese" in response
+    assert "# Complex Recipe\n\nThis recipe has a description." in response
+    assert "Added 1 item:" in response
+    assert "cheese" in response
 
 
 @pytest.mark.flaky(reruns=1)

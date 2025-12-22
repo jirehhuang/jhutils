@@ -141,9 +141,7 @@ def test_add_delete_shopping_items(mealie):
         {
             "note": "example",
             "foodId": next(
-                food["id"]
-                for food in mealie.foods
-                if food["name"] == "test food"
+                food["id"] for food in mealie.foods if food["name"] == "cheese"
             ),
         },
     ]
@@ -155,14 +153,14 @@ def test_parse_and_add_items(mealie):
     strings into a list of dictionaries and can be added to the shopping
     list."""
     items = [
-        "4 tbsp kosher salt, from Walmart",
-        "little sheep spicy broth",
-        "test food (1kg)",
+        "4 tbsp coconut oil, from Costco",
+        "american cheese, for burgers",
+        "calamari steak (1kg)",
     ]
     parsed_items = mealie.parse_items(items, as_payload=True)
     assert [item["name"] for item in parsed_items] == [
-        "kosher salt",
-        "Little Sheep spicy broth",
-        "test food",
+        "coconut oil",
+        "american cheese",
+        "calamari steak",
     ]
     add_temporary_shopping_items(mealie, parsed_items)
