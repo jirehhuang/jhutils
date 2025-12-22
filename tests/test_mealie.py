@@ -7,7 +7,7 @@ from jhutils import Mealie
 from tests.conftest import TEST_RECIPE_NAME
 
 
-def _add_temporary_shopping_items(mealie, items):
+def add_temporary_shopping_items(mealie, items):
     """Temporarily add items to the shopping list.
 
     Helper function to add items to the shopping list temporarily and then
@@ -147,7 +147,7 @@ def test_add_delete_shopping_items(mealie):
             ),
         },
     ]
-    _add_temporary_shopping_items(mealie, items)
+    add_temporary_shopping_items(mealie, items)
 
 
 def test_parse_and_add_items(mealie):
@@ -165,4 +165,4 @@ def test_parse_and_add_items(mealie):
         "Little Sheep spicy broth",
         "test food",
     ]
-    _add_temporary_shopping_items(mealie, parsed_items)
+    add_temporary_shopping_items(mealie, parsed_items)
