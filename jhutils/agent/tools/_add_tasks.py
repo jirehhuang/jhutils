@@ -51,8 +51,8 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
 
     def __init__(
         self,
+        obsidian: Obsidian,
         config: AddTasksConfig | None = None,
-        obsidian: Obsidian | None = None,
     ):
         if config is None:
             config = AddTasksConfig()
@@ -60,7 +60,7 @@ class AddTasksTool(BaseTool[AddTasksInputSchema, AddTasksOutputSchema]):
         self._obsidian = obsidian
 
     @property
-    def obsidian(self) -> Obsidian | None:
+    def obsidian(self) -> Obsidian:
         """Get the Obsidian instance."""
         return self._obsidian
 

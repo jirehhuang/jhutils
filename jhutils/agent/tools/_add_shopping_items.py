@@ -57,8 +57,8 @@ class AddShoppingItemsTool(
 
     def __init__(
         self,
+        mealie: Mealie,
         config: AddShoppingItemsConfig | None = None,
-        mealie: Mealie | None = None,
     ):
         if config is None:
             config = AddShoppingItemsConfig()
@@ -66,7 +66,7 @@ class AddShoppingItemsTool(
         self._mealie = mealie
 
     @property
-    def mealie(self) -> Mealie | None:
+    def mealie(self) -> Mealie:
         """Get the Mealie instance."""
         return self._mealie
 
