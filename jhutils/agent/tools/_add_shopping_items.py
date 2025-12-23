@@ -24,7 +24,15 @@ class AddShoppingItemsInputSchema(BaseIOSchema):
     items: ItemsList = Field(  # type: ignore[valid-type]
         ...,
         description=(
-            "Individual shopping items to add. Do not capitalize items."
+            "Individual shopping items to add.\n"
+            "- Do NOT capitalize items.\n"
+            "- Do NOT attempt to infer quantity and unit. "
+            "If they are not EXPLICITLY provided by the user, ONLY specify "
+            "the name (and note, if applicable). "
+            "For example, 'milk, from Safeway', or 'toilet paper'."
+            "- Use format: '<quantity> <unit> <name>, <note>', as applicable. "
+            "For example, '10 lb russet potatoes, from Costco', "
+            "'2 yellow onions', or 'hydrogen peroxide, from Walmart'.\n"
         ),
     )
 
