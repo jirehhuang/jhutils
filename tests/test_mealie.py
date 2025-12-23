@@ -27,6 +27,25 @@ FOOD_ITEMS: list[tuple] = [
     ("calamari steak (1kg)", "calamari steak", 1, "kilogram", ""),
 ]
 
+NON_FOOD_ITEMS: list[tuple] = [
+    (
+        "2 tablespoons of toothpaste, Crest brand from Walmart or Target",
+        "toothpaste",
+        2,
+        "tablespoon",
+        "Crest brand from Walmart or Target",
+    ),
+    (
+        "hydrogen peroxide, from Costco",
+        "hydrogen peroxide",
+        0.0,
+        "",
+        "from Costco",
+    ),
+    ("2 kg green bell peppers", "green bell peppers", 2, "kilogram", ""),
+    ("large black trash bags", "black trash bags", 0.0, "", "large"),
+]
+
 
 def add_temporary_shopping_items(mealie, items):
     """Temporarily add items to the shopping list.
@@ -222,26 +241,6 @@ def test_fail_to_parse_note_with_for(mealie, item_text, note):
     with notes containing the word 'for'."""
     parsed = mealie.parse_items([item_text], as_payload=False)[0]
     assert parsed["note"] == note
-
-
-NON_FOOD_ITEMS: list[tuple] = [
-    (
-        "2 tablespoons of toothpaste, Crest brand from Walmart or Target",
-        "toothpaste",
-        2,
-        "tablespoon",
-        "Crest brand from Walmart or Target",
-    ),
-    (
-        "hydrogen peroxide, from Costco",
-        "hydrogen peroxide",
-        0.0,
-        "",
-        "from Costco",
-    ),
-    ("2 kg green bell peppers", "green bell peppers", 2, "kilogram", ""),
-    ("large black trash bags", "black trash bags", 0.0, "", "large"),
-]
 
 
 @pytest.mark.clear_shopping_list
