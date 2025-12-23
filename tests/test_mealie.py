@@ -1,10 +1,50 @@
 """Test Mealie module."""
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
+# ruff: noqa: PLR0913
+
 import numpy as np
 import pytest
 
 from jhutils import Mealie
 from tests.conftest import TEST_RECIPE_NAME
+
+FOOD_ITEMS: list[tuple] = [
+    (
+        "4 tbsp coconut oil, from Costco",
+        "coconut oil",
+        4,
+        "tablespoon",
+        "from Costco",
+    ),
+    (
+        "american cheese, from Safeway",
+        "american cheese",
+        0.0,
+        "",
+        "from Safeway",
+    ),
+    ("calamari steak (1kg)", "calamari steak", 1, "kilogram", ""),
+]
+
+NON_FOOD_ITEMS: list[tuple] = [
+    (
+        "2 tablespoons of toothpaste, Crest brand from Walmart or Target",
+        "toothpaste",
+        2,
+        "tablespoon",
+        "Crest brand from Walmart or Target",
+    ),
+    (
+        "hydrogen peroxide, from Costco",
+        "hydrogen peroxide",
+        0.0,
+        "",
+        "from Costco",
+    ),
+    ("2 kg green bell peppers", "green bell peppers", 2, "kilogram", ""),
+    ("large black trash bags", "black trash bags", 0.0, "", "large"),
+]
 
 
 def add_temporary_shopping_items(mealie, items):
@@ -154,7 +194,7 @@ def test_parse_and_add_items(mealie):
     list."""
     items = [
         "4 tbsp coconut oil, from Costco",
-        "american cheese, for burgers",
+        "american cheese, from Safeway",
         "calamari steak (1kg)",
     ]
     parsed_items = mealie.parse_items(items, as_payload=True)
@@ -164,3 +204,67 @@ def test_parse_and_add_items(mealie):
         "calamari steak",
     ]
     add_temporary_shopping_items(mealie, parsed_items)
+
+
+@pytest.mark.clear_shopping_list
+@pytest.mark.parametrize("text, name, quantity, unit_name, note", FOOD_ITEMS)
+def test_parse_and_add_food_item(
+    mealie, text, name, quantity, unit_name, note
+):
+    """Test that method .parse_items() correctly parses individual items."""
+    parsed = mealie.parse_items([text], as_payload=False)[0]
+    # pylint: disable=protected-access
+    payload = mealie._parsed2payload(parsed)
+    mealie.add_shopping_items([payload])
+    added = mealie.load_shopping_items(force=True)[0]
+    for item in [parsed, payload, added]:
+        assert item["food"]["name"] == name
+        assert item["quantity"] == quantity
+        assert (item.get("unit", {}) or {}).get("name", "") == unit_name
+        assert item["note"] == note
+
+
+@pytest.mark.xfail(
+    reason=(
+        "Currently, notes containing the word 'for' often fail to be parsed "
+        "correctly."
+    ),
+    strict=True,
+)
+@pytest.mark.parametrize(
+    "item_text, note",
+    [
+        ("coconut oil, for health", "for health"),
+        ("american cheese, for burgers", "for burgers"),
+    ],
+)
+def test_fail_to_parse_note_with_for(mealie, item_text, note):
+    """Test that demonstrates that method .parse_items() fails to parse items
+    with notes containing the word 'for'."""
+    parsed = mealie.parse_items([item_text], as_payload=False)[0]
+    assert parsed["note"] == note
+
+
+@pytest.mark.clear_shopping_list
+@pytest.mark.parametrize(
+    "item_text, name, quantity, unit_name, note", NON_FOOD_ITEMS
+)
+def test_parse_and_add_non_food_item(
+    mealie, item_text, name, quantity, unit_name, note
+):
+    """Test that method .parse_items() correctly parses individual items."""
+    parsed = mealie.parse_items([item_text], as_payload=False)[0]
+    assert parsed["food"]["name"] == name
+    assert parsed["quantity"] == quantity
+    assert (parsed.get("unit", {}) or {}).get("name", "") == unit_name
+    assert parsed["note"] == note
+
+    # pylint: disable=protected-access
+    payload = mealie._parsed2payload(parsed)
+    mealie.add_shopping_items([payload])
+    added = mealie.load_shopping_items(force=True)[0]
+    for item in [payload, added]:
+        assert item["food"] is None
+        assert item["quantity"] == quantity
+        assert (item.get("unit", {}) or {}).get("name", "") == unit_name
+        assert item["note"] == f"{name}, {note}" if note else name

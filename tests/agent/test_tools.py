@@ -4,9 +4,9 @@ import pytest
 
 from jhutils.agent.tools import (
     AddShoppingItemsTool,
+    ReadRecipeTool,
     RespondTool,
 )
-from jhutils.agent.tools._read_recipe import ReadRecipeTool
 from tests.conftest import TEST_RECIPE_NAME
 
 
@@ -30,8 +30,8 @@ def test_add_shopping_items_tool(add_shopping_items_tool):
 
 def test_add_shopping_items_tool_parsed(add_shopping_items_tool):
     """Test that running the AddShoppingItemsTool correctly parses a food."""
-    items = ["3 lb test food, from Costco"]
-    expected_result = {"result": "Added 1 item: test food"}
+    items = ["3 lb butternut squash, from Costco"]
+    expected_result = {"result": "Added 1 item: butternut squash"}
     input_data = add_shopping_items_tool.input_schema(items=items)
     result = add_shopping_items_tool.run(input_data)
     assert result.model_dump() == expected_result

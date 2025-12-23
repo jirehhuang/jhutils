@@ -45,7 +45,7 @@ def test_error_if_max_chain_exceeded(assistant):
     """Test that AssistantAgent.run raises RuntimeError if maximum chain
     length is exceeded."""
     query = (
-        "Add test food to my shopping list. "
+        "Add zucchini to my shopping list. "
         "Then, add task to go to the grocery store."
     )
     msg = (
@@ -91,9 +91,10 @@ def test_assistant_select_and_execute_add_shopping_items(assistant):
     """Test that the assistant can correctly select and execute the
     AddShoppingItemsTool."""
     query = (
-        "I need cheese, bread, paper towels, and potatoes. "
-        "I'm also running low on tapioca starch. "
-        "I should pick up green onions for garnish."
+        "I need cheese, bread, paper towels, and potatoes from Costco. "
+        "I'm also running low on tapioca starch. I should get that from "
+        "Hankook Market or 99 Ranch. "
+        "I should pick up green onions for garnish from Indian Mega Mart."
     )
     response = assistant.run(query)
     assert response.startswith("Added 6 items:")
@@ -101,12 +102,12 @@ def test_assistant_select_and_execute_add_shopping_items(assistant):
     assert json.loads(history[1]["content"]) == {
         "called_tool_input": {
             "items": [
-                "cheese",
-                "bread",
-                "paper towels",
-                "potatoes",
-                "tapioca starch",
-                "green onions",
+                "cheese, from Costco",
+                "bread, from Costco",
+                "paper towels, from Costco",
+                "potatoes, from Costco",
+                "tapioca starch, from Hankook Market or 99 Ranch",
+                "green onions, from Indian Mega Mart",
             ]
         },
         "remainder": "",

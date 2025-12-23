@@ -406,11 +406,18 @@ class Mealie:
     @staticmethod
     def _parsed2payload(ingredient: dict[str, Any]) -> dict[str, Any]:
         """Convert parsed ingredient data into a payload dictionary."""
-        food = ingredient.get("food", {})
         unit = ingredient.get("unit", {}) or {}
 
+        # Non-food items must be entered as a note
+        food = ingredient.get("food", {})
+        name = food.get("name", "")
+        note = ingredient.get("note", "")
+        if food.get("id") is None:
+            food = None
+            note = f"{name}, {note}" if note else name
+
         return {
-            "name": food.get("name", ""),
+            "name": name,
             "quantity": ingredient.get("quantity", 1),
             "unit": {
                 "id": unit.get("id", ""),
@@ -426,24 +433,10 @@ class Mealie:
                 "createdAt": unit.get("createdAt", ""),
                 "updatedAt": unit.get("updatedAt", ""),
             },
-            "food": {
-                "id": food.get("id", ""),
-                "name": food.get("name", ""),
-                "pluralName": food.get("pluralName", ""),
-                "description": food.get("description", ""),
-                "extras": food.get("extras", {}),
-                "labelId": food.get("labelId", ""),
-                "aliases": food.get("aliases", []),
-                "householdsWithIngredientFood": food.get(
-                    "householdsWithIngredientFood", []
-                ),
-                "label": food.get("label", {}),
-                "createdAt": food.get("createdAt", ""),
-                "updatedAt": food.get("updatedAt", ""),
-            },
-            "note": ingredient.get("note", ""),
+            "food": food,
+            "note": note,
             "shoppingListId": ingredient.get("shoppingListId", None),
-            "foodId": food.get("id", None),
+            "foodId": (food or {}).get("id", None),
             "unitId": unit.get("id", None),
             "checked": False,
             "position": 0,
