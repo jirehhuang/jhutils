@@ -1,14 +1,17 @@
 """Test the agents module."""
 
 import json
+import os
 
 import instructor
 import numpy as np
 import pytest
+from dotenv import load_dotenv
 
 from jhutils import Mealie, Obsidian
 from jhutils.agent import AssistantAgent, AssistantFactory
 from jhutils.agent.tools import Toolset
+from tests.conftest import dotenv_file
 
 
 @pytest.fixture(name="assistant", scope="function")
@@ -26,6 +29,22 @@ def test_assistant_from_environ():
     assert isinstance(assistant, AssistantAgent)
     assert isinstance(assistant.toolset.kwargs.get("mealie"), Mealie)
     assert isinstance(assistant.toolset.kwargs.get("obsidian"), Obsidian)
+
+
+def test_assistant_from_environ_with_custom_model():
+    """Test that AssistantAgent.from_environ constructs an AssistantAgent
+    instance correctly from environment variables without optional
+    arguments."""
+    os.environ["ASSISTANT_MODEL"] = "gpt-4.1"
+    os.environ["ASSISTANT_TEMPERATURE"] = "0.7"
+    assistant = AssistantAgent.from_environ()
+
+    # pylint: disable=protected-access
+    assert assistant._config.model == "gpt-4.1"
+    assert assistant._config.model_api_parameters == {"temperature": 0.7}
+
+    # Reset environment variables
+    load_dotenv(dotenv_file, override=True)
 
 
 # pylint: disable=protected-access
