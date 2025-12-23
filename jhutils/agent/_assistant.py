@@ -23,7 +23,8 @@ OutputSchema = TypeVar("OutputSchema", bound=BaseIOSchema)
 
 
 DEFAULT_MODEL = "gpt-4o-mini"
-MODEL_API_PARAMETERS = {"temperature": 0.0}
+DEFAULT_TEMPERATURE = 0.0
+MODEL_API_PARAMETERS = {"temperature": DEFAULT_TEMPERATURE}
 
 ASSISTANT_BACKGROUND = [
     (
@@ -68,11 +69,19 @@ class AssistantAgent:
 
     _input_schema = QueryInputSchema
 
-    def __init__(self, client: instructor.Instructor, toolset: Toolset):
+    def __init__(
+        self,
+        client: instructor.Instructor,
+        toolset: Toolset,
+        model: str = DEFAULT_MODEL,
+        model_api_parameters: dict | None = None,
+    ):
+        if model_api_parameters is None:
+            model_api_parameters = MODEL_API_PARAMETERS
         self._config = AgentConfig(
             client=client,
-            model=DEFAULT_MODEL,
-            model_api_parameters=MODEL_API_PARAMETERS,
+            model=model,
+            model_api_parameters=model_api_parameters,
             system_prompt_generator=SystemPromptGenerator(
                 background=ASSISTANT_BACKGROUND,
                 output_instructions=OUTPUT_INSTRUCTIONS,
@@ -93,7 +102,18 @@ class AssistantAgent:
             client = make_openai_client_from_environ()
         if toolset is None:
             toolset = Toolset.from_environ()
-        return cls(client=client, toolset=toolset)
+        return cls(
+            client=client,
+            toolset=toolset,
+            model=os.getenv("ASSISTANT_MODEL", DEFAULT_MODEL),
+            model_api_parameters={
+                "temperature": float(
+                    os.getenv(
+                        "ASSISTANT_TEMPERATURE", str(DEFAULT_TEMPERATURE)
+                    )
+                )
+            },
+        )
 
     @property
     def toolset(self) -> Toolset:
