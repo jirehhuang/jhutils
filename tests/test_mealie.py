@@ -225,7 +225,10 @@ def test_parse_and_add_food_item(
 
 
 @pytest.mark.xfail(
-    reason="Currently, notes with food items are not parsed correctly.",
+    reason=(
+        "Currently, notes containing the word 'for' often fail to be parsed "
+        "correctly."
+    ),
     strict=True,
 )
 @pytest.mark.parametrize(
@@ -233,7 +236,6 @@ def test_parse_and_add_food_item(
     [
         ("coconut oil, for health", "for health"),
         ("american cheese, for burgers", "for burgers"),
-        ("calamari steak, for variety", "for variety"),
     ],
 )
 def test_fail_to_parse_note_with_for(mealie, item_text, note):
