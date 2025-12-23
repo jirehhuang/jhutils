@@ -232,6 +232,15 @@ NON_FOOD_ITEMS: list[tuple] = [
         "tablespoon",
         "Crest brand from Walmart or Target",
     ),
+    (
+        "hydrogen peroxide, from Costco",
+        "hydrogen peroxide",
+        0.0,
+        "",
+        "from Costco",
+    ),
+    ("2 kg green bell peppers", "green bell peppers", 2, "kilogram", ""),
+    ("large black trash bags", "black trash bags", 0.0, "", "large"),
 ]
 
 
@@ -257,4 +266,4 @@ def test_parse_and_add_non_food_item(
         assert item["food"] is None
         assert item["quantity"] == quantity
         assert (item.get("unit", {}) or {}).get("name", "") == unit_name
-        assert item["note"] == f"{name}, {note}"
+        assert item["note"] == f"{name}, {note}" if note else name
