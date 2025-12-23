@@ -108,7 +108,9 @@ class AssistantAgent:
             model=os.getenv("ASSISTANT_MODEL", DEFAULT_MODEL),
             model_api_parameters={
                 "temperature": float(
-                    os.getenv("MODEL_TEMPERATURE", str(DEFAULT_TEMPERATURE))
+                    os.getenv(
+                        "ASSISTANT_TEMPERATURE", str(DEFAULT_TEMPERATURE)
+                    )
                 )
             },
         )
