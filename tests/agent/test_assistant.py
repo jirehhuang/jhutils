@@ -45,7 +45,7 @@ def test_error_if_max_chain_exceeded(assistant):
     """Test that AssistantAgent.run raises RuntimeError if maximum chain
     length is exceeded."""
     query = (
-        "Add test food to my shopping list. "
+        "Add zucchini to my shopping list. "
         "Then, add task to go to the grocery store."
     )
     msg = (
