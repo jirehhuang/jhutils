@@ -90,7 +90,7 @@ update_changelog_on_bump = true
 addopts = "-v --cov=jhutils --cov-report=term-missing --cov-report=xml:coverage.xml"
 testpaths = ["tests"]
 markers = [
-    "e2e: mark a test as end-to-end (skipped unless --url is provided)"
+    "clear_shopping_list: clear the shopping list before this test"
 ]
 
 [tool.coverage.run]
